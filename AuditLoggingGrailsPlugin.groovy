@@ -53,7 +53,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
  * or inserted will be recorded as a single event.
  */
 class AuditLoggingGrailsPlugin {
-    def version = 0.3
+    def version = 0.4
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
     def title = "adds hibernate audit logging and onChange event handlers to GORM domain classes"
