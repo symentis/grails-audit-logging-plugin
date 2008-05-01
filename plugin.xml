@@ -1,0 +1,19 @@
+<plugin name='audit-logging' version='0.3'>
+  <author>Shawn Hartsock</author>
+  <authorEmail>hartsock@acm.org</authorEmail>
+  <title>adds hibernate audit logging and onChange event handlers to GORM domain classes</title>
+  <description>
+The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
+Audit events off of them. The events include onSave, onUpdate, onChange, onDelete and
+when called the event handlers have access to oldObj and newObj definitions that
+will allow you to take action on what has changed.
+    </description>
+  <resources>
+    <resource>AuditLogEvent</resource>
+    <resource>AuditLogEventController</resource>
+    <resource>UrlMappings</resource>
+    <resource>DataSource</resource>
+    <resource>AuditLogEvent</resource>
+    <resource>AuditLogEventController</resource>
+  </resources>
+</plugin>
