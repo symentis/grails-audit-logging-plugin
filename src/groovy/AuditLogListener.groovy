@@ -227,10 +227,13 @@ public class AuditLogListener implements PreDeleteEventListener,
 		def nameMap = event.getPersister().getPropertyNames()
 		def oldMap = [:]
 		def newMap = [:]
-		for(int ii=0; ii<newState.length; ii++) {
-			if(nameMap[ii]) {
-				oldMap[nameMap[ii]] = oldState[ii]
-				newMap[nameMap[ii]] = newState[ii]
+		
+		if(nameMap) {
+			for(int ii=0; ii<newState.length; ii++) {
+				if(nameMap[ii]) {
+					if(oldState) oldMap[nameMap[ii]] = oldState[ii]
+					if(newState) newMap[nameMap[ii]] = newState[ii]
+				}
 			}
 		}
 		
