@@ -22,6 +22,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
  *        inside a webflow context.
  *      * tweak application.properties for loading in other grails versions
  *      * update to views to show URI in an event
+ *      * fix missing oldState bug in change event
  */
 class AuditLoggingGrailsPlugin {
     def version = "0.4-SNAPSHOT"
