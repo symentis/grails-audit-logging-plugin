@@ -9,48 +9,18 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
  * Audit Logging plugin that will track individual
  * changes to columns.
  * 
- * Frankly, I'm not smart enough to come up with 
- * all of this stuff on my own. Fortunately, I have
- * great minds from which to copy.
+ * See:
+ * http://grails.codehaus.org/Grails+Audit+Logging+Plugin
  * 
- * Conventions:
- *  A domain class may now declare itself 'auditable' by using the
- *  
- *    static auditable = true 
- *  
- *  convention. If you don't want full auditing and only want to call
- *  the associated auditHandlers then you specify:
- *    
- *    static auditable = [handlersOnly:true]
- *    
- * Recognized Handlers are:
+ * Changes:
+ * Release 0.3
+ *      * actorKey and username features allow for the logging of
+ *        user or userPrincipal for most security systems.
  * 
- * onSave, onDelete, and onChange
- * 
- * onSave can have 0 or 1 parameter, the parameter is the new values map
- * onDelete can have 0 or 1 parameters value is old map
- * onChange can have 2 or 0 parameters values are old and new maps
- * 
- * The onSave handler is only called on first save of a new object
- * The onDelete handler is called just before delete 
- * The onChange event handler is only called when a value changes.
- * 
- * Audit log configuration can be added to Config.groovy by adding
- * 
- * auditLog {
- *   verbose = false 
- *   actor = "session.user.name" // optional
- *   // or
- *   // actor = "session.${}"
- * }
- * 
- * ... setting verbose to true means that all values will be recorded
- * to the audit log during the onSave and onDelete events so those two
- * events will log all the column values before they are destroyed turning
- * a single event into as many as the number of fields that an object has.
- * 
- * verbose = false means that only the fact that the object was deleted
- * or inserted will be recorded as a single event.
+ * Release 0.4
+ * 		* custom serializable implementation for AuditLogEvent so events can happen
+ *        inside a webflow context.
+ *
  */
 class AuditLoggingGrailsPlugin {
     def version = 0.4
