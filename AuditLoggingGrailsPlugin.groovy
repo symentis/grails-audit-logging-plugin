@@ -9,7 +9,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
  * Audit Logging plugin that will track individual
  * changes to columns.
  * 
- * See:
+ * See Documentation:
  * http://grails.codehaus.org/Grails+Audit+Logging+Plugin
  * 
  * Changes:
@@ -20,10 +20,11 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
  * Release 0.4
  * 		* custom serializable implementation for AuditLogEvent so events can happen
  *        inside a webflow context.
- *
+ *      * tweak application.properties for loading in other grails versions
+ *      * update to views to show URI in an event
  */
 class AuditLoggingGrailsPlugin {
-    def version = 0.4
+    def version = "0.4-SNAPSHOT"
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
     def title = "adds hibernate audit logging and onChange event handlers to GORM domain classes"
