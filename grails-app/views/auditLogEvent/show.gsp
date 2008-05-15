@@ -37,6 +37,13 @@
                         </tr>
                     
                         <tr class="prop">
+                            <td valign="top" class="name">Uri:</td>
+                            
+                            <td valign="top" class="value">${auditLogEvent.uri}</td>
+                            
+                        </tr>
+                    
+                        <tr class="prop">
                             <td valign="top" class="name">Class Name:</td>
                             
                             <td valign="top" class="value">${auditLogEvent.className}</td>

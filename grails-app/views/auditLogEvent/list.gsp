@@ -25,13 +25,13 @@
                         
                    	        <g:sortableColumn property="actor" title="Actor" />
                         
+                   	        <g:sortableColumn property="uri" title="Uri" />
+                        
                    	        <g:sortableColumn property="className" title="Class Name" />
                         
                    	        <g:sortableColumn property="persistedObjectId" title="Persisted Object Id" />
                         
                    	        <g:sortableColumn property="persistedObjectVersion" title="Persisted Object Version" />
-                        
-                   	        <g:sortableColumn property="eventName" title="Event Name" />
                         
                         </tr>
                     </thead>
@@ -43,13 +43,13 @@
                         
                             <td>${auditLogEvent.actor?.encodeAsHTML()}</td>
                         
+                            <td>${auditLogEvent.uri?.encodeAsHTML()}</td>
+                        
                             <td>${auditLogEvent.className?.encodeAsHTML()}</td>
                         
                             <td>${auditLogEvent.persistedObjectId?.encodeAsHTML()}</td>
                         
                             <td>${auditLogEvent.persistedObjectVersion?.encodeAsHTML()}</td>
-                        
-                            <td>${auditLogEvent.eventName?.encodeAsHTML()}</td>
                         
                         </tr>
                     </g:each>
