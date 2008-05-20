@@ -347,7 +347,6 @@ public class AuditLogListener implements PreDeleteEventListener,
 	def executeHandler(event,handler,oldState,newState) {
 		def entity = event.getEntity()
         if(isAuditableEntity(event) && entity.metaClass.hasProperty(entity,handler)) {
-        	try {
         		if(oldState && newState) {
             		if(entity."${handler}".maximumNumberOfParameters == 2) {
             			entity."${handler}"(oldState,newState)
@@ -362,9 +361,6 @@ public class AuditLogListener implements PreDeleteEventListener,
         		else if(newState) {        			
         			entity."${handler}"(newState)        			
         		}
-        	} catch (groovy.lang.MissingMethodException mme) {
-       			println "${handler} has to take a parameter!"
-        	}
         }			
 	}
 }
