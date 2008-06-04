@@ -12,6 +12,7 @@
  * 2008-04-17 created initial version 0.1
  * 2008-04-21 changes for version 0.2 include simpler events
  *  ... config file ... removed 'onUpdate' event.
+ * 2008-06-04 added ignore fields feature
  */
 
 import org.hibernate.EntityMode;
@@ -110,6 +111,17 @@ public class AuditLogListener implements PreDeleteEventListener,
 			return false
 		}
 		return false
+	}
+	
+	boolean ignoreList(entity) {
+		if(entity && entity.metaClass.hasProperty(entity,'auditable') && entity.'auditable') {
+			if(entity.auditable.getClass() == java.util.LinkedHashMap.class && 
+					entity.auditable.containsKey('ignore')) {
+				return entity.auditable[ignore]
+			}
+			return ['version']
+		}
+		return []
 	}
 	
 	def getEntityId(event) {
@@ -213,6 +225,31 @@ public class AuditLogListener implements PreDeleteEventListener,
 	}
 
 	/**
+	 * Prevent infinate loops of change logging by trapping
+	 * non-significant changes. Occasionally you can set up
+	 * a change handler that will create a "trivial" object
+	 * change that you don't want to trigger another change
+	 * event. So this feature uses the ignore parameter
+	 * to provide a list of fields for onChange to ignore.
+	 */
+	private boolean significantChange(entity,oldMap,newMap) {
+		def ignore = ignoreList(entity)
+		if(ignore?.size()) {
+			ignore.each({ key ->
+				oldMap.remove(key)
+				newMap.remove(key)
+			})
+		}
+		boolean changed = false
+		oldMap.each({ k,v ->
+			if(v != newMap[k]) {
+				changed = true
+			}
+		})
+		return changed
+	}
+	
+	/**
 	 * only if this is an auditable entity
 	 */
 	private void onChange(final PostUpdateEvent event) {
@@ -235,6 +272,10 @@ public class AuditLogListener implements PreDeleteEventListener,
 					if(newState) newMap[nameMap[ii]] = newState[ii]
 				}
 			}
+		}
+		
+		if(!significantChange(entity,oldMap,NewMap)) {
+			return
 		}
 		
 		// allow user's to over-ride whether you do auditing for them.
