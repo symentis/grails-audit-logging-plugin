@@ -113,15 +113,26 @@ public class AuditLogListener implements PreDeleteEventListener,
 		return false
 	}
 	
+	/**
+	 * The default ignore field list is:  ['version','lastUpdated'] if you want
+	 * to provide your own ignore list do so by specifying the ignore list like so:
+	 * 
+	 *   static auditable = [ignore:['version','lastUpdated','myField']]
+	 *   
+	 * ... if instead you really want to trigger on version and lastUpdated changes you
+	 * may specify an empty ignore list ... like so ...
+	 * 
+	 *   static auditable = [ignore:[]]
+	 * 
+	 */
 	boolean ignoreList(entity) {
 		if(entity && entity.metaClass.hasProperty(entity,'auditable') && entity.'auditable') {
 			if(entity.auditable.getClass() == java.util.LinkedHashMap.class && 
 					entity.auditable.containsKey('ignore')) {
-				return entity.auditable[ignore]
+				return entity.auditable['ignore']
 			}
-			return ['version']
 		}
-		return []
+		return ['version','lastUpdated']
 	}
 	
 	def getEntityId(event) {
