@@ -274,7 +274,7 @@ public class AuditLogListener implements PreDeleteEventListener,
 			}
 		}
 		
-		if(!significantChange(entity,oldMap,NewMap)) {
+		if(!significantChange(entity,oldMap,newMap)) {
 			return
 		}
 		
