@@ -103,8 +103,8 @@ public class AuditLogListener implements PreDeleteEventListener,
 	 *  if they don't want us to log events for them and instead have their own plan.
 	 */
 	boolean callHandlersOnly(entity) {
-		if(entity && entity.metaClass.hasProperty(entity,'auditable') && entity.'auditable') {
-			if(entity.auditable.getClass() == java.util.LinkedHashMap.class && 
+		if(entity?.metaClass?.hasProperty(entity,'auditable') && entity?.'auditable') {
+			if(entity.auditable instanceof java.util.Map && 
 					entity.auditable.containsKey('handlersOnly')) {
 				return (entity.auditable['handlersOnly'])?true:false
 			}
@@ -125,14 +125,17 @@ public class AuditLogListener implements PreDeleteEventListener,
 	 *   static auditable = [ignore:[]]
 	 * 
 	 */
-	boolean ignoreList(entity) {
-		if(entity && entity.metaClass.hasProperty(entity,'auditable') && entity.'auditable') {
-			if(entity.auditable.getClass() == java.util.LinkedHashMap.class && 
-					entity.auditable.containsKey('ignore')) {
-				return entity.auditable['ignore']
+	List ignoreList(entity) {
+		def ignore = ['version','lastUpdated']
+		if(entity?.metaClass?.hasProperty(entity,'auditable')) {
+			if(entity.auditable instanceof java.util.Map && entity.auditable.containsKey('ignore')) {
+				def list = entity.auditable['ignore']
+				if(list instanceof java.util.List) {
+					ignore = list
+				}
 			}
 		}
-		return ['version','lastUpdated']
+		return ignore
 	}
 	
 	def getEntityId(event) {
@@ -245,12 +248,10 @@ public class AuditLogListener implements PreDeleteEventListener,
 	 */
 	private boolean significantChange(entity,oldMap,newMap) {
 		def ignore = ignoreList(entity)
-		if(ignore?.size()) {
-			ignore.each({ key ->
+		ignore?.each({ key ->
 				oldMap.remove(key)
 				newMap.remove(key)
-			})
-		}
+		})
 		boolean changed = false
 		oldMap.each({ k,v ->
 			if(v != newMap[k]) {
