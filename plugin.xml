@@ -1,4 +1,4 @@
-<plugin name='audit-logging' version='0.4-SNAPSHOT'>
+<plugin name='audit-logging' version='0.4'>
   <author>Shawn Hartsock</author>
   <authorEmail>hartsock@acm.org</authorEmail>
   <title>adds hibernate audit logging and onChange event handlers to GORM domain classes</title>
