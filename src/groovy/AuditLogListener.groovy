@@ -330,7 +330,7 @@ public class AuditLogListener implements PreDeleteEventListener,
 							oldValue:truncate(oldMap[key]),
 							newValue:truncate(newMap[key]),
 						)
-						if(!audit.save()) {
+						if(!audit.save(flush:true)) {
 							println audit.errors
 						}
 					}
@@ -349,7 +349,7 @@ public class AuditLogListener implements PreDeleteEventListener,
 							oldValue:null,
 							newValue:truncate(val),
 						)
-					if(!audit.save()) {
+					if(!audit.save(flush:true)) {
 						println audit.errors
 					}
 			})
@@ -367,7 +367,7 @@ public class AuditLogListener implements PreDeleteEventListener,
 							oldValue:truncate(val),
 							newValue:null
 						)
-					if(!audit.save()) {
+					if(!audit.save(flush:true)) {
 						println audit.errors
 					}
 			})
@@ -381,7 +381,7 @@ public class AuditLogListener implements PreDeleteEventListener,
 					persistedObjectId:persistedObjectId.toString(),
 					persistedObjectVersion:persistedObjectVersion.toString()
 				)
-			if(!audit.save()) {
+			if(!audit.save(flush:true)) {
 				// TODO don't use println...
 				println audit.errors
 			}
