@@ -1,4 +1,4 @@
-<plugin name='audit-logging' version='0.4'>
+<plugin name='audit-logging' version='0.4.1' grailsVersion='1.1.1 &gt; *'>
   <author>Shawn Hartsock</author>
   <authorEmail>hartsock@acm.org</authorEmail>
   <title>adds hibernate audit logging and onChange event handlers to GORM domain classes</title>
@@ -9,7 +9,9 @@ when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
     </description>
   <resources>
-    <resource>AuditLogEvent</resource>
+    <resource>UrlMappings</resource>
     <resource>AuditLogEventController</resource>
+    <resource>AuditLogEvent</resource>
   </resources>
+  <dependencies />
 </plugin>

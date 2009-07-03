@@ -23,9 +23,11 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
  *      * tweak application.properties for loading in other grails versions
  *      * update to views to show URI in an event
  *      * fix missing oldState bug in change event
+ * Release 0.4.1
+ *      * repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181
  */
 class AuditLoggingGrailsPlugin {
-    def version = "0.4"
+    def version = "0.4.1"
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
     def title = "adds hibernate audit logging and onChange event handlers to GORM domain classes"
