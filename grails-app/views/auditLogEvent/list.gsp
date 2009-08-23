@@ -8,7 +8,7 @@
     </head>
     <body>
         <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLinkTo(dir:'')}">Home</a></span>
+            <span class="menuButton"><a class="home" href="${resource(dir:'')}">Home</a></span>
             <span class="menuButton"><g:link class="create" action="create">New AuditLogEvent</g:link></span>
         </div>
         <div class="body">
@@ -36,20 +36,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                    <g:each in="${auditLogEventList}" status="i" var="auditLogEvent">
+                    <g:each in="${auditLogEventInstanceList}" status="i" var="auditLogEventInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${auditLogEvent.id}">${auditLogEvent.id?.encodeAsHTML()}</g:link></td>
+                            <td><g:link action="show" id="${auditLogEventInstance.id}">${fieldValue(bean:auditLogEventInstance, field:'id')}</g:link></td>
                         
-                            <td>${auditLogEvent.actor?.encodeAsHTML()}</td>
+                            <td>${fieldValue(bean:auditLogEventInstance, field:'actor')}</td>
                         
-                            <td>${auditLogEvent.uri?.encodeAsHTML()}</td>
+                            <td>${fieldValue(bean:auditLogEventInstance, field:'uri')}</td>
                         
-                            <td>${auditLogEvent.className?.encodeAsHTML()}</td>
+                            <td>${fieldValue(bean:auditLogEventInstance, field:'className')}</td>
                         
-                            <td>${auditLogEvent.persistedObjectId?.encodeAsHTML()}</td>
+                            <td>${fieldValue(bean:auditLogEventInstance, field:'persistedObjectId')}</td>
                         
-                            <td>${auditLogEvent.persistedObjectVersion?.encodeAsHTML()}</td>
+                            <td>${fieldValue(bean:auditLogEventInstance, field:'persistedObjectVersion')}</td>
                         
                         </tr>
                     </g:each>
@@ -57,7 +57,7 @@
                 </table>
             </div>
             <div class="paginateButtons">
-                <g:paginate total="${AuditLogEvent.count()}" />
+                <g:paginate total="${auditLogEventInstanceTotal}" />
             </div>
         </div>
     </body>

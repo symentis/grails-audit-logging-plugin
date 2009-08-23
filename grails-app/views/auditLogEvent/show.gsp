@@ -8,7 +8,7 @@
     </head>
     <body>
         <div class="nav">
-            <span class="menuButton"><a class="home" href="${createLinkTo(dir:'')}">Home</a></span>
+            <span class="menuButton"><a class="home" href="${resource(dir:'')}">Home</a></span>
             <span class="menuButton"><g:link class="list" action="list">AuditLogEvent List</g:link></span>
             <span class="menuButton"><g:link class="create" action="create">New AuditLogEvent</g:link></span>
         </div>
@@ -25,84 +25,84 @@
                         <tr class="prop">
                             <td valign="top" class="name">Id:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.id}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'id')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Actor:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.actor}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'actor')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Uri:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.uri}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'uri')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Class Name:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.className}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'className')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Persisted Object Id:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.persistedObjectId}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'persistedObjectId')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Persisted Object Version:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.persistedObjectVersion}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'persistedObjectVersion')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Event Name:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.eventName}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'eventName')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Property Name:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.propertyName}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'propertyName')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Old Value:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.oldValue}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'oldValue')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">New Value:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.newValue}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'newValue')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Date Created:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.dateCreated}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'dateCreated')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Last Updated:</td>
                             
-                            <td valign="top" class="value">${auditLogEvent.lastUpdated}</td>
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'lastUpdated')}</td>
                             
                         </tr>
                     
@@ -111,7 +111,7 @@
             </div>
             <div class="buttons">
                 <g:form>
-                    <input type="hidden" name="id" value="${auditLogEvent?.id}" />
+                    <input type="hidden" name="id" value="${auditLogEventInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>
