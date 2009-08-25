@@ -1,6 +1,7 @@
-package grails.orm.auditable
+package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import grails.orm.auditable.AuditLogEvent
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 
 class AuditLogEventController {
 

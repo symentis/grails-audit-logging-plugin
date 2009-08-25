@@ -1,4 +1,4 @@
-package grails.orm.auditable
+package org.codehaus.groovy.grails.plugins.orm.auditable
 /**
  * @author shawn hartsock
  *
@@ -32,6 +32,7 @@ import org.hibernate.SessionFactory
 import org.hibernate.Session
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 
 public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
   private static final Log log = LogFactory.getLog(AuditLogListener.class);

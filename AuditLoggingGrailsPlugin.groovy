@@ -1,4 +1,6 @@
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
+
 /**
  * Most of this code is brazenly lifted from two sources
  * first is Kevin Burke's HibernateEventsGrailsPlugin
@@ -23,15 +25,22 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
  *      * tweak application.properties for loading in other grails versions
  *      * update to views to show URI in an event
  *      * fix missing oldState bug in change event
+ *
  * Release 0.4.1
  *      * repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181
+ *
+ * Release 0.5_BETA see GRAILSPLUGINS-391
+ *      * changes to AuditLogEvent domain object uses composite id to simplify logging
+ *      * changes to AuditLogListener uses new domain model with separate transaction
+ *        for logging action to avoid invalidating the main hibernate session.
+ * 
  */
 class AuditLoggingGrailsPlugin {
     def version = "0.4.1"
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
-    def title = "adds hibernate audit logging and onChange event handlers to GORM domain classes"
-    def description = """
+    def title = "adds auditable to GORM domain classes"
+    def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
 Audit events off of them. The events include onSave, onUpdate, onChange, onDelete and
 when called the event handlers have access to oldObj and newObj definitions that
@@ -57,8 +66,11 @@ will allow you to take action on what has changed.
     	if(config?.username) {
     		listener.sessionAttribute = (config?.username)?:null
     	}
-    	
-    	// use preDelete so we can see what is going to be destroyed
+
+        listener.applicationContext = applicationContext
+        listener.sessionFactory = applicationContext.sessionFactory
+
+        // use preDelete so we can see what is going to be destroyed
     	// hook to the postInsert to grab the ID of the object
     	// hook to postUpdate to use the old and new state hooks
     	['preDelete','postInsert', 'postUpdate',].each({

@@ -1,4 +1,4 @@
-package grails.orm.auditable
+package org.codehaus.groovy.grails.plugins.orm.auditable
 /**
  * AuditLogEvents are reported to the AuditLog table
  * this requires you to set up a table or allow
