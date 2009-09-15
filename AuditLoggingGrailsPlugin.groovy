@@ -45,6 +45,14 @@ The Audit Logging plugin adds an instance hook to domain objects that allows you
 Audit events off of them. The events include onSave, onUpdate, onChange, onDelete and
 when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
+
+Stable Releases:
+    0.4
+    0.4.1
+
+Testing Releases:
+    0.5_BETA
+
     """
     def dependsOn = [:]
 	

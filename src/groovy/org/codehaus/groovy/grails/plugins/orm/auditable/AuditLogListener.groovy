@@ -15,6 +15,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  *  ... config file ... removed 'onUpdate' event.
  * 2008-06-04 added ignore fields feature
  * 2009-07-04 fetches its own session from sessionFactory to avoid transaction munging
+ * 2009-09-05 getActor as a closure to allow developers to supply their own security plugins
  */
 
 import org.hibernate.HibernateException;
@@ -42,16 +43,6 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * each as an individual event.
    */
   static verbose = false // in Config.groovy auditLog.verbose = true
-  /**
-   * Override the actorKey by specifying in Config.groovy
-   *
-   * auditLog {*     actor = "userPrincipal.name"
-   *}*
-   * ... or try
-   *
-   * auditLog {*     actor = "user.id"
-   *}*
-   */
   static String actorKey = 'userPrincipal.name' // session.user.name
   static String sessionAttribute = null
   org.springframework.context.ApplicationContext applicationContext
@@ -62,46 +53,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     return (attr?.currentRequest?.uri?.toString()) ?: null
   }
 
-  def getActor() {
-    def attr = RequestContextHolder?.getRequestAttributes()
-    def actor = null
-    if (sessionAttribute) {
-      log.debug "configured with session attribute ${sessionAttribute} attempting to resolve"
-      log.trace "calling session.getAttribute('${sessionAttribute}')"
-      actor = attr?.session?.getAttribute(sessionAttribute)
-    }
-    else {
-      log.debug "configured with actorKey ${actorKey} resolve using request attributes "
-      actor = resolve(attr, actorKey)
-    }
-    return actor
-  }
-
-  def resolve(attr, str) {
-    def tokens = str?.split("\\.")
-    def res = attr
-    log.trace "resolving recursively ${str} from request attributes..."
-    tokens.each({
-      log.trace "\t\t ${it}"
-      try {
-        if (res) res = res."${it}"
-      } catch (groovy.lang.MissingPropertyException mpe) {
-        log.debug """
-AuditLogListener:
-
-You attempted to configure a request attribute named '${str}' and
-${AuditLogListener.class} attempted to dynamically resolve this from
-the servlet context session attributes but failed!
-
-Last attribute resolved class ${res?.getClass()} value ${res}
-        """
-        mpe.printStackTrace()
-        res = null
-      }
-
-    })
-    return (res) ? res.toString() : null
-  }
+  def getActor = AuditLogListenerUtil.getActorDefault
 
   // returns true for auditable entities.
   def isAuditableEntity(event) {
@@ -334,6 +286,8 @@ Last attribute resolved class ${res?.getClass()} value ${res}
    * ... this feels crufty... should be tighter...
    */
   def logChanges(newMap, oldMap, parentObject, persistedObjectId, eventName, className) {
+    def attr = RequestContextHolder?.getRequestAttributes()
+    def session = attr.session
     log.trace "logging changes... "
     AuditLogEvent audit = null
     def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
@@ -344,7 +298,7 @@ Last attribute resolved class ${res?.getClass()} value ${res}
       newMap.each({key, val ->
         if (val != oldMap[key]) {
           audit = new AuditLogEvent(
-                  actor: this.getActor(),
+                  actor: this.getActor(attr,session),
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
@@ -361,7 +315,7 @@ Last attribute resolved class ${res?.getClass()} value ${res}
       log.trace "there are new values and logging is verbose ... "
       newMap.each({key, val ->
         audit = new AuditLogEvent(
-                actor: this.getActor(),
+                actor: this.getActor(attr,session),
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,
@@ -377,7 +331,7 @@ Last attribute resolved class ${res?.getClass()} value ${res}
         log.trace "there is only an old map of values available and logging is set to verbose... "
         oldMap.each({key, val ->
           audit = new AuditLogEvent(
-                  actor: this.getActor(),
+                  actor: this.getActor(attr,session),
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
@@ -392,7 +346,7 @@ Last attribute resolved class ${res?.getClass()} value ${res}
       else {
         log.trace "creating a basic audit logging event object."
         audit = new AuditLogEvent(
-                actor: this.getActor(),
+                actor: this.getActor(attr,session),
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,

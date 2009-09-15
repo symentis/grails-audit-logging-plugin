@@ -12,6 +12,8 @@ import javax.servlet.http.HttpSession
  * can be used as either templates for your own extensions to
  * the plugin or as default utilities.
  *
+ * TODO: write a howto for the grails website on how to set up a closure
+ * for the AuditLogListener and feed it to the Listener's configurator...
  */
 public class AuditLogListenerUtil {
 

@@ -217,47 +217,6 @@
         <entry key="$PROJECT_DIR$">
           <value>
             <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="https://svn.codehaus.org/grails-plugins/grails-audit-logging/branches">
-                    <value>
-                      <list>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1228165384460" />
-                          <option name="revision" value="45554" />
-                          <option name="url" value="https://svn.codehaus.org/grails-plugins/grails-audit-logging/branches/audit-facade" />
-                        </SvnBranchItem>
-                      </list>
-                    </value>
-                  </entry>
-                  <entry key="https://svn.codehaus.org/grails-plugins/grails-audit-logging/tags">
-                    <value>
-                      <list>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1212979948663" />
-                          <option name="revision" value="41649" />
-                          <option name="url" value="https://svn.codehaus.org/grails-plugins/grails-audit-logging/tags/LATEST_RELEASE" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1212979898496" />
-                          <option name="revision" value="41647" />
-                          <option name="url" value="https://svn.codehaus.org/grails-plugins/grails-audit-logging/tags/RELEASE_0_4" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1210889158102" />
-                          <option name="revision" value="41207" />
-                          <option name="url" value="https://svn.codehaus.org/grails-plugins/grails-audit-logging/tags/RELEASE_0_4-SNAPSHOT" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1209651060594" />
-                          <option name="revision" value="40962" />
-                          <option name="url" value="https://svn.codehaus.org/grails-plugins/grails-audit-logging/tags/RELEASE_0_3" />
-                        </SvnBranchItem>
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://svn.codehaus.org/grails-plugins/grails-audit-logging/branches" />
