@@ -29,14 +29,14 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
  * Release 0.4.1
  *      * repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181
  *
- * Release 0.5_BETA see GRAILSPLUGINS-391
+ * Release 0.5_ALPHA see GRAILSPLUGINS-391
  *      * changes to AuditLogEvent domain object uses composite id to simplify logging
  *      * changes to AuditLogListener uses new domain model with separate transaction
  *        for logging action to avoid invalidating the main hibernate session.
  * 
  */
 class AuditLoggingGrailsPlugin {
-    def version = "0.4.1"
+    def version = "0.5_ALPHA"
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
     def title = "adds auditable to GORM domain classes"
@@ -51,7 +51,7 @@ Stable Releases:
     0.4.1
 
 Testing Releases:
-    0.5_BETA
+    0.5_ALPHA
 
     """
     def dependsOn = [:]
