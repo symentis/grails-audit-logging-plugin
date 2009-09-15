@@ -363,8 +363,8 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 
   String truncate(final obj, max = 255) {
     log.trace "trimming object's string representation based on ${max} characters." 
-    def str = obj.toString().trim()
-    return (str.length() > max) ? str.substring(0, max) : str
+    def str = obj?.toString()?.trim()
+    return (str?.length() > max) ? str?.substring(0, max) : str
   }
 
   /**
