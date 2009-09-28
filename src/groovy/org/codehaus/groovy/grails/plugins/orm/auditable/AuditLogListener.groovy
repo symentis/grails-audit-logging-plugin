@@ -443,14 +443,36 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     log.trace "... execute handler is finished."
   }
 
-
-  void saveAuditLog(AuditLogEvent audit) {
+  /**
+   * Performs special logging and save actions for AuditLogEvent class. You cannot use
+   * the GORM save features to persist this class on transactional databases due to timing
+   * conflicts with the session. Due to problems in this routine on some databases
+   * this closure has comprehensive trace logging in it for your diagnostics.
+   *
+   * It has also been written as a closure for your sake so that you may over-ride the
+   * save closure with your own should your particular database not work with this closure
+   * you may over-ride the definition of this closure using ... TODO
+   *
+   * To debug in Config.groovy set: 
+   *    log4j.debug 'org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener'
+   * or
+   *    log4j.trace 'org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener'
+   *
+   * SEE: GRAILSPLUGINS-391
+   */
+  def saveAuditLog = { AuditLogEvent audit ->
     audit.with {
         dateCreated = new Date()
         lastUpdated = new Date()
     }
     log.info audit
     try {
+        // NOTE: you simply cannot use the session that GORM is using for some
+        // audit log events. That's because some audit events occur *after* a
+        // transaction has committed. Late session save actions can invalidate 
+        // sessions or you can essentially roll-back your audit log saves. This is
+        // why you have to open your own session and transaction on some
+        // transactional databases and not others.
         Session session = sessionFactory.openSession()
         log.trace "opened new session for audit log persistence"
         def trans = session.beginTransaction()
@@ -464,7 +486,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
         session.close()
         log.trace "session closed"
     } catch (org.hibernate.HibernateException ex) {
-      log.error "Audit Log save has failed!"
+      log.error "AuditLogEvent save has failed!"
       log.error ex
     }
     return
