@@ -23,10 +23,10 @@ class AuditLogEvent implements java.io.Serializable {
   static constraints = {
     actor(nullable:true)
     uri(nullable:true)
-    className(nullable:false)
+    className(nullable:true)
     persistedObjectId(nullable:true)
     persistedObjectVersion(nullable:true)
-    eventName(nullable:false)
+    eventName(nullable:true)
     propertyName(nullable:true)
     oldValue(nullable:true)
     newValue(nullable:true)
@@ -35,8 +35,10 @@ class AuditLogEvent implements java.io.Serializable {
   static mapping = {
     table 'audit_log'
     cache usage:'read-only', include:'non-lazy'
-    // id composite:['className','persistedObjectId','persistedObjectVersion', 'eventName','propertyName']
-    // version false
+    version false
+    columns {
+      id composite:['className','persistedObjectId','persistedObjectVersion']
+    }
   }
 
   /**
@@ -72,6 +74,10 @@ class AuditLogEvent implements java.io.Serializable {
             newValue:newValue,
     ]
     out.writeObject(map)
+  }
+
+  String toString() {
+    "audit log ${new Date()} ${actor?"user '${actor}'":""} ${eventName} ${className} id:${persistedObjectId} version:${persistedObjectVersion}"
   }
 }
 

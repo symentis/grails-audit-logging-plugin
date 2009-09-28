@@ -12,11 +12,12 @@ Stable Releases:
     0.4
     0.4.1
 
-Testing Releases:
+Testing Release:
     0.5_ALPHA
 
     </description>
   <resources>
+    <resource>Config</resource>
     <resource>UrlMappings</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>

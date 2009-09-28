@@ -16,6 +16,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * 2008-06-04 added ignore fields feature
  * 2009-07-04 fetches its own session from sessionFactory to avoid transaction munging
  * 2009-09-05 getActor as a closure to allow developers to supply their own security plugins
+ * 2009-09-25 rewrite.
  */
 
 import org.hibernate.HibernateException;
@@ -28,12 +29,13 @@ import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.orm.hibernate3.SessionFactoryUtils
 import org.hibernate.SessionFactory
-import org.hibernate.Session
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
+import org.hibernate.Session
+import org.springframework.orm.hibernate3.SessionFactoryUtils
+import org.codehaus.groovy.grails.orm.hibernate.metaclass.SavePersistentMethod
 
 public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
   private static final Log log = LogFactory.getLog(AuditLogListener.class);
@@ -42,18 +44,62 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * insert and delete events. If this is true then all columns are logged
    * each as an individual event.
    */
-  static verbose = false // in Config.groovy auditLog.verbose = true
-  static String actorKey = 'userPrincipal.name' // session.user.name
-  static String sessionAttribute = null
-  org.springframework.context.ApplicationContext applicationContext
-  SessionFactory sessionFactory
+  boolean verbose = false // in Config.groovy auditLog.verbose = true
+  def sessionFactory
+
+  Closure actorClosure
+
+  void init() {
+    log.info AuditLogListener.class.getCanonicalName() + " initializing AuditLogListener... "
+    registerSelf()
+  }
+
+  void registerSelf() {
+    sessionFactory.eventListeners.with {
+        preDeleteEventListeners = addListener(sessionFactory.eventListeners.preDeleteEventListeners)
+        postInsertEventListeners = addListener(sessionFactory.eventListeners.postInsertEventListeners)
+        postUpdateEventListeners = addListener(sessionFactory.eventListeners.postUpdateEventListeners)
+    }
+  }
+
+  Object[] addListener(Object[] array) {
+    def expanded = new Object[array?.length?:0 + 1]
+    if(array) {
+      System.arraycopy(array, 0, expanded, 0, array.length)
+    }
+    expanded[-1] = this
+    return expanded
+  }
+
+  SessionFactory getSessionFactory() {
+    this.sessionFactory
+  }
+
+  void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory
+  }
+
+  boolean isVerbose() {
+    this.verbose
+  }
+
+  void setVerbose(boolean verbose) {
+    this.verbose = verbose
+  }
+
+  def getActor() {
+    if(!actorClosure) {
+      return null
+    }
+    def attr = RequestContextHolder?.getRequestAttributes()
+    def session = attr.session
+    return actorClosure(attr,session)
+  }
 
   def getUri() {
     def attr = RequestContextHolder?.getRequestAttributes()
     return (attr?.currentRequest?.uri?.toString()) ?: null
   }
-
-  def getActor = AuditLogListenerUtil.getActorDefault
 
   // returns true for auditable entities.
   def isAuditableEntity(event) {
@@ -169,13 +215,14 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
         logChanges(map, null, null, entityId, 'INSERT', entityName)
       }
       if (audit) {
-        log.debug "calling handler onSave for "
+        log.debug "calling event handlers for ${event.getEntity().getClass().getCanonicalName()}"
         executeHandler(event, 'onSave', null, map)
       }
     } catch (HibernateException e) {
       log.error "Audit Plugin unable to process INSERT event"
       e.printStackTrace()
     }
+    log.trace "... onPostInsert is finished."
     return;
   }
 
@@ -286,8 +333,6 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * ... this feels crufty... should be tighter...
    */
   def logChanges(newMap, oldMap, parentObject, persistedObjectId, eventName, className) {
-    def attr = RequestContextHolder?.getRequestAttributes()
-    def session = attr.session
     log.trace "logging changes... "
     AuditLogEvent audit = null
     def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
@@ -298,7 +343,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
       newMap.each({key, val ->
         if (val != oldMap[key]) {
           audit = new AuditLogEvent(
-                  actor: this.getActor(attr,session),
+                  actor: this.getActor(),
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
@@ -315,7 +360,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
       log.trace "there are new values and logging is verbose ... "
       newMap.each({key, val ->
         audit = new AuditLogEvent(
-                actor: this.getActor(attr,session),
+                actor: this.getActor(),
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,
@@ -331,7 +376,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
         log.trace "there is only an old map of values available and logging is set to verbose... "
         oldMap.each({key, val ->
           audit = new AuditLogEvent(
-                  actor: this.getActor(attr,session),
+                  actor: this.getActor(),
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
@@ -346,7 +391,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
       else {
         log.trace "creating a basic audit logging event object."
         audit = new AuditLogEvent(
-                actor: this.getActor(attr,session),
+                actor: this.getActor(),
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,
@@ -400,15 +445,17 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 
 
   void saveAuditLog(AuditLogEvent audit) {
-    log.debug "save audit log object: ${audit.getEventName()} for ${audit.className} and id: ${audit.persistedObjectId} version: ${audit.persistedObjectVersion}"
+    log.info audit
     Session session = SessionFactoryUtils.getNewSession(sessionFactory)
     log.trace "opened new session for audit log persistence"
-    session.save(audit)
+    if( !session.saveOrUpdate(audit) ) {
+      log.error "Audit Log save has failed!"
+    }
+    else {
+      log.trace "AuditLog save worked."
+    }
     log.trace "save invoked, moving to flush audit log persistence session"
-    session.flush()
-    log.trace "session has been flushed. Closing this session."
-    session.close()
-    log.trace "session has been closed."
     return
+    //*/
   }
 }
