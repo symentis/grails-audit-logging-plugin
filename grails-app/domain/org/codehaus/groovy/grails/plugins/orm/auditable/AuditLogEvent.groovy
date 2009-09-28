@@ -36,9 +36,6 @@ class AuditLogEvent implements java.io.Serializable {
     table 'audit_log'
     cache usage:'read-only', include:'non-lazy'
     version false
-    columns {
-      id composite:['className','persistedObjectId','persistedObjectVersion']
-    }
   }
 
   /**
@@ -58,7 +55,6 @@ class AuditLogEvent implements java.io.Serializable {
   private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     def map = [
             id:id,
-            version:version,
             dateCreated:dateCreated,
             lastUpdated:lastUpdated,
 
@@ -77,7 +73,9 @@ class AuditLogEvent implements java.io.Serializable {
   }
 
   String toString() {
-    "audit log ${new Date()} ${actor?"user '${actor}'":""} ${eventName} ${className} id:${persistedObjectId} version:${persistedObjectVersion}"
+    "audit log ${dateCreated} ${actor?'user ${actor}':'user ?'} " + 
+        "${eventName} ${className} " + 
+        "id:${persistedObjectId} version:${persistedObjectVersion}"
   }
 }
 

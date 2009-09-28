@@ -24,7 +24,7 @@ public class AuditLogListenerUtil {
    *
    * These are strongly typed here for the purpose of documentation.
    */
-  static getActorDefault = { RequestAttributes attr, HttpSession session ->
+  static Closure actorDefaultGetter = { RequestAttributes attr, HttpSession session ->
     def actor = null
     if (delegate.sessionAttribute) {
       delegate.log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"

@@ -445,17 +445,28 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 
 
   void saveAuditLog(AuditLogEvent audit) {
+    audit.with {
+        dateCreated = new Date()
+        lastUpdated = new Date()
+    }
     log.info audit
-    Session session = SessionFactoryUtils.getNewSession(sessionFactory)
-    log.trace "opened new session for audit log persistence"
-    if( !session.saveOrUpdate(audit) ) {
+    try {
+        Session session = sessionFactory.openSession()
+        log.trace "opened new session for audit log persistence"
+        def trans = session.beginTransaction()
+        log.trace " + began transaction "
+        def saved = session.merge(audit)
+        log.debug " + saved log entry id:'${saved.id}'."
+        session.flush()
+        log.trace " + flushed session"
+        trans.commit()
+        log.trace " + committed transaction"
+        session.close()
+        log.trace "session closed"
+    } catch (org.hibernate.HibernateException ex) {
       log.error "Audit Log save has failed!"
+      log.error ex
     }
-    else {
-      log.trace "AuditLog save worked."
-    }
-    log.trace "save invoked, moving to flush audit log persistence session"
     return
-    //*/
   }
 }
