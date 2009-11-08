@@ -1,4 +1,4 @@
-<plugin name='audit-logging' version='0.5_ALPHA' grailsVersion='1.1.1 &gt; *'>
+<plugin name='audit-logging' version='0.5' grailsVersion='1.1.1 &gt; *'>
   <author>Shawn Hartsock</author>
   <authorEmail>hartsock@acm.org</authorEmail>
   <title>adds auditable to GORM domain classes</title>
@@ -9,11 +9,10 @@ when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
 Stable Releases:
-    0.4
-    0.4.1
+    0.5
 
 Testing Release:
-    0.5_ALPHA
+    0.6_ALPHA
 
     </description>
   <resources>

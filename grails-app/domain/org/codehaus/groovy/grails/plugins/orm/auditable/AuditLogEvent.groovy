@@ -6,6 +6,9 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  */
 class AuditLogEvent implements java.io.Serializable {
   private static final long serialVersionUID = 1L
+
+  static auditable = false
+
   Date dateCreated
   Date lastUpdated
 

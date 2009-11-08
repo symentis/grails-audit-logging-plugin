@@ -17,6 +17,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * 2009-07-04 fetches its own session from sessionFactory to avoid transaction munging
  * 2009-09-05 getActor as a closure to allow developers to supply their own security plugins
  * 2009-09-25 rewrite.
+ * 2009-10-04 preparing beta release
  */
 
 import org.hibernate.HibernateException;
@@ -45,7 +46,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * each as an individual event.
    */
   boolean verbose = false // in Config.groovy auditLog.verbose = true
-  def sessionFactory
+  SessionFactory sessionFactory
 
   Closure actorClosure
 
@@ -62,7 +63,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     }
   }
 
-  Object[] addListener(Object[] array) {
+  Object[] addListener(final Object[] array) {
     def expanded = new Object[array?.length?:0 + 1]
     if(array) {
       System.arraycopy(array, 0, expanded, 0, array.length)
@@ -82,8 +83,13 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   boolean isVerbose() {
     this.verbose
   }
-
-  void setVerbose(boolean verbose) {
+  
+  /**
+   * if verbose is set to 'true' then you get a log event on
+   * each individually changed column/field sent to the database
+   * with a record of the old value and the new value.
+   */
+  void setVerbose(final boolean verbose) {
     this.verbose = verbose
   }
 
@@ -450,7 +456,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * this closure has comprehensive trace logging in it for your diagnostics.
    *
    * It has also been written as a closure for your sake so that you may over-ride the
-   * save closure with your own should your particular database not work with this closure
+   * save closure with your own code (should your particular database not work with this code)
    * you may over-ride the definition of this closure using ... TODO
    *
    * To debug in Config.groovy set: 
