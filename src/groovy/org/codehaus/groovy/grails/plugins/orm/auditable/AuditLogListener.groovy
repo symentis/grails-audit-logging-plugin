@@ -37,6 +37,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.hibernate.Session
 import org.springframework.orm.hibernate3.SessionFactoryUtils
 import org.codehaus.groovy.grails.orm.hibernate.metaclass.SavePersistentMethod
+import org.springframework.web.context.request.WebRequest
 
 public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
   private static final Log log = LogFactory.getLog(AuditLogListener.class);
@@ -49,6 +50,10 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   SessionFactory sessionFactory
 
   Closure actorClosure
+  void setActorClosure(Closure closure) {
+    closure.delegate = this
+    this.actorClosure = closure
+  }
 
   void init() {
     log.info AuditLogListener.class.getCanonicalName() + " initializing AuditLogListener... "
@@ -93,13 +98,18 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     this.verbose = verbose
   }
 
-  def getActor() {
+  String getActor() {
     if(!actorClosure) {
       return null
     }
     def attr = RequestContextHolder?.getRequestAttributes()
-    def session = attr.session
-    return actorClosure(attr,session)
+    def session = attr?.session
+    if(attr && session) {
+      return actorClosure(attr,session)
+    }
+    else {
+      return 'system'
+    }
   }
 
   def getUri() {

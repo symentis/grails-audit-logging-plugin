@@ -2,6 +2,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import org.springframework.web.context.request.RequestAttributes
 import javax.servlet.http.HttpSession
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 /*
  * Created by IntelliJ IDEA.
  * User: Shawn Hartsock
@@ -24,14 +25,20 @@ public class AuditLogListenerUtil {
    *
    * These are strongly typed here for the purpose of documentation.
    */
-  static Closure actorDefaultGetter = { RequestAttributes attr, HttpSession session ->
+  static Closure actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
     def actor = null
-    if (delegate.sessionAttribute) {
+    if(request.remoteUser) {
+      actor = request.remoteUser
+    }
+    else if(request.userPrincipal) {
+      actor = request.userPrincipal.getName()
+    }
+    else if (delegate.sessionAttribute) {
       delegate.log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
       delegate.log.trace "calling session.getAttribute('${delegate.sessionAttribute}')"
       actor = session?.getAttribute(delegate.sessionAttribute)
     }
-    else {
+    else if(delegate.actorKey) {
       delegate.log.debug "configured with actorKey ${actorKey} resolve using request attributes "
       actor = resolve(attr, delegate.actorKey, delegate.log)
     }

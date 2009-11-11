@@ -75,7 +75,7 @@ Testing Release:
    
     def doWithApplicationContext = { applicationContext ->
       AuditLogListener listener = applicationContext.getBean("auditLogListener")
-      // TODO: inject application configuration & call configuration routines.
+      listener.actorClosure = application.config?.auditLog?.actorClosure?:AuditLogListenerUtil.actorDefaultGetter
       listener.init()
     }
 
