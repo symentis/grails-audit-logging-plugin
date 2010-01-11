@@ -89,10 +89,6 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     this.sessionFactory = sessionFactory
   }
 
-  boolean isVerbose() {
-    this.verbose
-  }
-  
   /**
    * if verbose is set to 'true' then you get a log event on
    * each individually changed column/field sent to the database
