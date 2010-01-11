@@ -49,9 +49,13 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   boolean verbose = false // in Config.groovy auditLog.verbose = true
   SessionFactory sessionFactory
 
+  String sessionAttribute
+  String actorKey
+
   Closure actorClosure
   void setActorClosure(Closure closure) {
     closure.delegate = this
+    closure.metaClass.log = log
     this.actorClosure = closure
   }
 
@@ -99,17 +103,25 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
   String getActor() {
-    if(!actorClosure) {
-      return null
+    def actor = null
+    try {
+      if(actorClosure) {
+        def attr = RequestContextHolder?.getRequestAttributes()
+        def session = attr?.session
+        if(attr && session) {
+          actor = actorClosure.call(attr,session)
+        }
+        else { // no session or attributes mean this is invoked from a Service, Quartz Job, or other headless-operation
+          actor = 'system'
+        }
+      }
+    } catch (Exception ex) {
+      log.error "The auditLog.actorClosure threw this exception: ${ex.message}"
+      ex.printStackTrace()
+      log.error "The auditLog.actorClosure will be disabled now."
+      actorClosure = null
     }
-    def attr = RequestContextHolder?.getRequestAttributes()
-    def session = attr?.session
-    if(attr && session) {
-      return actorClosure(attr,session)
-    }
-    else {
-      return 'system'
-    }
+    return actor?.toString()
   }
 
   def getUri() {

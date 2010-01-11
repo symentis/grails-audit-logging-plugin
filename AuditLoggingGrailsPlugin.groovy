@@ -68,7 +68,9 @@ Testing Release:
       if (manager?.hasGrailsPlugin("hibernate")) {
         auditLogListener(AuditLogListener) {
           sessionFactory = sessionFactory
-          verbose = application.config?.auditLog?.verbose ? true : false
+          verbose          = application.config?.auditLog?.verbose ? true : false
+          sessionAttribute = application.config?.auditLog?.sessionAttribute?:""
+          actorKey         = application.config?.auditLog?.actorKey?:""
         }
       }
     }

@@ -30,17 +30,21 @@ public class AuditLogListenerUtil {
     if(request.remoteUser) {
       actor = request.remoteUser
     }
-    else if(request.userPrincipal) {
+
+    if(!actor && request.userPrincipal) {
       actor = request.userPrincipal.getName()
     }
-    else if (delegate.sessionAttribute) {
-      delegate.log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
-      delegate.log.trace "calling session.getAttribute('${delegate.sessionAttribute}')"
+
+    if (!actor && delegate.sessionAttribute) {
+      log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
       actor = session?.getAttribute(delegate.sessionAttribute)
+      log.trace "session.getAttribute('${delegate.sessionAttribute}') returned '${actor}'"
     }
-    else if(delegate.actorKey) {
-      delegate.log.debug "configured with actorKey ${actorKey} resolve using request attributes "
+
+    if(!actor && delegate.actorKey) {
+      log.debug "configured with actorKey ${actorKey} resolve using request attributes "
       actor = resolve(attr, delegate.actorKey, delegate.log)
+      log.trace "resolve on ${delegate.actorKey} returned '${actor}'"
     }
     return actor
   }
@@ -77,6 +81,6 @@ Last attribute resolved class ${res?.getClass()} value ${res}
       }
 
     })
-    return (res) ? res.toString() : null
+    return res?.toString() ?: null
   }
 }
