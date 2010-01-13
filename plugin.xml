@@ -1,4 +1,4 @@
-<plugin name='audit-logging' version='0.5'>
+<plugin name='audit-logging' version='0.5' grailsVersion='1.2.0 &gt; *'>
   <author>Shawn Hartsock</author>
   <authorEmail>hartsock@acm.org</authorEmail>
   <title>adds auditable to GORM domain classes</title>
@@ -18,4 +18,10 @@ Stable Releases:
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>
   </resources>
+  <dependencies>
+    <resolvers>
+      <resolver type='grailsPlugins' name='grailsPlugins' />
+    </resolvers>
+  </dependencies>
+  <behavior />
 </plugin>
