@@ -41,7 +41,8 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  *      * changes to AuditLogListener uses new domain model with separate transaction
  *        for logging action to avoid invalidating the main hibernate session.
  * Release 0.5_BETA see GRAILSPLUGINS-391
- *      * testing version released generally. 
+ *      * testing version released generally.
+ * Release 0.5 see GRAILSPLUGINS-391, GRAILSPLUGINS-1496, GRAILSPLUGINS-1181, GRAILSPLUGINS-1515, GRAILSPLUGINS-1811
  */
 class AuditLoggingGrailsPlugin {
     def version = "0.5"
@@ -56,9 +57,6 @@ will allow you to take action on what has changed.
 
 Stable Releases:
     0.5
-
-Testing Release:
-    0.6_ALPHA
 
     """
     def dependsOn = [:]

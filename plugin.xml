@@ -1,4 +1,4 @@
-<plugin name='audit-logging' version='0.5' grailsVersion='1.1.1 &gt; *'>
+<plugin name='audit-logging' version='0.5'>
   <author>Shawn Hartsock</author>
   <authorEmail>hartsock@acm.org</authorEmail>
   <title>adds auditable to GORM domain classes</title>
@@ -8,11 +8,8 @@ Audit events off of them. The events include onSave, onUpdate, onChange, onDelet
 when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
-Stable Releases:
+Stable Release:
     0.5
-
-Testing Release:
-    0.6_ALPHA
 
     </description>
   <resources>
