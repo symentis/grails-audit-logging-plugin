@@ -8,7 +8,7 @@ Audit events off of them. The events include onSave, onUpdate, onChange, onDelet
 when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
-Stable Release:
+Stable Releases:
     0.5
 
     </description>
@@ -18,5 +18,4 @@ Stable Release:
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>
   </resources>
-  <dependencies />
 </plugin>
