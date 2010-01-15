@@ -46,7 +46,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * insert and delete events. If this is true then all columns are logged
    * each as an individual event.
    */
-  boolean verbose = false // in Config.groovy auditLog.verbose = true
+  boolean verbose = true // in Config.groovy auditLog.verbose = true
   SessionFactory sessionFactory
 
   String sessionAttribute
@@ -377,6 +377,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   oldValue: truncate(oldMap[key]),
                   newValue: truncate(newMap[key]),
           )
+          saveAuditLog(audit)
         }
       })
     }
@@ -394,6 +395,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 oldValue: null,
                 newValue: truncate(val),
         )
+        saveAuditLog(audit)
       })
     }
     else if (oldMap && verbose) {
@@ -410,6 +412,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   oldValue: truncate(val),
                   newValue: null
           )
+          saveAuditLog(audit)
         })
       }
       else {
@@ -422,9 +425,6 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 persistedObjectId: persistedObjectId.toString(),
                 persistedObjectVersion: persistedObjectVersion.toString()
         )
-      }
-      if (audit){
-        log.debug "... persisting audit log event object ... "
         saveAuditLog(audit)
       }
       return
