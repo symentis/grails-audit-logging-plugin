@@ -44,7 +44,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  *      * testing version released generally.
  * Release 0.5 see GRAILSPLUGINS-391, GRAILSPLUGINS-1496, GRAILSPLUGINS-1181, GRAILSPLUGINS-1515, GRAILSPLUGINS-1811
  * Release 0.5.1 fixes regression in field logging
- * Release 0.5.2 see GRAILSPLUGINS-1887 
+ * Release 0.5.2 see GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354
  */
 class AuditLoggingGrailsPlugin {
     def version = "0.5.2"
@@ -58,7 +58,7 @@ when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
 Stable Releases:
-    0.5.1
+    0.5.2
 
     """
     def dependsOn = [:]
@@ -76,9 +76,14 @@ Stable Releases:
     }
    
     def doWithApplicationContext = { applicationContext ->
+      // pulls in the bean to inject and init
       AuditLogListener listener = applicationContext.getBean("auditLogListener")
+      // allows user to over-ride the maximum length the value stored by the audit logger.
       listener.setActorClosure( application.config?.auditLog?.actorClosure?:AuditLogListenerUtil.actorDefaultGetter )
       listener.init()
+      if(application.config?.auditLog?.TRUNCATE_LENGTH) {
+        listener.truncateLength = new Long(application.config?.auditLog?.TRUNCATE_LENGTH)
+      }
     }
 
     def doWithWebDescriptor = { xml ->

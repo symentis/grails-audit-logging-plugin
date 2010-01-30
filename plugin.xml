@@ -9,7 +9,7 @@ when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
 Stable Releases:
-    0.5.1
+    0.5.2
 
     </description>
   <resources>

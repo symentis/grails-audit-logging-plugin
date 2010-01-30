@@ -40,13 +40,17 @@ import org.codehaus.groovy.grails.orm.hibernate.metaclass.SavePersistentMethod
 import org.springframework.web.context.request.WebRequest
 
 public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
-  private static final Log log = LogFactory.getLog(AuditLogListener.class);
+
+  public static final Log log = LogFactory.getLog(AuditLogListener.class);
+  public static Long TRUNCATE_LENGTH = 255
+
   /**
    * The verbose flag flips on and off column by column change logging in
    * insert and delete events. If this is true then all columns are logged
    * each as an individual event.
    */
   boolean verbose = true // in Config.groovy auditLog.verbose = true
+  Long truncateLength
   SessionFactory sessionFactory
 
   String sessionAttribute
@@ -61,6 +65,12 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 
   void init() {
     log.info AuditLogListener.class.getCanonicalName() + " initializing AuditLogListener... "
+    if(!truncateLength) {
+      truncateLength = new Long(TRUNCATE_LENGTH)
+    }
+    else {
+      log.debug "truncate length set to ${truncateLength}"
+    }
     registerSelf()
   }
 
@@ -371,8 +381,8 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
-                  persistedObjectId: persistedObjectId.toString(),
-                  persistedObjectVersion: persistedObjectVersion.toString(),
+                  persistedObjectId: persistedObjectId?.toLong(),
+                  persistedObjectVersion: persistedObjectVersion?.toLong(),
                   propertyName: key,
                   oldValue: truncate(oldMap[key]),
                   newValue: truncate(newMap[key]),
@@ -389,8 +399,8 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,
-                persistedObjectId: persistedObjectId.toString(),
-                persistedObjectVersion: persistedObjectVersion.toString(),
+                persistedObjectId: persistedObjectId?.toLong(),
+                persistedObjectVersion: persistedObjectVersion?.toLong(),
                 propertyName: key,
                 oldValue: null,
                 newValue: truncate(val),
@@ -406,8 +416,8 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
-                  persistedObjectId: persistedObjectId.toString(),
-                  persistedObjectVersion: persistedObjectVersion.toString(),
+                  persistedObjectId: persistedObjectId?.toLong(),
+                  persistedObjectVersion: persistedObjectVersion?.toLong(),
                   propertyName: key,
                   oldValue: truncate(val),
                   newValue: null
@@ -422,15 +432,19 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,
-                persistedObjectId: persistedObjectId.toString(),
-                persistedObjectVersion: persistedObjectVersion.toString()
+                persistedObjectId: persistedObjectId?.toLong(),
+                persistedObjectVersion: persistedObjectVersion?.toLong()
         )
         saveAuditLog(audit)
       }
       return
   }
 
-  String truncate(final obj, max = 255) {
+  String truncate(final obj) {
+    truncate(obj,truncateLength.toInteger())
+  }
+  
+  String truncate(final obj, int max) {
     log.trace "trimming object's string representation based on ${max} characters." 
     def str = obj?.toString()?.trim()
     return (str?.length() > max) ? str?.substring(0, max) : str
@@ -475,7 +489,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    *
    * It has also been written as a closure for your sake so that you may over-ride the
    * save closure with your own code (should your particular database not work with this code)
-   * you may over-ride the definition of this closure using ... TODO
+   * you may over-ride the definition of this closure using ... TODO allow over-ride via config
    *
    * To debug in Config.groovy set: 
    *    log4j.debug 'org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener'
@@ -511,7 +525,8 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
         log.trace "session closed"
     } catch (org.hibernate.HibernateException ex) {
       log.error "AuditLogEvent save has failed!"
-      log.error ex
+      log.error ex.message
+      log.error audit.errors
     }
     return
   }
