@@ -55,7 +55,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   Closure actorClosure
   void setActorClosure(Closure closure) {
     closure.delegate = this
-    closure.metaClass.log = log
+    closure.properties.putAt("log",this.log) 
     this.actorClosure = closure
   }
 

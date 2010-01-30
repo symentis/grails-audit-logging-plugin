@@ -77,7 +77,7 @@ Stable Releases:
    
     def doWithApplicationContext = { applicationContext ->
       AuditLogListener listener = applicationContext.getBean("auditLogListener")
-      listener.actorClosure = application.config?.auditLog?.actorClosure?:AuditLogListenerUtil.actorDefaultGetter
+      listener.setActorClosure( application.config?.auditLog?.actorClosure?:AuditLogListenerUtil.actorDefaultGetter )
       listener.init()
     }
 
