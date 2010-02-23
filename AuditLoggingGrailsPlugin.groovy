@@ -9,7 +9,9 @@ import org.codehaus.groovy.grails.orm.hibernate.support.SpringLobHandlerDetector
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 
 /**
- * Most of this code is brazenly lifted from two sources
+ * @author Shawn Hartsock
+ *
+ * Credit is due to the following other projects,
  * first is Kevin Burke's HibernateEventsGrailsPlugin
  * second is the AuditLogging post by Rob Monie at
  * http://www.hibernate.org/318.html
@@ -19,7 +21,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * changes to columns.
  * 
  * See Documentation:
- * http://grails.codehaus.org/Grails+Audit+Logging+Plugin
+ * http://grails.org/plugin/audit-logging
  * 
  * Changes:
  * Release 0.3
