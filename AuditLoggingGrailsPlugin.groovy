@@ -65,7 +65,7 @@ Stable Releases:
 
     """
     def dependsOn = [:]
-    def loadAfter = ['hibernate']
+    def loadAfter = ['core','hibernate']
 
     def doWithSpring = {
       if (manager?.hasGrailsPlugin("hibernate")) {
