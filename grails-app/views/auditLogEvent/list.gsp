@@ -9,7 +9,6 @@
     <body>
         <div class="nav">
             <span class="menuButton"><a class="home" href="${resource(dir:'')}">Home</a></span>
-            <span class="menuButton"><g:link class="create" action="create">New AuditLogEvent</g:link></span>
         </div>
         <div class="body">
             <h1>AuditLogEvent List</h1>
