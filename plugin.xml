@@ -1,4 +1,4 @@
-<plugin name='audit-logging' version='0.5.2' grailsVersion='1.2.0 &gt; *'>
+<plugin name='audit-logging' version='0.5.3'>
   <author>Shawn Hartsock</author>
   <authorEmail>hartsock@acm.org</authorEmail>
   <title>adds auditable to GORM domain classes</title>
@@ -9,19 +9,13 @@ when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
 Stable Releases:
-    0.5.2
+    0.5.3
 
     </description>
   <resources>
-    <resource>Config</resource>
-    <resource>UrlMappings</resource>
+    <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
+    <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>
   </resources>
-  <dependencies>
-    <resolvers>
-      <resolver type='grailsPlugins' name='grailsPlugins' />
-    </resolvers>
-  </dependencies>
-  <behavior />
 </plugin>

@@ -47,7 +47,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5 see GRAILSPLUGINS-391, GRAILSPLUGINS-1496, GRAILSPLUGINS-1181, GRAILSPLUGINS-1515, GRAILSPLUGINS-1811
  * Release 0.5.1 fixes regression in field logging
  * Release 0.5.2 see GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354
- * Release 0.5.3 TBD
+ * Release 0.5.3 GRAILSPLUGINS-2135 GRAILSPLUGINS-2060 && an issue with extra JAR files that are somehow getting released as part of the plugin
  */
 class AuditLoggingGrailsPlugin {
     def version = "0.5.3"
