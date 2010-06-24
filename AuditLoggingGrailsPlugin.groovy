@@ -51,6 +51,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  */
 class AuditLoggingGrailsPlugin {
     def version = "0.5.3"
+    def grailsVersion = '1.0 > *'    
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
     def title = "adds auditable to GORM domain classes"
