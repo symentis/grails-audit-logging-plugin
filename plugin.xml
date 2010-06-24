@@ -13,8 +13,7 @@ Stable Releases:
 
     </description>
   <resources>
-    <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
-    <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>
+    <resource>UrlMappings</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>
   </resources>
