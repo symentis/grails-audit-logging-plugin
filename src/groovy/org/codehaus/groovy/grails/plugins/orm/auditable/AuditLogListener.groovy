@@ -83,7 +83,8 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
   Object[] addListener(final Object[] array) {
-    def expanded = new Object[array?.length?:0 + 1]
+    def size = array?.length?:0
+    def expanded = new Object[size + 1]
     if(array) {
       System.arraycopy(array, 0, expanded, 0, array.length)
     }
