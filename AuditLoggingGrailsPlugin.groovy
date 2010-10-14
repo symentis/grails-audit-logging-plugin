@@ -48,10 +48,11 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.1 fixes regression in field logging
  * Release 0.5.2 see GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354
  * Release 0.5.3 GRAILSPLUGINS-2135 GRAILSPLUGINS-2060 && an issue with extra JAR files that are somehow getting released as part of the plugin
+ * Release 0.5.4 compatibility issues with Grails 1.3.x
  */
 class AuditLoggingGrailsPlugin {
-    def version = "0.5.3"
-    def grailsVersion = '1.0 > *'    
+    def version = "0.5.4"
+    def grailsVersion = '1.1 > *'    
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
     def title = "adds auditable to GORM domain classes"
@@ -62,7 +63,8 @@ when called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
 Stable Releases:
-    0.5.3
+    0.5.3 (Grails 1.2 or below)
+    0.5.4 (Grails 1.3 or above)
 
     """
     def dependsOn = [:]
@@ -71,14 +73,15 @@ Stable Releases:
     def doWithSpring = {
       if (manager?.hasGrailsPlugin("hibernate")) {
         auditLogListener(AuditLogListener) {
-          sessionFactory = sessionFactory
-          verbose          = application.config?.auditLog?.verbose ? true : false
+          sessionFactory   = sessionFactory
+          verbose          = application.config?.auditLog?.verbose?:false
+          transactional    = application.config?.auditLog?.transactional?:false
           sessionAttribute = application.config?.auditLog?.sessionAttribute?:""
           actorKey         = application.config?.auditLog?.actorKey?:""
         }
       }
     }
-   
+
     def doWithApplicationContext = { applicationContext ->
       // pulls in the bean to inject and init
       AuditLogListener listener = applicationContext.getBean("auditLogListener")

@@ -18,6 +18,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * 2009-09-05 getActor as a closure to allow developers to supply their own security plugins
  * 2009-09-25 rewrite.
  * 2009-10-04 preparing beta release
+ * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
  */
 
 import org.hibernate.HibernateException;
@@ -38,6 +39,10 @@ import org.hibernate.Session
 import org.springframework.orm.hibernate3.SessionFactoryUtils
 import org.codehaus.groovy.grails.orm.hibernate.metaclass.SavePersistentMethod
 import org.springframework.web.context.request.WebRequest
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.util.GrailsUtil
+import grails.util.Environment
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
 
@@ -50,6 +55,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * each as an individual event.
    */
   boolean verbose = true // in Config.groovy auditLog.verbose = true
+  boolean transactional = false
   Long truncateLength
   SessionFactory sessionFactory
 
@@ -64,6 +70,10 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
   void init() {
+    if( Environment.getCurrent() != Environment.PRODUCTION && ConfigurationHolder.config.auditLog?.transactional == null ) {
+      transactional = false
+    }
+
     log.info AuditLogListener.class.getCanonicalName() + " initializing AuditLogListener... "
     if(!truncateLength) {
       truncateLength = new Long(TRUNCATE_LENGTH)
@@ -514,14 +524,19 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
         // transactional databases and not others.
         Session session = sessionFactory.openSession()
         log.trace "opened new session for audit log persistence"
-        def trans = session.beginTransaction()
-        log.trace " + began transaction "
+        def trans = null
+        if(transactional) {
+          trans = session.beginTransaction()
+          log.trace " + began transaction "
+        }
         def saved = session.merge(audit)
         log.debug " + saved log entry id:'${saved.id}'."
         session.flush()
         log.trace " + flushed session"
-        trans.commit()
-        log.trace " + committed transaction"
+        if(transactional){
+          trans?.commit()
+          log.trace " + committed transaction"
+        }
         session.close()
         log.trace "session closed"
     } catch (org.hibernate.HibernateException ex) {
