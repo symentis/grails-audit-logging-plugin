@@ -392,7 +392,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
-                  persistedObjectId: persistedObjectId?.toLong(),
+                  persistedObjectId: persistedObjectId?.toString(),
                   persistedObjectVersion: persistedObjectVersion?.toLong(),
                   propertyName: key,
                   oldValue: truncate(oldMap[key]),
@@ -410,7 +410,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,
-                persistedObjectId: persistedObjectId?.toLong(),
+                persistedObjectId: persistedObjectId?.toString(),
                 persistedObjectVersion: persistedObjectVersion?.toLong(),
                 propertyName: key,
                 oldValue: null,
@@ -427,7 +427,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   uri: this.getUri(),
                   className: className,
                   eventName: eventName,
-                  persistedObjectId: persistedObjectId?.toLong(),
+                  persistedObjectId: persistedObjectId?.toString(),
                   persistedObjectVersion: persistedObjectVersion?.toLong(),
                   propertyName: key,
                   oldValue: truncate(val),
@@ -443,7 +443,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 uri: this.getUri(),
                 className: className,
                 eventName: eventName,
-                persistedObjectId: persistedObjectId?.toLong(),
+                persistedObjectId: persistedObjectId?.toString(),
                 persistedObjectVersion: persistedObjectVersion?.toLong()
         )
         saveAuditLog(audit)

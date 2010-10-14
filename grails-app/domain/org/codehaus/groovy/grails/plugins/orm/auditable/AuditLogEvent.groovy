@@ -15,7 +15,7 @@ class AuditLogEvent implements java.io.Serializable {
   String actor
   String uri
   String className
-  Long persistedObjectId
+  String persistedObjectId
   Long persistedObjectVersion = 0
 
   String eventName
