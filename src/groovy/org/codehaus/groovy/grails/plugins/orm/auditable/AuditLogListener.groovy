@@ -37,6 +37,9 @@ import org.apache.commons.logging.LogFactory
 import org.hibernate.Session
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.hibernate.collection.PersistentCollection
+import org.hibernate.engine.CollectionEntry
+import org.hibernate.engine.PersistenceContext
 
 public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
 
@@ -297,24 +300,28 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     /**
      * only if this is an auditable entity
      */
-    private void onChange(final PostUpdateEvent event) {
+       private void onChange(final PostUpdateEvent event) {
         def entity = event.getEntity()
-        def entityName = entity.getClass().getName()
+        String entityName = entity.getClass().getName()
         def entityId = event.getId()
 
         // object arrays representing the old and new state
         def oldState = event.getOldState()
         def newState = event.getState()
 
-        def nameMap = event.getPersister().getPropertyNames()
-        def oldMap = [:]
-        def newMap = [:]
+        List<String> propertyNames = event.getPersister().getPropertyNames()
+        Map oldMap = [:]
+        Map newMap = [:]
 
-        if (nameMap) {
-            for (int ii = 0; ii < newState.length; ii++) {
-                if (nameMap[ii]) {
-                    if (oldState) oldMap[nameMap[ii]] = oldState[ii]
-                    if (newState) newMap[nameMap[ii]] = newState[ii]
+        if (propertyNames) {
+            for (int index = 0; index < newState.length; index++) {
+                if (propertyNames[index]) {
+                    if (oldState) {
+                        populateOldStateMap(oldState, oldMap, propertyNames[index], index)
+                    }
+                    if (newState) {
+                        newMap[propertyNames[index]] = newState[index]
+                    }
                 }
             }
         }
@@ -334,6 +341,32 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
          */
         executeHandler(event, 'onChange', oldMap, newMap)
         return
+    }
+
+    private populateOldStateMap(def oldState, Map oldMap, String keyName, index) {
+        def oldPropertyState = oldState[index]
+        if (oldPropertyState instanceof PersistentCollection) {
+            PersistentCollection pc = (PersistentCollection) oldPropertyState;
+            PersistenceContext context = sessionFactory.getCurrentSession().getPersistenceContext();
+            CollectionEntry entry = context.getCollectionEntry(pc);
+            Object snapshot = entry.getSnapshot();
+            if (pc instanceof List) {
+                oldMap[keyName] = Collections.unmodifiableList((List) snapshot);
+            }
+            else if (pc instanceof Map) {
+                oldMap[keyName] = Collections.unmodifiableMap((Map) snapshot);
+            }
+            else if (pc instanceof Set) {
+                //Set snapshot is actually stored as a Map
+                Map snapshotMap = (Map) snapshot;
+                oldMap[keyName] = Collections.unmodifiableSet(new HashSet(snapshotMap.values()));
+            }
+            else {
+                oldMap[keyName] = pc;
+            }
+        } else {
+            oldMap[keyName] = oldPropertyState
+        }
     }
 
     public void initialize(final Configuration config) {
