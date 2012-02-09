@@ -96,14 +96,42 @@ Stable Releases:
         auditableRegistry(AuditableRegistry)
 
         if (manager?.hasGrailsPlugin("hibernate")) {
-            this.setupDefaultActorGetterClosure(application)
             auditEventListenerConfig(AuditLogConfig) {
                 sessionFactory = sessionFactory
                 auditableRegistry = auditableRegistry
                 verbose = application.config?.auditLog?.verbose ?: false
                 transactional = application.config?.auditLog?.transactional ?: false
                 // users may specify their own closure for this job
-                actorClosure = application.config?.auditLog?.actorClosure ?: actorDefaultGetter
+                actorClosure = {->
+                    def actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
+                        def actor = null
+                        if(request.remoteUser) {
+                            actor = request.remoteUser
+                        }
+
+                        if(!actor && request.userPrincipal) {
+                            actor = request.userPrincipal.getName()
+                        }
+                        return actor
+                    }
+
+                    if (application.config?.auditLog?.sessionAttribute) {
+                        actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
+                            log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
+                            session.getAttribute(application.config?.auditLog?.sessionAttribute)
+                        }
+                    }
+                    else if (application.config?.auditLog?.actorKey) {
+                        actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
+                            log.debug "configured with actorKey ${actorKey} resolve using request attributes "
+                            AuditLogListenerUtil.resolve(request.getAttributes(),application.config?.auditLog?.actorKey,delegate.log)
+                        }
+                    }
+                    else if (application.config?.auditLog?.actorClosure) {
+                        actorDefaultGetter = application.config?.auditLog?.actorClosure
+                    }
+                    actorDefaultGetter
+                }
             }
 
 
@@ -127,21 +155,6 @@ Stable Releases:
         }
         else {
             log.error("Audit Logging Plugin only implements Hibernate!")
-        }
-    }
-
-    void setupDefaultActorGetterClosure(application) {
-        if (application.config?.auditLog?.sessionAttribute) {
-            actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-                log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
-                session.getAttribute(application.config?.auditLog?.sessionAttribute)
-            }
-        }
-        else if (application.config?.auditLog?.actorKey) {
-            actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-                log.debug "configured with actorKey ${actorKey} resolve using request attributes "
-                AuditLogListenerUtil.resolve(request.getAttributes(),application.config?.auditLog?.actorKey,delegate.log)
-            }
         }
     }
 
@@ -180,15 +193,4 @@ Stable Releases:
         // the event contain: event.source, event.application and event.applicationContext objects
     }
 
-    def actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-        def actor = null
-        if(request.remoteUser) {
-            actor = request.remoteUser
-        }
-
-        if(!actor && request.userPrincipal) {
-            actor = request.userPrincipal.getName()
-        }
-        return actor
-    }
 }
