@@ -5,3 +5,10 @@
 *.iws
 
 *.log
+
+target
+
+out
+
+grails-audit-logging-plugin.iws
+
