@@ -15,9 +15,9 @@ class AuditableRegistryTests extends AbstractHibernateTests {
 
     void loadClasses() {
         this.gcl.parseClass('''
-// import grails.persistence.*
+import grails.persistence.*
 
-// @Entity
+@Entity
 class ExampleClassicAuditableEntity {
     static auditable = true
     String value
@@ -26,9 +26,13 @@ class ExampleClassicAuditableEntity {
     }
 
     void testAuditableRegistryDetection() {
-        def exampleClass = grailsApplication.getDomainClass("ExampleClassicAuditableEntity").clazz
+        println ga.getDomainClasses()
+        def dClass = ga.getDomainClass("ExampleClassicAuditableEntity")
+        println dClass
+        def exampleClass = dClass.clazz
+        println exampleClass
         assert exampleClass != null
-        assert auditableRegistry.isAuditable(exampleClass) == true
+        assert auditableRegistry.isAuditable(dClass) == true
     }
 }
 
