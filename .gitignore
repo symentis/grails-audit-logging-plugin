@@ -17,3 +17,12 @@ grails-audit-logging-plugin.iws
 *.jar
 
 .idea/
+
+*.js
+
+*.swp
+
+grails-app/conf/UrlMappings.groovy
+
+grails-app/i18n/messages.properties
+
