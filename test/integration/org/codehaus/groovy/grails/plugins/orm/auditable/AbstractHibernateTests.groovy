@@ -1,6 +1,5 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import grails.test.GrailsUnitTestCase
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager
 import org.codehaus.groovy.grails.support.MockApplicationContext
