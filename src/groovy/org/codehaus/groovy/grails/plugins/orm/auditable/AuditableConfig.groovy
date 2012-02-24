@@ -7,6 +7,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * Time: 11:16 PM
  * To change this template use File | Settings | File Templates.
  */
+@Immutable
 class AuditableConfig {
     Boolean handlersOnly
     List ignoreList
