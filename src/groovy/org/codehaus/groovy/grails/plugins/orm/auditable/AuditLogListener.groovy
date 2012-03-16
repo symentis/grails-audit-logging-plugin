@@ -57,6 +57,8 @@ public class AuditLogListener implements AuditEventListener {
         if(config?.actorClosure)
             this.setActorClosure(config.actorClosure)
 
+
+
         log.info AuditLogListener.class.getCanonicalName() + " initializing AuditLogListener... "
         if (!truncateLength) {
             truncateLength = new Long(TRUNCATE_LENGTH)
@@ -244,7 +246,7 @@ public class AuditLogListener implements AuditEventListener {
     }
 
     /**
-     * Prevent infinite loops of change logging by trapping
+     * Prevent infinate loops of change logging by trapping
      * non-significant changes. Occasionally you can set up
      * a change handler that will create a "trivial" object
      * change that you don't want to trigger another change
@@ -309,7 +311,7 @@ public class AuditLogListener implements AuditEventListener {
     }
 
     public void initialize(final Configuration config) {
-        // TODO at some point we will participate in Hibernate configuration
+        // TODO Auto-generated method stub
         return
     }
 
