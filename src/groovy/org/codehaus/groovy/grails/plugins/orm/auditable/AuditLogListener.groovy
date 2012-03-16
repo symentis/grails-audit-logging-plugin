@@ -34,11 +34,20 @@ import org.hibernate.Session
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
-public class AuditLogListener extends AbstractAuditEventListener implements AuditEventListener {
+public class AuditLogListener implements AuditEventListener {
+    public static final Log log = LogFactory.getLog(AuditLogListener.class);
     public static Long TRUNCATE_LENGTH = 255
     Long truncateLength
 
+    AuditLogConfig config
     def sessionFactory
+    Closure actorClosure
+
+    void setActorClosure(Closure closure) {
+        closure.delegate = this
+        closure.properties.putAt("log", this.log)
+        this.actorClosure = closure
+    }
 
     void init() {
         if (Environment.getCurrent() != Environment.PRODUCTION && ConfigurationHolder.config.auditLog?.transactional == null) {
@@ -158,7 +167,7 @@ public class AuditLogListener extends AbstractAuditEventListener implements Audi
                 def entity = event.getEntity()
                 def entityName = entity.getClass().getName()
                 def entityId = getEntityId(event)
-                emitAuditEvent(null, map, null, entityId, 'DELETE', entityName)
+                logChanges(null, map, null, entityId, 'DELETE', entityName)
             }
             if (audit) {
                 executeHandler(event, 'onDelete', map, null)
@@ -188,7 +197,7 @@ public class AuditLogListener extends AbstractAuditEventListener implements Audi
                 def entity = event.getEntity()
                 def entityName = entity.getClass().getName()
                 def entityId = getEntityId(event)
-                emitAuditEvent(map, null, null, entityId, 'INSERT', entityName)
+                logChanges(map, null, null, entityId, 'INSERT', entityName)
             }
             if (audit) {
                 log.debug "calling event handlers for ${event.getEntity().getClass().getCanonicalName()}"
@@ -288,7 +297,7 @@ public class AuditLogListener extends AbstractAuditEventListener implements Audi
 
         // allow user's to over-ride whether you do auditing for them.
         if (!callHandlersOnly(event.getEntity())) {
-            emitAuditEvent(newMap, oldMap, event, entityId, 'UPDATE', entityName)
+            logChanges(newMap, oldMap, event, entityId, 'UPDATE', entityName)
         }
         /**
          * Hibernate only saves changes when there are changes.
@@ -308,18 +317,7 @@ public class AuditLogListener extends AbstractAuditEventListener implements Audi
      * Leans heavily on the "toString()" of a property
      * ... this feels crufty... should be tighter...
      */
-    def emitAuditEvent(newMap, oldMap, parentObject, persistedObjectId, eventName, className) {
-        final AuditEvent event = new AuditEvent(
-                actor: this.getActor(),
-                uri: this.getUri(),
-                newMap:newMap,
-                oldMap:oldMap,
-                parentObject:parentObject,
-                persistedObjectId:persistedObjectId,
-                eventName:eventName,
-                className:className
-        );        
-        
+    def logChanges(newMap, oldMap, parentObject, persistedObjectId, eventName, className) {
         log.trace "logging changes... "
         AuditLogEvent audit = null
         def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
