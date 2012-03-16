@@ -100,7 +100,7 @@ Stable Releases:
                 actorClosure = application.config?.auditLog?.actorClosure ?: actorDefaultGetter
             }
 
-            Class listenerClass = application.config?.auditLog?.listenerClass ?: AuditLogListener
+            Class listenerClass = application.config?.auditLogListenerClass ?: AuditLogListener
             auditLogListener(listenerClass) {
                 configuration = auditEventListenerConfig
             }
