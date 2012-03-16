@@ -8,7 +8,15 @@ class AuditableRegistry {
     def registry = [:]
     
     public boolean isAuditable(entity) {
-        entity.properties['auditable']
+        boolean is = false
+        try {
+            if( entity.newInstance().auditable ) {
+                is = true
+            }
+        } catch (Throwable t ) {
+            is = false
+        }
+        return is
     }
 
     AuditableConfig getConfiguration(Class clazz) {
