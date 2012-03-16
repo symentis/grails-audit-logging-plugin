@@ -1,9 +1,6 @@
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import javax.servlet.http.HttpSession
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogConfig
 
 /**
  * @author Shawn Hartsock
@@ -91,58 +88,22 @@ Stable Releases:
 
     def doWithSpring = {
         if (manager?.hasGrailsPlugin("hibernate")) {
-            setupDefaultActorGetterClosure()
-            auditEventListenerConfig(AuditLogConfig) {
+            auditLogListener(AuditLogListener) {
                 sessionFactory = sessionFactory
                 verbose = application.config?.auditLog?.verbose ?: false
                 transactional = application.config?.auditLog?.transactional ?: false
-                // users may specify their own closure for this job
-                actorClosure = application.config?.auditLog?.actorClosure ?: actorDefaultGetter
+                sessionAttribute = application.config?.auditLog?.sessionAttribute ?: ""
+                actorKey = application.config?.auditLog?.actorKey ?: ""
             }
-
-            Class listenerClass = application.config?.auditLogListenerClass ?: AuditLogListener
-            auditLogListener(listenerClass) {
-                configuration = auditEventListenerConfig
-            }
-
             //PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
             hibernateEventListeners(HibernateEventListeners) {
                 listenerMap = [
                         'post-insert': auditLogListener,
                         'post-update': auditLogListener,
-                        'pre-delete': auditLogListener
-                ]
-            }
-        }
-        else {
-            log.error("Audit Logging Plugin only implements Hibernate!")
-        }
-    }
-
-    private setupDefaultActorGetterClosure() {
-        if (application.config?.auditLog?.sessionAttribute) {
-            actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-                log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
-                session.getAttribute(application.config?.auditLog?.sessionAttribute)
-            }
-        }
-        else if (application.config?.auditLog?.actorKey) {
-            actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-                log.debug "configured with actorKey ${actorKey} resolve using request attributes "
-                AuditLogListenerUtil.resolve(request.getAttributes(),application.config?.auditLog?.actorKey,delegate.log)
-            }
-        }
-        else {
-            actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-                def actor = null
-                if(request.remoteUser) {
-                    actor = request.remoteUser
-                }
-
-                if(!actor && request.userPrincipal) {
-                    actor = request.userPrincipal.getName()
-                }
-                return actor
+                        'pre-delete': auditLogListener,
+                        'pre-collection-update': auditLogListener,
+                        'pre-collection-remove': auditLogListener,
+                        'post-collection-recreate': auditLogListener]
             }
         }
     }
@@ -150,8 +111,9 @@ Stable Releases:
     def doWithApplicationContext = { applicationContext ->
         // pulls in the bean to inject and init
         AuditLogListener listener = applicationContext.getBean("auditLogListener")
-        listener.init()
         // allows user to over-ride the maximum length the value stored by the audit logger.
+        listener.setActorClosure(application.config?.auditLog?.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter)
+        listener.init()
         if (application.config?.auditLog?.TRUNCATE_LENGTH) {
             listener.truncateLength = new Long(application.config?.auditLog?.TRUNCATE_LENGTH)
         }
@@ -174,6 +136,4 @@ Stable Releases:
         // TODO Implement code that is executed when any class in a GrailsApplication changes
         // the event contain: event.source, event.application and event.applicationContext objects
     }
-
-    def actorDefaultGetter
 }

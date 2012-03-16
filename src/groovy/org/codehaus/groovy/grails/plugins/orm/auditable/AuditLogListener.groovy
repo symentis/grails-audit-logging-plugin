@@ -19,28 +19,43 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * 2009-09-25 rewrite.
  * 2009-10-04 preparing beta release
  * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
- * 2012-01-20 Audit Logging rewrite for Grails 2.0
  */
 
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.event.Initializable;
 import org.hibernate.event.PreDeleteEvent;
+import org.hibernate.event.PreDeleteEventListener;
 import org.hibernate.event.PostInsertEvent;
+import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
+import org.hibernate.event.PostUpdateEventListener;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.hibernate.SessionFactory
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.hibernate.Session
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
-public class AuditLogListener implements AuditEventListener {
+public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
+
     public static final Log log = LogFactory.getLog(AuditLogListener.class);
     public static Long TRUNCATE_LENGTH = 255
-    Long truncateLength
 
-    AuditLogConfig config
-    def sessionFactory
+    /**
+     * The verbose flag flips on and off column by column change logging in
+     * insert and delete events. If this is true then all columns are logged
+     * each as an individual event.
+     */
+    boolean verbose = true // in Config.groovy auditLog.verbose = true
+    boolean transactional = false
+    Long truncateLength
+    SessionFactory sessionFactory
+
+    String sessionAttribute
+    String actorKey
+
     Closure actorClosure
 
     void setActorClosure(Closure closure) {
@@ -51,13 +66,8 @@ public class AuditLogListener implements AuditEventListener {
 
     void init() {
         if (Environment.getCurrent() != Environment.PRODUCTION && ConfigurationHolder.config.auditLog?.transactional == null) {
-            config.transactional = false
+            transactional = false
         }
-
-        if(config?.actorClosure)
-            this.setActorClosure(config.actorClosure)
-
-
 
         log.info AuditLogListener.class.getCanonicalName() + " initializing AuditLogListener... "
         if (!truncateLength) {
@@ -68,12 +78,28 @@ public class AuditLogListener implements AuditEventListener {
         }
     }
 
+    /**
+     * if verbose is set to 'true' then you get a log event on
+     * each individually changed column/field sent to the database
+     * with a record of the old value and the new value.
+     */
+    void setVerbose(final boolean verbose) {
+        this.verbose = verbose
+    }
+
     String getActor() {
         def actor = null
         try {
-            def attr = RequestContextHolder?.getRequestAttributes()
-            def session = attr?.session
-            actor = ( session ) ? actorClosure?.call(attr, session) : 'system'
+            if (actorClosure) {
+                def attr = RequestContextHolder?.getRequestAttributes()
+                def session = attr?.session
+                if (attr && session) {
+                    actor = actorClosure.call(attr, session)
+                }
+                else { // no session or attributes mean this is invoked from a Service, Quartz Job, or other headless-operation
+                    actor = 'system'
+                }
+            }
         } catch (Exception ex) {
             log.error "The auditLog.actorClosure threw this exception: ${ex.message}"
             ex.printStackTrace()
@@ -487,10 +513,5 @@ public class AuditLogListener implements AuditEventListener {
             log.error audit.errors
         }
         return
-    }
-
-    @Override
-    void setConfig(AuditEventListenerConfig config) {
-        this.config = config
     }
 }
