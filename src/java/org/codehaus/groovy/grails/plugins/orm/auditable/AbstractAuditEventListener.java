@@ -18,6 +18,11 @@ import java.util.List;
 abstract class AbstractAuditEventListener implements AuditEventListener{
     public static final Log log = LogFactory.getLog(AuditEventListener.class);
 
+    AuditableRegistry auditableRegistry;
+    public void setAuditableRegistry(AuditableRegistry auditableReg) {
+        this.auditableRegistry = auditableReg;
+    }
+
     AuditLogConfig config;
     public void setConfig(AuditLogConfig config) {
         this.config = config;
