@@ -15,7 +15,7 @@ class AuditEventLogHandler implements AuditEventHandler {
     }
 
     @Override
-    boolean handle(AuditEvent event) {
+    boolean handle(final AuditEvent event) {
         return false  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

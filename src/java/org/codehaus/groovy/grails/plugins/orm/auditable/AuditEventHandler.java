@@ -9,5 +9,5 @@ package org.codehaus.groovy.grails.plugins.orm.auditable;
  */
 public interface AuditEventHandler {
     void setListener(AuditEventListener listener);
-    boolean handle(AuditEvent event);
+    boolean handle(final AuditEvent event);
 }
