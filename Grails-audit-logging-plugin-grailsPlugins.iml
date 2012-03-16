@@ -6,7 +6,6 @@
     <content url="file://$USER_HOME$/.grails/2.0.0/projects/audit-logging/plugins/tomcat-2.0.0" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="groovy-1.7.10" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="grails-2.0.0" level="application" />
     <orderEntry type="module-library" exported="">
       <library name="Grails User Library (Grails-audit-logging-plugin-grailsPlugins)">
