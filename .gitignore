@@ -1,0 +1,8 @@
+*.iml
+out/
+target/
+*.log
+*.class
+*.zip
+.idea/
+web-app/
