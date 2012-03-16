@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="78551329-f309-42ff-8c61-4e8f941889fd" name="Default" comment="attribution">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Grails-audit-logging-plugin-grailsPlugins.iml" afterPath="$PROJECT_DIR$/Grails-audit-logging-plugin-grailsPlugins.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Grails-audit-logging-plugin.iml" afterPath="$PROJECT_DIR$/Grails-audit-logging-plugin.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grails-audit-logging-plugin.ipr" afterPath="$PROJECT_DIR$/grails-audit-logging-plugin.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grails-audit-logging-plugin.iws" afterPath="$PROJECT_DIR$/grails-audit-logging-plugin.iws" />
-    </list>
+    <list default="true" id="78551329-f309-42ff-8c61-4e8f941889fd" name="Default" comment="" />
     <ignored path="grails-audit-logging-plugin.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$USER_HOME$/.grails/" />
@@ -17,9 +12,6 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
-  <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/grails-audit-logging-plugin$testAuditableRegistryDetection__.ic" NAME="testAuditableRegistryDetection() Coverage Results" MODIFIED="1328238233182" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
-  </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
@@ -27,34 +19,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistryTests.groovy" line="29" class="org.codehaus.groovy.grails.plugins.orm.auditable.AuditableRegistryTests" package="">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistry.groovy" line="10" class="org.codehaus.groovy.grails.plugins.orm.auditable.AuditableRegistry" package="">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </line_breakpoints>
     <breakpoint_any>
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -95,79 +59,68 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="AuditableRegistryTests.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistryTests.groovy">
+      <file leaf-file-name="AuditLogListener.groovy" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogListener.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="92" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0">
+            <state line="85" column="17" selection-start="3053" selection-end="3053" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="e#58#117#0" expanded="true" />
+                <element signature="e#961#1000#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MockHibernateGrailsPlugin.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/MockHibernateGrailsPlugin.groovy">
+      <file leaf-file-name="AuditLogConfig.groovy" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogConfig.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="3" selection-start="223" selection-end="223" vertical-scroll-proportion="0.0">
+            <state line="10" column="0" selection-start="271" selection-end="271" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AuditEventListenerConfig.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AuditEventListenerConfig.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="12" column="0" selection-start="286" selection-end="286" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AuditEventListener.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AuditEventListener.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="50" selection-start="939" selection-end="939" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="e#58#136#0" expanded="true" />
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AbstractHibernateTests.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AbstractHibernateTests.groovy">
+      <file leaf-file-name="CreateAuditLogDomain.groovy" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/scripts/CreateAuditLogDomain.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="42" selection-start="1288" selection-end="1288" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#58#95#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="8" column="65" selection-start="209" selection-end="209" vertical-scroll-proportion="0.13274336">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AuditableRegistry.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistry.groovy">
+      <file leaf-file-name="AuditLogEvent.groovy" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogEvent.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="14" selection-start="179" selection-end="179" vertical-scroll-proportion="0.0">
+            <state line="6" column="6" selection-start="209" selection-end="209" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GrailsUnitTestCase.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/tools/grails/grails-2.0.0/src/grails-plugin-testing-2.0.0-sources.jar!/grails/test/GrailsUnitTestCase.groovy">
+      <file leaf-file-name="AuditLogListenerUtil.groovy" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogListenerUtil.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="97" column="0" selection-start="4050" selection-end="4050" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AuditableConfig.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableConfig.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="24" selection-start="261" selection-end="261" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AuditableConfigTests.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableConfigTests.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="55" selection-start="509" selection-end="509" vertical-scroll-proportion="0.0">
+            <state line="18" column="33" selection-start="658" selection-end="678" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -176,17 +129,10 @@
       <file leaf-file-name="AuditLoggingGrailsPlugin.groovy" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AuditLoggingGrailsPlugin.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="100" column="38" selection-start="3618" selection-end="3618" vertical-scroll-proportion="-0.5769231">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AuditLogConfig.groovy" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogConfig.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="225" selection-end="225" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="176" column="26" selection-start="6872" selection-end="6872" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#0#72#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -207,21 +153,12 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogListener.groovy" />
-        <option value="$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AbstractAuditEventListener.java" />
-        <option value="$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/Auditable.aj" />
-        <option value="$PROJECT_DIR$/test/unit/AuditableRegistryTests.groovy" />
-        <option value="$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditEvent.groovy" />
-        <option value="$PROJECT_DIR$/scripts/CreateAuditLogDomain.groovy" />
-        <option value="$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AbstractGormTests.groovy" />
-        <option value="$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableConfig.groovy" />
-        <option value="$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableConfigTests.groovy" />
-        <option value="$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogConfig.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogListenerUtil.groovy" />
         <option value="$PROJECT_DIR$/AuditLoggingGrailsPlugin.groovy" />
-        <option value="$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistry.groovy" />
-        <option value="$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/MockHibernateGrailsPlugin.groovy" />
-        <option value="$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistryTests.groovy" />
-        <option value="$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AbstractHibernateTests.groovy" />
-        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogConfig.groovy" />
+        <option value="$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AuditEventListener.java" />
+        <option value="$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AuditEventListenerConfig.java" />
+        <option value="$PROJECT_DIR$/scripts/CreateAuditLogDomain.groovy" />
       </list>
     </option>
   </component>
@@ -260,20 +197,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="grails-audit-logging-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Grails-audit-logging-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -294,46 +217,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="grails-audit-logging-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="grails-audit-logging-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="grails-audit-logging-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="unit" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="auditable" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="grails-audit-logging-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="grails-audit-logging-plugin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="integration" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -467,6 +350,20 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="grails-audit-logging-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Grails-audit-logging-plugin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -475,7 +372,6 @@
     <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="options.lastSelected" value="preferences.pluginManager" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -485,85 +381,15 @@
     <property name="FullScreen" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="org.codehaus.groovy.grails.plugins.orm.auditable" />
     </key>
   </component>
-  <component name="RunManager" selected="Grails.AuditableRegistryTests">
-    <configuration default="false" name="testAuditableRegistryDetection()" type="GrailsRunConfigurationType" factoryName="Grails" temporary="true">
-      <module name="Grails-audit-logging-plugin" />
-      <setting name="vmparams" value="" />
-      <setting name="cmdLine" value="test-app unit: org.codehaus.groovy.grails.plugins.orm.auditable.AuditableRegistry.testAuditableRegistryDetection -echoOut --stacktrace -verbose -verboseCompile" />
-      <setting name="depsClasspath" value="true" />
-      <env name="grails.verboseCompile" value="true" />
-      <setting name="passParentEnv" value="true" />
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <setting name="launchBrowser" value="true" />
-      <MavenGeneralSettings>
-        <option name="checksumPolicy" value="FAIL" />
-        <option name="failureBehavior" value="FAST" />
-        <option name="localRepository" value="" />
-        <option name="mavenHome" value="" />
-        <option name="nonRecursive" value="false" />
-        <option name="pluginUpdatePolicy" value="DO_NOT_UPDATE" />
-        <option name="printErrorStackTraces" value="false" />
-        <option name="snapshotUpdatePolicy" value="ALWAYS_UPDATE" />
-        <option name="usePluginRegistry" value="false" />
-        <option name="userSettingsFile" value="" />
-        <option name="workOffline" value="false" />
-      </MavenGeneralSettings>
-      <RunnerSettings RunnerId="Cover" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Cover" />
-      <ConfigurationWrapper RunnerId="Debug" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method>
-        <option name="Make" enabled="false" />
-      </method>
-    </configuration>
-    <configuration default="false" name="AuditableRegistryTests" type="GrailsRunConfigurationType" factoryName="Grails" temporary="true">
-      <module name="Grails-audit-logging-plugin" />
-      <setting name="vmparams" value="" />
-      <setting name="cmdLine" value="test-app unit: org.codehaus.groovy.grails.plugins.orm.auditable.AuditableRegistry -echoOut" />
-      <setting name="depsClasspath" value="true" />
-      <setting name="passParentEnv" value="true" />
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <setting name="launchBrowser" value="true" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <ConfigurationWrapper RunnerId="Debug" />
-      <method>
-        <option name="Make" enabled="false" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GrailsRunConfigurationType" factoryName="Grails">
-      <module name="" />
-      <setting name="vmparams" value="" />
-      <setting name="cmdLine" value="run-app" />
-      <setting name="depsClasspath" value="true" />
-      <setting name="passParentEnv" value="true" />
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <setting name="launchBrowser" value="true" />
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-      </method>
-    </configuration>
+  <component name="RunManager">
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
@@ -588,6 +414,24 @@
       </method>
     </configuration>
     <configuration default="true" type="FlexUnitRunConfigurationType" factoryName="FlexUnit" adl_options="" air_descriptor_path="" air_program_params="" air_publisher_id="" air_root_dir_path="" air_run_mode="AppDescriptor" browser_family="FIREFOX" class_name="" debugger_sdk="Module SDK" html_or_swf_file_path="" launcher_type="OSDefault" main_class_name="" method_name="" module_name="" output_log_level="" package_name="" player_path="/Applications/Flash Player Debugger.app" port="0" run_mode="HtmlOrSwfFile" run_trusted="true" scope="Class" socket_policy_port="0" url_to_launch="http://">
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
@@ -621,24 +465,6 @@
       <envs />
       <properties />
       <listeners />
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-      </method>
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
@@ -706,10 +532,7 @@
         <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
-    <list size="2">
-      <item index="0" class="java.lang.String" itemvalue="Grails.testAuditableRegistryDetection()" />
-      <item index="1" class="java.lang.String" itemvalue="Grails.AuditableRegistryTests" />
-    </list>
+    <list size="0" />
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
       <Port>5050</Port>
@@ -744,20 +567,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1072" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.53515214" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5424974" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Grails View" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32965687" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="ASM" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32948583" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -765,12 +586,13 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27267158" sideWeight="0.46484786" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32948583" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25245097" sideWeight="0.67051417" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32948583" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32948583" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -808,7 +630,7 @@
     <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
     <option name="CREATE_PATCH_EXPAND_DETAILS_DEFAULT" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="ignore configuration files" />
+    <option name="LAST_COMMIT_MESSAGE" value="beginning to do a serious refactor, define more atomic API and define extension points for end users to implement their own take on Audit Logging." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -825,11 +647,6 @@
     <MESSAGE value="formatting" />
     <MESSAGE value="Preparing for new release" />
     <MESSAGE value="beginning to do a serious refactor, define more atomic API and define extension points for end users to implement their own take on Audit Logging." />
-    <MESSAGE value="this refactor introduces a stub for AuditEvent handlers. This will let us deal with folks who want their own custom logging or other behaviors without having to create a patch." />
-    <MESSAGE value="building up a registry of the domain classes configured for AuditLog events" />
-    <MESSAGE value="A step toward testable events thanks to code from grails-core" />
-    <MESSAGE value="attribution" />
-    <MESSAGE value="ignore configuration files" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -839,104 +656,62 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogEvent.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="6" selection-start="209" selection-end="209" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogListener.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="120" column="30" selection-start="4430" selection-end="4430" vertical-scroll-proportion="0.0" />
+        <state line="85" column="17" selection-start="3053" selection-end="3053" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#961#1000#0" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AbstractAuditEventListener.java">
+    <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogListenerUtil.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="4" selection-start="567" selection-end="567" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/tools/grails/grails-2.0.0/src/grails-core-2.0.0-sources.jar!/org/codehaus/groovy/grails/support/MockApplicationContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="13" selection-start="1872" selection-end="1872" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/Auditable.aj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="14" selection-start="154" selection-end="154" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/tools/grails/grails-2.0.0/src/grails-scripts-2.0.0-sources.jar!/TestApp.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="0" selection-start="2720" selection-end="2720" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/tools/groovy/groovy-1.7.10/lib/ant-1.8.2.jar!/org/apache/tools/ant/UnknownElement.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="0" selection-start="3575" selection-end="3575" vertical-scroll-proportion="0.8280423" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableConfig.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="24" selection-start="261" selection-end="261" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableConfigTests.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="55" selection-start="509" selection-end="509" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogConfig.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="225" selection-end="225" vertical-scroll-proportion="0.0">
+        <state line="18" column="33" selection-start="658" selection-end="678" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AuditLoggingGrailsPlugin.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="100" column="38" selection-start="3618" selection-end="3618" vertical-scroll-proportion="-0.5769231">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistry.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="14" selection-start="179" selection-end="179" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/tools/grails/grails-2.0.0/src/grails-plugin-testing-2.0.0-sources.jar!/grails/test/GrailsUnitTestCase.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="0" selection-start="4050" selection-end="4050" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/MockHibernateGrailsPlugin.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="3" selection-start="223" selection-end="223" vertical-scroll-proportion="0.0">
+        <state line="176" column="26" selection-start="6872" selection-end="6872" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#58#136#0" expanded="true" />
+            <element signature="e#0#72#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AuditableRegistryTests.groovy">
+    <entry file="file://$PROJECT_DIR$/src/groovy/org/codehaus/groovy/grails/plugins/orm/auditable/AuditLogConfig.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="92" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0">
+        <state line="10" column="0" selection-start="271" selection-end="271" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AuditEventListenerConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="0" selection-start="286" selection-end="286" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/org/codehaus/groovy/grails/plugins/orm/auditable/AuditEventListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="50" selection-start="939" selection-end="939" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#58#117#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/unit/org/codehaus/groovy/grails/plugins/orm/auditable/AbstractHibernateTests.groovy">
+    <entry file="file://$PROJECT_DIR$/scripts/CreateAuditLogDomain.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="42" selection-start="1288" selection-end="1288" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#58#95#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="8" column="65" selection-start="209" selection-end="209" vertical-scroll-proportion="0.13274336">
           <folding />
         </state>
       </provider>
