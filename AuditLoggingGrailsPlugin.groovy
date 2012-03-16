@@ -10,70 +10,48 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 
 /**
  * @author Shawn Hartsock
- *<p/>
+ *
  * Credit is due to the following other projects,
  * first is Kevin Burke's HibernateEventsGrailsPlugin
  * second is the AuditLogging post by Rob Monie at
  * http://www.hibernate.org/318.html
- * <p/>
+ * 
  * I've combined the two sources to create a Grails
  * Audit Logging plugin that will track individual
  * changes to columns.
- * <p/>
+ * 
  * See Documentation:
  * http://grails.org/plugin/audit-logging
- * <p/>
+ * 
  * Changes:
- * <p/>
  * Release 0.3
- * <p/>
  *      * actorKey and username features allow for the logging of
  *        user or userPrincipal for most security systems.
- * <p/>
  * 
  * Release 0.4
- * <p/>
  * 		* custom serializable implementation for AuditLogEvent so events can happen
  *        inside a webflow context.
- * <p/>
  *      * tweak application.properties for loading in other grails versions
- * <p/>
  *      * update to views to show URI in an event
- * <p/>
  *      * fix missing oldState bug in change event
- * <p/>
  *
  * Release 0.4.1
- * <p/>
  *      * repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181
- * <p/>
  *
  * Release 0.5_ALPHA see GRAILSPLUGINS-391
- * <p/>
  *      * changes to AuditLogEvent domain object uses composite id to simplify logging
- * <p/>
  *      * changes to AuditLogListener uses new domain model with separate transaction
  *        for logging action to avoid invalidating the main hibernate session.
- * <p/>
  * Release 0.5_BETA see GRAILSPLUGINS-391
- * <p/>
  *      * testing version released generally.
- * <p/>
  * Release 0.5 see GRAILSPLUGINS-391, GRAILSPLUGINS-1496, GRAILSPLUGINS-1181, GRAILSPLUGINS-1515, GRAILSPLUGINS-1811
- * <p/>
  * Release 0.5.1 fixes regression in field logging
- * <p/>
  * Release 0.5.2 see GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354
- * <p/>
- * Release 0.5.3 GRAILSPLUGINS-2135 GRAILSPLUGINS-2060 &amp; an issue with extra JAR files that are somehow getting released as part of the plugin
- * <p/>
+ * Release 0.5.3 GRAILSPLUGINS-2135 GRAILSPLUGINS-2060 && an issue with extra JAR files that are somehow getting released as part of the plugin
  * Release 0.5.4 compatibility issues with Grails 1.3.x
- * <p/>
- * Release 0.5.5 
- * <p/>
  */
 class AuditLoggingGrailsPlugin {
-    def version = "0.5.5-SNAPSHOT"
+    def version = "0.5.4"
     def grailsVersion = '1.1 > *'    
     def author = "Shawn Hartsock"
     def authorEmail = "hartsock@acm.org"
