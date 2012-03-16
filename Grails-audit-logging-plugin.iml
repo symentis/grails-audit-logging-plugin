@@ -31,11 +31,10 @@
       <sourceFolder url="file://$MODULE_DIR$/grails-app/services" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/grails-app/taglib" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/unit" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/controllers" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/domain" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="groovy-1.7.10" level="application" />
     <orderEntry type="library" name="grails-2.0.0" level="application" />
     <orderEntry type="module-library" exported="">
       <library name="Grails User Library (Grails-audit-logging-plugin)">
