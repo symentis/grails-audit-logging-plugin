@@ -92,66 +92,75 @@ Stable Releases:
     def loadAfter = ['core', 'hibernate']
 
     def doWithSpring = {
-        auditableRegsitry(AuditableRegistry)
 
-        def auditEventHandlers = new LinkedList<AuditEventHandler>()
-        // TODO stuff... and things...
+        auditableRegistry(AuditableRegistry)
 
-        Class listenerClass = application.config?.auditLog?.listenerClass ?: AuditLogListener
+        if (manager?.hasGrailsPlugin("hibernate")) {
+            auditEventListenerConfig(AuditLogConfig) {
+                sessionFactory = sessionFactory
+                auditableRegistry = auditableRegistry
+                verbose = application.config?.auditLog?.verbose ?: false
+                transactional = application.config?.auditLog?.transactional ?: false
+                // users may specify their own closure for this job
+                actorClosure = {->
+                    def actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
+                        def actor = null
+                        if(request.remoteUser) {
+                            actor = request.remoteUser
+                        }
 
-        auditLogListener(listenerClass) {
-            configuration = { AuditLogConfig auditLogConfig ->
-                verbose = application.config?.auditLog?.verbose ?true: false
-                transactional = application.config?.auditLog?.transactional ?true: false
+                        if(!actor && request.userPrincipal) {
+                            actor = request.userPrincipal.getName()
+                        }
+                        return actor
+                    }
+
+                    if (application.config?.auditLog?.sessionAttribute) {
+                        actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
+                            log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
+                            session.getAttribute(application.config?.auditLog?.sessionAttribute)
+                        }
+                    }
+                    else if (application.config?.auditLog?.actorKey) {
+                        actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
+                            log.debug "configured with actorKey ${actorKey} resolve using request attributes "
+                            AuditLogListenerUtil.resolve(request.getAttributes(),application.config?.auditLog?.actorKey,delegate.log)
+                        }
+                    }
+                    else if (application.config?.auditLog?.actorClosure) {
+                        actorDefaultGetter = application.config?.auditLog?.actorClosure
+                    }
+                    actorDefaultGetter
+                }
             }
-            auditEventHandlers = auditEventHandlers
 
+
+            def auditEventHandlers = new LinkedList<AuditEventHandler>()
+            // TODO stuff... and things...
+
+            Class listenerClass = application.config?.auditLog?.listenerClass ?: AuditLogListener
+            auditLogListener(listenerClass) {
+                configuration = auditEventListenerConfig
+                auditEventHandlers = auditEventHandlers
+            }
+
+            //PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
+            hibernateEventListeners(HibernateEventListeners) {
+                listenerMap = [
+                        'post-insert': auditLogListener,
+                        'post-update': auditLogListener,
+                        'pre-delete': auditLogListener
+                ]
+            }
         }
-
-        //PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
-        hibernateEventListeners(HibernateEventListeners) {
-            listenerMap = [
-                    'post-insert': auditLogListener,
-                    'post-update': auditLogListener,
-                    'pre-delete': auditLogListener
-            ]
+        else {
+            log.error("Audit Logging Plugin only implements Hibernate!")
         }
     }
 
-
     def doWithApplicationContext = { applicationContext ->
-        AuditLogListener listener = applicationContext.getBean("auditLogListener")
-        listener.auditableRegistry = applicationContext.getBean("auditableRegsitry")
-        listener.actorClosure = { GrailsWebRequest request, HttpSession session ->
-            def actor = null
-            if(request.remoteUser) {
-                actor = request.remoteUser
-            }
-
-            if(!actor && request.userPrincipal) {
-                actor = request.userPrincipal.getName()
-            }
-            return actor
-        }
-
-        if (application.config?.auditLog?.sessionAttribute) {
-            listener.actorClosure = { GrailsWebRequest request, HttpSession session ->
-                log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
-                session.getAttribute(application.config?.auditLog?.sessionAttribute)
-            }
-        }
-        else if (application.config?.auditLog?.actorKey) {
-            listener.actorClosure = { GrailsWebRequest request, HttpSession session ->
-                log.debug "configured with actorKey ${actorKey} resolve using request attributes "
-                AuditLogListenerUtil.resolve(request.getAttributes(),application.config?.auditLog?.actorKey,delegate.log)
-            }
-        }
-        else if (application.config?.auditLog?.actorClosure) {
-            listener.actorClosure = application.config?.auditLog?.actorClosure
-        }
-
         // pulls in the bean to inject and init
-        listener.sessionFactory = applicationContext.getBean('sessionFactory')
+        AuditLogListener listener = applicationContext.getBean("auditLogListener")
         listener.init()
         // allows user to over-ride the maximum length the value stored by the audit logger.
         if (application.config?.auditLog?.TRUNCATE_LENGTH) {

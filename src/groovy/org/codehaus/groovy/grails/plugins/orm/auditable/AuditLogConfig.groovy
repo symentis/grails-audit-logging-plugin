@@ -8,9 +8,6 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * To change this template use File | Settings | File Templates.
  */
 class AuditLogConfig implements AuditEventListenerConfig {
-    public static Long TRUNCATE_LENGTH = 255
-    Long truncateLength
-
     boolean verbose
     boolean transactional
     Closure actorClosure
