@@ -35,22 +35,22 @@ import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 public class AuditLogListener extends AbstractAuditEventListener implements AuditEventListener {
-
-    AuditLogConfig configuration
+    public static Long TRUNCATE_LENGTH = 255
+    Long truncateLength
 
     def sessionFactory
 
     void init() {
         if (Environment.getCurrent() != Environment.PRODUCTION && ConfigurationHolder.config.auditLog?.transactional == null) {
-            configuration.transactional = false
+            config.transactional = false
         }
 
-        if(configuration?.actorClosure)
-            this.setActorClosure(configuration.actorClosure)
+        if(config?.actorClosure)
+            this.setActorClosure(config.actorClosure)
 
         log.info AuditLogListener.class.getCanonicalName() + " initializing AuditLogListener... "
-        if (!configuration.truncateLength) {
-            configuration.truncateLength = new Long(AuditLogConfig.TRUNCATE_LENGTH)
+        if (!truncateLength) {
+            truncateLength = new Long(TRUNCATE_LENGTH)
         }
         else {
             log.debug "truncate length set to ${truncateLength}"
@@ -394,7 +394,7 @@ public class AuditLogListener extends AbstractAuditEventListener implements Audi
     }
 
     String truncate(final obj) {
-        truncate(obj, configuration.truncateLength.toInteger())
+        truncate(obj, truncateLength.toInteger())
     }
 
     String truncate(final obj, int max) {
@@ -467,7 +467,7 @@ public class AuditLogListener extends AbstractAuditEventListener implements Audi
             Session session = sessionFactory.openSession()
             log.trace "opened new session for audit log persistence"
             def trans = null
-            if (configuration.transactional) {
+            if (transactional) {
                 trans = session.beginTransaction()
                 log.trace " + began transaction "
             }
@@ -475,7 +475,7 @@ public class AuditLogListener extends AbstractAuditEventListener implements Audi
             log.debug " + saved log entry id:'${saved.id}'."
             session.flush()
             log.trace " + flushed session"
-            if (configuration.transactional) {
+            if (transactional) {
                 trans?.commit()
                 log.trace " + committed transaction"
             }
