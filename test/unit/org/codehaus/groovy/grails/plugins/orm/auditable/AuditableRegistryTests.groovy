@@ -22,28 +22,10 @@ class ExampleClassicAuditableEntity {
     static auditable = true
     String value
 }
-
-@Entity
-class ExampleMapConfiguredEntity {
-    static auditable = [handlersOnly:true]
-    String value
-}
-
-@Entity
-class ExampleMapConfiguredEntityToo {
-    static auditable = [ignoreList:['value']]
-    String value
-}
-
-@Entity
-class ExampleMapConfiguredEntityTransactionalTrue {
-    static auditable = [transactional:true]
-    String value
-}
 ''')
     }
 
-    void testIsAuditableRegistryDetection() {
+    void testAuditableRegistryDetection() {
         println ga.getDomainClasses()
         def dClass = ga.getDomainClass("ExampleClassicAuditableEntity")
         println dClass
@@ -51,34 +33,6 @@ class ExampleMapConfiguredEntityTransactionalTrue {
         println exampleClass
         assert exampleClass != null
         assert auditableRegistry.isAuditable(dClass) == true
-    }
-
-    void testRegistrationOfDomainClass() {
-        def dClass = ga.getDomainClass("ExampleClassicAuditableEntity")
-        assert auditableRegistry.register(dClass) == true
-        def config = auditableRegistry.getAuditableConfig(dClass)
-        assert config instanceof AuditableConfig
-        assert config.handlersOnly == false
-        assert config.ignoreList == ['version','lastUpdated']
-    }
-
-    void testGetAuditableConfigHandlersOnly() {
-        def dClass = ga.getDomainClass("ExampleMapConfiguredEntity")
-        assert auditableRegistry.register(dClass) == true
-        def config = auditableRegistry.getAuditableConfig(dClass)
-        assert config instanceof AuditableConfig
-        assert config.handlersOnly == true
-        assert config.ignoreList == ['version','lastUpdated']
-    }
-
-    void testGetAuditableConfigHandlersOnlyTooTransactionalTrue() {
-        def dClass = ga.getDomainClass("ExampleMapConfiguredEntityTransactionalTrue")
-        assert auditableRegistry.register(dClass) == true
-        def config = auditableRegistry.getAuditableConfig(dClass)
-        assert config instanceof AuditableConfig
-        assert config.handlersOnly == false
-        assert config.ignoreList == ['version','lastUpdated']
-        assert config.transactional == true
     }
 }
 
