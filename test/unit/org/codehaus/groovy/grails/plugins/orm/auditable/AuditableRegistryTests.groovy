@@ -1,5 +1,8 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import grails.test.GrailsUnitTestCase
+
 /**
  * Created by IntelliJ IDEA.
  * User: hartsock
