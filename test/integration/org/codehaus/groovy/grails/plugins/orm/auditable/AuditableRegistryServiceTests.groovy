@@ -10,12 +10,24 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.testing.AbstractHibernat
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(AuditableRegistryService)
-class AuditableRegistryServiceTests extends AbstractHibernateTests {
+class AuditableRegistryServiceTests {
     AuditableRegistryService auditableRegistryService
 
     void loadClasses() {
         this.gcl.parseClass('''
 import grails.persistence.*
+
+@Entity
+class Book {
+    static auditable = true
+    String title
+    String isbn
+
+    static constraints = {
+        title(nullable:false)
+        isbn(unique:true)
+    }
+}
 
 ''')
     }
@@ -23,6 +35,7 @@ import grails.persistence.*
     void testInit() {
         assert auditableRegistryService != null
         assert auditableRegistryService.registered() != [].toSet()
+        println auditableRegistryService.registered()
     }
 
     void testIsAuditable() {

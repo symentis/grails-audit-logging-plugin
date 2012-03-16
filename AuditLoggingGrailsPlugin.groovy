@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogConfig
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditEventHandler
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditableRegistry
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditableRegistryService
 
 /**
  * @author Shawn Hartsock
@@ -92,7 +93,11 @@ Stable Releases:
     def loadAfter = ['core', 'hibernate']
 
     def doWithSpring = {
-        auditableRegsitry(AuditableRegistry)
+        auditableRegsitryService(AuditableRegistryService) { bean ->
+            bean.autowire = 'byName'
+            bean.initMethod = 'init'
+            bean.scope = 'prototype'
+        }
 
         def auditEventHandlers = new LinkedList<AuditEventHandler>()
         // TODO stuff... and things...
@@ -121,7 +126,7 @@ Stable Releases:
 
     def doWithApplicationContext = { applicationContext ->
         AuditLogListener listener = applicationContext.getBean("auditLogListener")
-        listener.auditableRegistry = applicationContext.getBean("auditableRegsitry")
+        listener.auditableRegistry = applicationContext.getBean("auditableRegsitryService")
         listener.actorClosure = { GrailsWebRequest request, HttpSession session ->
             def actor = null
             if(request.remoteUser) {
@@ -156,13 +161,6 @@ Stable Releases:
         // allows user to over-ride the maximum length the value stored by the audit logger.
         if (application.config?.auditLog?.TRUNCATE_LENGTH) {
             listener.truncateLength = new Long(application.config?.auditLog?.TRUNCATE_LENGTH)
-        }
-
-        AuditableRegistry auditableRegistry = applicationContext.getBean("auditableRegsitry")
-        for (dc in application.domainClasses) {
-            if( auditableRegistry.isAuditable(dc) ) {
-                auditableRegistry.register(dc)
-            }
         }
     }
 

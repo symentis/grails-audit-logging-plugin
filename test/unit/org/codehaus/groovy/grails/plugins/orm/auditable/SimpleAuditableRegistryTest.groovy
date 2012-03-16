@@ -1,5 +1,7 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
+import org.codehaus.groovy.grails.plugins.orm.auditable.testing.AbstractHibernateTests
+
 /**
  * Created by IntelliJ IDEA.
  * User: hartsock

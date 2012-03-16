@@ -8,8 +8,9 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  */
 class AuditableRegistry {
     Map registry = new LinkedHashMap<Object,AuditableConfig>()
-    
+
     public Boolean isAuditable(entity) {
+        // TODO: make more efficient
         entity?.newInstance()?.auditable?true:false
     }
 
