@@ -21,9 +21,11 @@ import org.codehaus.groovy.grails.plugins.PluginManagerHolder
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 /**
- * This code was shamelessly lifted from:
- * https://github.com/grails/grails-core/
- * src/test/org/codehaus/groovy/grails/orm/hibernate/AbstractGrailsHibernateTests.groovy
+ * Created by IntelliJ IDEA.
+ * User: hartsock
+ * Date: 2/8/12
+ * Time: 11:50 PM
+ * To change this template use File | Settings | File Templates.
  */
 abstract class AbstractHibernateTests extends GroovyTestCase {
     GroovyClassLoader gcl = new GroovyClassLoader(this.getClass().classLoader)
