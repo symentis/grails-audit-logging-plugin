@@ -13,13 +13,15 @@ import org.hibernate.event.PreDeleteEventListener;
  * Date: 1/23/12
  * Time: 7:49 PM
  *
- * To provide your own
- *                       sessionFactory = sessionFactory
- verbose = application.config?.auditLog?.verbose ?: false
- transactional = application.config?.auditLog?.transactional ?: false
- sessionAttribute = application.config?.auditLog?.sessionAttribute ?: ""
- actorKey = application.config?.auditLog?.actorKey ?: ""
-
+ * To provide your own AuditEventListener implement this interface then configure
+ *
+ * <pre>
+ *     // inside conf/Config.groovy
+ *     auditLog {
+ *         listenerClass = MyClass
+ *     }
+ * </pre>
+ *
  * */
 public interface AuditEventListener extends PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
     void setSessionFactory(Object sessionFactory);
