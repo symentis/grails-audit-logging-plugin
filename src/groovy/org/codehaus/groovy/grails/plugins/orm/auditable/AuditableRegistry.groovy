@@ -1,24 +1,14 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
 /**
- * The auditableRegistry service provides a mechanism to more rapidly process
- * whether a class is auditable or not. It should <strong>never</strong> have
- * a class evicted from it. So it should be safe to have multiple threads reading
- * this service information.
+ *
  */
+
 class AuditableRegistry {
-    Map registry = new LinkedHashMap<Object,AuditableConfig>()
+    def registry = [:]
     
     public Boolean isAuditable(entity) {
         entity?.newInstance()?.auditable?true:false
-    }
-
-    Collection registered() {
-        registry.keySet()
-    }
-
-    boolean isRegistered(domainClass) {
-        registry.keySet().contains(domainClass)
     }
 
     AuditableConfig getAuditableConfig(entity) {
@@ -57,7 +47,7 @@ class AuditableRegistry {
         return config
     }
 
-    boolean register(clazz, AuditableConfig config) {
+    Boolean register(clazz, AuditableConfig config) {
         // Is this elegant? I'm not sure. It is Functional(tm)
         isAuditable(clazz)?
             {-> registry.put(clazz,config); true }.call() : false
