@@ -8,7 +8,7 @@ class AuditableRegistry {
     def registry = [:]
     
     public boolean isAuditable(entity) {
-        entity.properties['auditable']
+        entity.metaClass.properties['auditable']
     }
 
     AuditableConfig getConfiguration(Class clazz) {
