@@ -159,9 +159,9 @@ Stable Releases:
         }
 
         AuditableRegistry auditableRegistry = applicationContext.getBean("auditableRegsitry")
-        for (Class dc in application.domainClasses) {
-            if( dc.properties.containsKey('auditable') ) {
-                auditableRegistry.register(dc,dc.properties['auditable'])
+        for (dc in application.domainClasses) {
+            if( auditableRegistry.isAuditable(dc) ) {
+                auditableRegistry.register(dc)
             }
         }
     }
