@@ -10,4 +10,5 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
 class AuditableConfig {
     Boolean handlersOnly
     List ignoreList
+    Boolean transactional = false
 }
