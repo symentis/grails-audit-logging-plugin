@@ -12,7 +12,3 @@ out
 
 grails-audit-logging-plugin.iws
 
-*.class
-
-*.jar
-
