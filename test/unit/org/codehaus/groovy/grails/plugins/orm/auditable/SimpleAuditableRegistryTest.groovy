@@ -7,7 +7,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * Time: 8:38 PM
  * To change this template use File | Settings | File Templates.
  */
-class AuditableRegistryTests extends AbstractHibernateTests {
+class SimpleAuditableRegistryTest extends AbstractHibernateTests {
    AuditableRegistry auditableRegistry = new AuditableRegistry();
 
     void loadClasses() {

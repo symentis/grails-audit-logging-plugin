@@ -1,4 +1,4 @@
-package org.codehaus.groovy.grails.plugins.orm.auditable
+package org.codehaus.groovy.grails.plugins.orm.auditable.testing
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager
@@ -85,6 +85,7 @@ hibernate {
         dependantPluginClasses << gcl.loadClass("org.codehaus.groovy.grails.plugins.web.filters.FiltersGrailsPlugin")
         dependantPluginClasses << gcl.loadClass("org.codehaus.groovy.grails.plugins.converters.ConvertersGrailsPlugin")
         dependantPluginClasses << gcl.loadClass("org.codehaus.groovy.grails.plugins.services.ServicesGrailsPlugin")
+        dependantPluginClasses << gcl.loadClass("AuditLoggingGrailsPlugin")
         dependantPluginClasses << MockHibernateGrailsPlugin
 
         def dependentPlugins = dependantPluginClasses.collect { new DefaultGrailsPlugin(it, ga)}

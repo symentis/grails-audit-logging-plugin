@@ -1,4 +1,4 @@
-package org.codehaus.groovy.grails.plugins.orm.auditable
+package org.codehaus.groovy.grails.plugins.orm.auditable.testing
 
 import org.codehaus.groovy.grails.commons.AnnotationDomainClassArtefactHandler
 import org.codehaus.groovy.grails.plugins.orm.hibernate.HibernatePluginSupport
