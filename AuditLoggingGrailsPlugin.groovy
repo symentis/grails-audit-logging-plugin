@@ -1,6 +1,10 @@
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
+import org.codehaus.groovy.grails.plugins.orm.auditable.DomainEventListenerService
+import org.codehaus.groovy.grails.commons.spring.GrailsWebApplicationContext
+import org.codehaus.groovy.grails.domain.GrailsDomainClassMappingContext
+import org.grails.datastore.mapping.transactions.DatastoreTransactionManager
 
 /**
  * @author Shawn Hartsock
@@ -87,35 +91,53 @@ Stable Releases:
     def loadAfter = ['core', 'hibernate']
 
     def doWithSpring = {
+
+        auditLogListener(AuditLogListener) {
+            // can't inject here: sessionFactory = sessionFactory
+            verbose = application.config?.auditLog?.verbose ?: false
+            transactional = application.config?.auditLog?.transactional ?: false
+            sessionAttribute = application.config?.auditLog?.sessionAttribute ?: ""
+            actorKey = application.config?.auditLog?.actorKey ?: ""
+        }
+
         if (manager?.hasGrailsPlugin("hibernate")) {
-            auditLogListener(AuditLogListener) {
-                sessionFactory = sessionFactory
-                verbose = application.config?.auditLog?.verbose ?: false
-                transactional = application.config?.auditLog?.transactional ?: false
-                sessionAttribute = application.config?.auditLog?.sessionAttribute ?: ""
-                actorKey = application.config?.auditLog?.actorKey ?: ""
-            }
             //PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
             hibernateEventListeners(HibernateEventListeners) {
                 listenerMap = [
+                        //implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
                         'post-insert': auditLogListener,
                         'post-update': auditLogListener,
                         'pre-delete': auditLogListener,
-                        'pre-collection-update': auditLogListener,
-                        'pre-collection-remove': auditLogListener,
-                        'post-collection-recreate': auditLogListener]
+                        //'pre-collection-update': auditLogListener,
+                        //'pre-collection-remove': auditLogListener,
+                        //'post-collection-recreate': auditLogListener
+                        ]
             }
         }
     }
 
-    def doWithApplicationContext = { applicationContext ->
-        // pulls in the bean to inject and init
+    def doWithApplicationContext = { GrailsWebApplicationContext applicationContext ->
+        def sessionFactory = applicationContext.getBean('sessionFactory')
+        def domainEventListenerService = applicationContext.getBean("domainEventListenerService")
+
         AuditLogListener listener = applicationContext.getBean("auditLogListener")
+        listener.setSessionFactory(sessionFactory)
         // allows user to over-ride the maximum length the value stored by the audit logger.
         listener.setActorClosure(application.config?.auditLog?.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter)
         listener.init()
+
+        domainEventListenerService.auditLogListener = listener
+
+        applicationContext.applicationListeners.add(domainEventListenerService)
+        applicationContext.applicationEventMulticaster.addApplicationListener(domainEventListenerService)
+
         if (application.config?.auditLog?.TRUNCATE_LENGTH) {
             listener.truncateLength = new Long(application.config?.auditLog?.TRUNCATE_LENGTH)
+        }
+
+        def transactionManager = applicationContext.getBean('transactionManager')
+        if(transactionManager.hasProperty('datastore')) {
+            domainEventListenerService.register(transactionManager.datastore)
         }
     }
 

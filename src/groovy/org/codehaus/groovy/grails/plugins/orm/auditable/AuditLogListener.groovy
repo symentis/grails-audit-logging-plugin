@@ -19,6 +19,7 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * 2009-09-25 rewrite.
  * 2009-10-04 preparing beta release
  * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
+ * 2012-03-16 pull from https://github.com/ankurtripathi/grails-audit-logging-plugin issue with collections
  */
 
 import org.hibernate.HibernateException;
@@ -41,7 +42,7 @@ import org.hibernate.collection.PersistentCollection
 import org.hibernate.engine.CollectionEntry
 import org.hibernate.engine.PersistenceContext
 
-public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
+public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener {
 
     public static final Log log = LogFactory.getLog(AuditLogListener.class);
     public static Long TRUNCATE_LENGTH = 255
@@ -118,12 +119,9 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     }
 
     // returns true for auditable entities.
-    def isAuditableEntity(event) {
-        if (event && event.getEntity()) {
-            def entity = event.getEntity()
-            if (entity.metaClass.hasProperty(entity, 'auditable') && entity.'auditable') {
-                return true
-            }
+    def isAuditableEntity(entity) {
+        if (entity.metaClass.hasProperty(entity, 'auditable') && entity.'auditable') {
+            return true
         }
         return false
     }
@@ -190,7 +188,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
      */
     public boolean onPreDelete(final PreDeleteEvent event) {
         try {
-            def audit = isAuditableEntity(event)
+            def audit = isAuditableEntity(event.entity)
             String[] names = event.getPersister().getPropertyNames()
             Object[] state = event.getDeletedState()
             def map = makeMap(names, state)
@@ -219,7 +217,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
      */
     public void onPostInsert(final PostInsertEvent event) {
         try {
-            def audit = isAuditableEntity(event)
+            def audit = isAuditableEntity(event.entity)
             String[] names = event.getPersister().getPropertyNames()
             Object[] state = event.getState()
             def map = makeMap(names, state)
@@ -268,7 +266,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
      * Needs complex type testing BTW.
      */
     public void onPostUpdate(final PostUpdateEvent event) {
-        if (isAuditableEntity(event)) {
+        if (isAuditableEntity(event.entity)) {
             log.trace "${event.getClass()} onChange handler has been called"
             onChange(event)
         }
@@ -468,7 +466,12 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     def executeHandler(event, handler, oldState, newState) {
         log.trace "calling execute handler ... "
         def entity = event.getEntity()
-        if (isAuditableEntity(event) && entity.metaClass.hasProperty(entity, handler)) {
+        executeHandlerEntity(entity, handler, oldState, newState)
+        log.trace "... execute handler is finished."
+    }
+
+    def executeHandlerEntity(entity, handler, oldState, newState) {
+        if (isAuditableEntity(entity) && entity.metaClass.hasProperty(entity, handler)) {
             log.trace "entity was auditable and had a handler property ${handler}"
             if (oldState && newState) {
                 log.trace "there was both an old state and a new state"
@@ -490,7 +493,6 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 entity."${handler}"(newState)
             }
         }
-        log.trace "... execute handler is finished."
     }
 
     /**
