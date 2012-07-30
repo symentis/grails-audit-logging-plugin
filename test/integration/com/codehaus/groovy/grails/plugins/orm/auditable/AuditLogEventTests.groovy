@@ -5,28 +5,28 @@ import grails.persistence.Entity
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.codehaus.groovy.grails.plugins.orm.auditable.DomainEventListenerService
 import grails.test.mixin.TestFor
-import grails.test.GrailsUnitTestCase
-import org.codehaus.groovy.grails.domain.GrailsDomainClassMappingContext
 
-@TestFor(AuditLogEvent)
+@TestFor(ExampleClassicAuditableEntity)
 class AuditLogEventTests  {
     DomainEventListenerService domainEventListenerService
     AuditLogListener auditLogListener
 
     void testAuditableDetection() {
+        def logCount = 0
         assert domainEventListenerService != null
         assert auditLogListener != null
+        auditLogListener.saveAuditLog = { AuditLogEvent audit ->
+            logCount++
+        }
 
-        mockDomain(ExampleClassicAuditableEntity);
+        mockDomain(AuditLogEvent);
 
-        // domainEventListenerService.register(simpleDatastore)
         applicationContext.applicationEventMulticaster.addApplicationListener(domainEventListenerService)
 
-        def count = AuditLogEvent.count()
-        assert ExampleClassicAuditableEntity.count() == 0
+        assert 0 == logCount
         new ExampleClassicAuditableEntity(value:'foo').save()
         assert ExampleClassicAuditableEntity.count() == 1
-        assert count + 1 == AuditLogEvent.count()
+        assert 1 == logCount
     }
 }
 
@@ -34,7 +34,4 @@ class AuditLogEventTests  {
 class ExampleClassicAuditableEntity {
     static auditable = true
     String value
-    void afterInsert() {
-        println "called"
-    }
 }

@@ -525,22 +525,22 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
             // sessions or you can essentially roll-back your audit log saves. This is
             // why you have to open your own session and transaction on some
             // transactional databases and not others.
-            Session session = sessionFactory.openSession()
+            Session session = sessionFactory?.openSession()
             log.trace "opened new session for audit log persistence"
             def trans = null
             if (transactional) {
-                trans = session.beginTransaction()
+                trans = session?.beginTransaction()
                 log.trace " + began transaction "
             }
-            def saved = session.merge(audit)
-            log.debug " + saved log entry id:'${saved.id}'."
-            session.flush()
+            def saved = session?.merge(audit)
+            log.debug " + saved log entry id:'${saved?.id}'."
+            session?.flush()
             log.trace " + flushed session"
             if (transactional) {
                 trans?.commit()
                 log.trace " + committed transaction"
             }
-            session.close()
+            session?.close()
             log.trace "session closed"
         } catch (org.hibernate.HibernateException ex) {
             log.error "AuditLogEvent save has failed!"

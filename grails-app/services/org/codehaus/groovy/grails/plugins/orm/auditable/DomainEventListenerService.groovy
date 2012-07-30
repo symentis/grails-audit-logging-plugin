@@ -1,14 +1,13 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import org.grails.datastore.mapping.engine.event.PersistenceEventListener
 import org.springframework.context.ApplicationEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.*
-import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.model.MappingContext;
+import org.springframework.context.event.SmartApplicationListener
+import org.grails.datastore.mapping.engine.EntityAccess
+import org.grails.datastore.mapping.model.PersistentEntity;
 
-class DomainEventListenerService implements PersistenceEventListener {
+class DomainEventListenerService implements SmartApplicationListener {
     AuditLogListener auditLogListener
 
     @Override
@@ -48,8 +47,16 @@ class DomainEventListenerService implements PersistenceEventListener {
     void onPersistenceEvent(AbstractPersistenceEvent event) {
         switch( event.class ) {
             case PostInsertEvent:
-                println event
+                postInsert(event.entity,event.entityAccess)
                 break
         }
+    }
+
+    void postInsert(PersistentEntity entity, EntityAccess entityAccess)  {
+        def newMap = [:]
+        entityAccess.entity.properties.each { key, val ->
+            newMap[key] = val
+        }
+        auditLogListener.logChanges(newMap,null,entityAccess.entity,entityAccess.entity.id,'INSERT',entity.javaClass.getName())
     }
 }
