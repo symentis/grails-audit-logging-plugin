@@ -1,33 +1,21 @@
 package com.codehaus.groovy.grails.plugins.orm.auditable
 
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import grails.persistence.Entity
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
-import org.codehaus.groovy.grails.plugins.orm.auditable.DomainEventListenerService
+
+import org.junit.Test
 import grails.test.mixin.TestFor
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 
 @TestFor(ExampleClassicAuditableEntity)
-class AuditLogEventTests  {
-    DomainEventListenerService domainEventListenerService
-    AuditLogListener auditLogListener
-
-    void testAuditableDetection() {
-        def logCount = 0
-        assert domainEventListenerService != null
-        assert auditLogListener != null
-        auditLogListener.saveAuditLog = { AuditLogEvent audit ->
-            logCount++
-        }
-
-        mockDomain(AuditLogEvent);
-
-        applicationContext.applicationEventMulticaster.addApplicationListener(domainEventListenerService)
-
+class AuditLogEventTests extends DomainEventListenerServiceTest  {
+    @Test
+    void testOnSaveEvent() {
         assert 0 == logCount
         new ExampleClassicAuditableEntity(value:'foo').save()
         assert ExampleClassicAuditableEntity.count() == 1
         assert 1 == logCount
     }
+
 }
 
 @Entity
