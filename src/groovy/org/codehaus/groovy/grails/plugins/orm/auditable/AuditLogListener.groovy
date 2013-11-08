@@ -457,7 +457,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   
   String truncate(final obj, int max) {
     log.trace "trimming object's string representation based on ${max} characters." 
-    def str = obj?.toString()?.trim()
+    def str = "$obj".trim() // GPAUDITLOGGING-40
     return (str?.length() > max) ? str?.substring(0, max) : str
   }
 
