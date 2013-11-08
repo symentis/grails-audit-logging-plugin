@@ -69,8 +69,6 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 class AuditLoggingGrailsPlugin {
     def version = "1.0.0-SNAPSHOT"
     def grailsVersion = '2.0 > *'
-    def author = "Shawn Hartsock"
-    def authorEmail = "hartsock@acm.org"
     def title = "Adds auditable to GORM domain classes"
     def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
@@ -84,6 +82,15 @@ Stable Releases:
     1.0.0 (Grails 2.0 or above)
     """
     def loadAfter = ['core', 'hibernate']
+
+    def documentation = 'http://grails.org/plugin/audit-logging'
+    def license = 'APACHE'
+    def developers = [
+        [name: 'Robert Oschwald', email: 'robertoschwald@googlemail.com'],
+        [name: 'Shawn Hartsock', email: 'hartsock@acm.org']
+    ]
+    def issueManagement = [system: 'GITHUB', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
+    def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
 
     def doWithSpring = {
         if (manager?.hasGrailsPlugin("hibernate")) {
