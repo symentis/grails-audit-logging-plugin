@@ -51,10 +51,10 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.4 compatibility issues with Grails 1.3.x
  */
 class AuditLoggingGrailsPlugin {
-    def version = "0.5.4"
+    def version = "0.5.4.1"
     def grailsVersion = '1.1 > *'    
-    def author = "Shawn Hartsock"
-    def authorEmail = "hartsock@acm.org"
+    def author = "Robert Oschwald"
+    def authorEmail = "roos@symentis.com"
     def title = "adds auditable to GORM domain classes"
     def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
@@ -65,7 +65,6 @@ will allow you to take action on what has changed.
 Stable Releases:
     0.5.3 (Grails 1.2 or below)
     0.5.4 (Grails 1.3 or above)
-
     """
     def dependsOn = [:]
     def loadAfter = ['core','hibernate']
