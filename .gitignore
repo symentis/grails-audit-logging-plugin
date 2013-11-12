@@ -1,0 +1,16 @@
+/cobertura.ser
+*.log
+/target
+/docs
+/plugin.xml
+/*.zip
+.idea
+*.iml
+*.iws
+*.ipr
+/out
+.settings
+.classpath
+.project
+.DS_Store
+/web-app
