@@ -89,7 +89,8 @@ class AuditLogEvent implements java.io.Serializable {
   }
 
   String toString() {
-    "audit log ${dateCreated} ${actor?'user ${actor}':'user ?'} " + 
+		String actorStr = actor ? "user ${actor}" : "user ?"
+    "audit log ${dateCreated} ${actorStr} " +
         "${eventName} ${className} " + 
         "id:${persistedObjectId} version:${persistedObjectVersion}"
   }
