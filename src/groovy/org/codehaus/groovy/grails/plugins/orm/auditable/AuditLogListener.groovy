@@ -1,8 +1,6 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 
 /**
  * @author shawn hartsock
@@ -124,22 +122,28 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 
 	void setTruncateLength(Long length){
 		// GPAUDITLOGGING-42
-		def oldValueMaxSize = AuditLogEvent.constraints.oldValue.maxSize
-		def newValueMaxSize = AuditLogEvent.constraints.newValue.maxSize
+		// Note: We are not setting the column types in the Domain mapping, but constraints for now.
+
+		// Mapping mapping = new GrailsDomainBinder().getMapping(AuditLogEvent) // since Grails 2.3, GrailsDomainBinder is not static anymore.
+		// def oldValueColumnType = mapping?.columns?.oldValue?.type
+		// def newValueColumnType = mapping?.columns?.newValue?.type
+
+		def oldValueMaxSize = AuditLogEvent.constraints.oldValue?.maxSize
+		def newValueMaxSize = AuditLogEvent.constraints.newValue?.maxSize
 		if (!oldValueMaxSize && length > 255){
-			log.error("auditLog.TRUNCATE_LENGTH $length exceeds oldValue column size 255. Ignoring.")
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds oldValue column size 255. Ignoring TRUNCATE_LENGTH setting.")
 			return
 		}
 		if (oldValueMaxSize && length > oldValueMaxSize){
-			log.error("auditLog.TRUNCATE_LENGTH $length exceeds oldValue column size ${oldValueMaxSize}. Ignoring.")
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds oldValue column size ${oldValueMaxSize}. Ignoring TRUNCATE_LENGTH setting.")
 			return
 		}
 		if (!newValueMaxSize && length > 255){
-			log.error("auditLog.TRUNCATE_LENGTH $length exceeds newValue column size 255. Ignoring.")
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds newValue column size 255. Ignoring TRUNCATE_LENGTH setting.")
 			return
 		}
 		if (newValueMaxSize && length > newValueMaxSize){
-			log.error("auditLog.TRUNCATE_LENGTH $length exceeds newValue column size ${newValueMaxSize}. Ignoring.")
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds newValue column size ${newValueMaxSize}. Ignoring TRUNCATE_LENGTH setting.")
 			return
 		}
 		this.truncateLength = length
