@@ -1,22 +1,17 @@
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
-import org.hibernate.SessionFactory
-import org.hibernate.event.EventListeners
-import org.codehaus.groovy.grails.orm.hibernate.ConfigurableLocalSessionFactoryBean
-import org.springframework.beans.factory.config.PropertiesFactoryBean
-import org.codehaus.groovy.grails.orm.hibernate.support.ClosureEventTriggeringInterceptor
-import org.codehaus.groovy.grails.orm.hibernate.support.SpringLobHandlerDetectorFactoryBean
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 
 /**
  * @author Shawn Hartsock
+ * @author Robert Oschwald
  *
  * Credit is due to the following other projects,
  * first is Kevin Burke's HibernateEventsGrailsPlugin
  * second is the AuditLogging post by Rob Monie at
  * http://www.hibernate.org/318.html
  * 
- * I've combined the two sources to create a Grails
+ * Combined the two sources to create a Grails
  * Audit Logging plugin that will track individual
  * changes to columns.
  * 
@@ -49,34 +44,43 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.2 see GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354
  * Release 0.5.3 GRAILSPLUGINS-2135 GRAILSPLUGINS-2060 && an issue with extra JAR files that are somehow getting released as part of the plugin
  * Release 0.5.4 compatibility issues with Grails 1.3.x
+ * Release 0.5.5 collections logging, log ids, replacement patterns, property value masking, large fields support, fixes and enhancements
  */
 class AuditLoggingGrailsPlugin {
-    def version = "0.5.4.1"
-    def grailsVersion = '1.1 > *'    
-    def author = "Robert Oschwald"
-    def authorEmail = "roos@symentis.com"
-    def title = "adds auditable to GORM domain classes"
-    def description = """ Automatically log change events for domain objects.
+  def version = "0.5.5"
+  def grailsVersion = '1.3 > *'
+	def title = "adds auditable to GORM domain classes"
+	def author = "Robert Oschwald"
+	def authorEmail = "roos@symentis.com"
+  def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
-Audit events off of them. The events include onSave, onUpdate, onChange, onDelete and
-when called the event handlers have access to oldObj and newObj definitions that
+Audit events off of them. The events include onSave, onUpdate, onChange and onDelete.
+When called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
-
 Stable Releases:
     0.5.3 (Grails 1.2 or below)
     0.5.4 (Grails 1.3 or above)
+    0.5.5 (Grails 1.3 or above)
     """
-    def dependsOn = [:]
-    def loadAfter = ['core','hibernate']
+
+	def license = "APACHE"
+	def organization = [name: "symentis", url: "http://www.symentis.com/"]
+	def scm = [url: "https://github.com/robertoschwald/grails-audit-logging-plugin/tree/0.5.5"]
+  def dependsOn = [:]
+  def loadAfter = ['core','hibernate']
 
     def doWithSpring = {
       if (manager?.hasGrailsPlugin("hibernate")) {
         auditLogListener(AuditLogListener) {
+					grailsApplication = ref('grailsApplication')
           sessionFactory   = sessionFactory
           verbose          = application.config?.auditLog?.verbose?:false
           transactional    = application.config?.auditLog?.transactional?:false
           sessionAttribute = application.config?.auditLog?.sessionAttribute?:""
           actorKey         = application.config?.auditLog?.actorKey?:""
+					logIds					 = application.config?.auditLog?.logIds?:false
+					replacementPatterns = application.config?.auditLog?.replacementPatterns?:null
+					propertyMask		 = application.config?.auditLog?.propertyMask?:""
         }
       }
     }
@@ -84,9 +88,10 @@ Stable Releases:
     def doWithApplicationContext = { applicationContext ->
       // pulls in the bean to inject and init
       AuditLogListener listener = applicationContext.getBean("auditLogListener")
-      // allows user to over-ride the maximum length the value stored by the audit logger.
-      listener.setActorClosure( application.config?.auditLog?.actorClosure?:AuditLogListenerUtil.actorDefaultGetter )
+      // allows to configure the Actor name Closure in the config
+      listener.setActorClosure(application.config?.auditLog?.actorClosure?:AuditLogListenerUtil.actorDefaultGetter )
       listener.init()
+			// allows user to over-ride the maximum length the value stored by the audit logger.
       if(application.config?.auditLog?.TRUNCATE_LENGTH) {
         listener.truncateLength = new Long(application.config?.auditLog?.TRUNCATE_LENGTH)
       }
