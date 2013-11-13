@@ -49,7 +49,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 class AuditLoggingGrailsPlugin {
   def version = "0.5.5"
   def grailsVersion = '1.3 > *'
-	def title = "adds auditable to GORM domain classes"
+	def title = "Audit Logging Plugin"
 	def author = "Robert Oschwald"
 	def authorEmail = "roos@symentis.com"
   def description = """ Automatically log change events for domain objects.
