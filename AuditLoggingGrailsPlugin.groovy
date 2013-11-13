@@ -45,9 +45,10 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.3 GRAILSPLUGINS-2135 GRAILSPLUGINS-2060 && an issue with extra JAR files that are somehow getting released as part of the plugin
  * Release 0.5.4 compatibility issues with Grails 1.3.x
  * Release 0.5.5 collections logging, log ids, replacement patterns, property value masking, large fields support, fixes and enhancements
+ * Release 0.5.5.1 Fixed the title. No changes in the plugin code.
  */
 class AuditLoggingGrailsPlugin {
-  def version = "0.5.5"
+  def version = "0.5.5.1"
   def grailsVersion = '1.3 > *'
 	def title = "Audit Logging Plugin"
 	def author = "Robert Oschwald"
@@ -60,12 +61,12 @@ will allow you to take action on what has changed.
 Stable Releases:
     0.5.3 (Grails 1.2 or below)
     0.5.4 (Grails 1.3 or above)
-    0.5.5 (Grails 1.3 or above)
+    0.5.5.1 (Grails 1.3 or above)
     """
 
 	def license = "APACHE"
 	def organization = [name: "symentis", url: "http://www.symentis.com/"]
-	def scm = [url: "https://github.com/robertoschwald/grails-audit-logging-plugin/tree/0.5.5"]
+	def scm = [url: "https://github.com/robertoschwald/grails-audit-logging-plugin/tree/0.5.5.1"]
   def dependsOn = [:]
   def loadAfter = ['core','hibernate']
 
@@ -95,23 +96,5 @@ Stable Releases:
       if(application.config?.auditLog?.TRUNCATE_LENGTH) {
         listener.truncateLength = new Long(application.config?.auditLog?.TRUNCATE_LENGTH)
       }
-    }
-
-    def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional)
-    }
-	                                      
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-	
-    def onChange = { event ->
-        // TODO Implement code that is executed when this class plugin class is changed  
-        // the event contains: event.application and event.applicationContext objects
-    }
-                                                                                  
-    def onApplicationChange = { event ->
-        // TODO Implement code that is executed when any class in a GrailsApplication changes
-        // the event contain: event.source, event.application and event.applicationContext objects
     }
 }

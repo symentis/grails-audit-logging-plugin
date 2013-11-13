@@ -1,4 +1,4 @@
-<plugin name='audit-logging' version='0.5.5' grailsVersion='1.3 &gt; *'>
+<plugin name='audit-logging' version='0.5.5.1' grailsVersion='1.3 &gt; *'>
   <author>Robert Oschwald</author>
   <authorEmail>roos@symentis.com</authorEmail>
   <title>Audit Logging Plugin</title>
@@ -10,7 +10,7 @@ will allow you to take action on what has changed.
 Stable Releases:
     0.5.3 (Grails 1.2 or below)
     0.5.4 (Grails 1.3 or above)
-    0.5.5 (Grails 1.3 or above)
+    0.5.5.1 (Grails 1.3 or above)
     </description>
   <type>AuditLoggingGrailsPlugin</type>
   <resources>
