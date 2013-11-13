@@ -1,4 +1,9 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
+
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
+
 /**
  * @author shawn hartsock
  *
@@ -19,32 +24,31 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
  * 2009-09-25 rewrite.
  * 2009-10-04 preparing beta release
  * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
+ * 2013-11-11 log collections (Thanks to Ankur Tripathi), log ids, replacement patterns support, cleanup
  */
 
 import org.hibernate.HibernateException;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Configuration
+import org.hibernate.collection.PersistentCollection
+import org.hibernate.engine.CollectionEntry
+import org.hibernate.engine.PersistenceContext;
 import org.hibernate.event.Initializable;
 import org.hibernate.event.PreDeleteEvent;
 import org.hibernate.event.PreDeleteEventListener;
 import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
-import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.event.PostUpdateEventListener
 import org.springframework.web.context.request.RequestContextHolder;
 import org.hibernate.SessionFactory
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.hibernate.Session
-import org.springframework.orm.hibernate3.SessionFactoryUtils
-import org.codehaus.groovy.grails.orm.hibernate.metaclass.SavePersistentMethod
-import org.springframework.web.context.request.WebRequest
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import grails.util.GrailsUtil
 import grails.util.Environment
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 public class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
+	// set on startup
+	GrailsApplication grailsApplication
 
   public static final Log log = LogFactory.getLog(AuditLogListener.class);
   public static Long TRUNCATE_LENGTH = 255
@@ -55,14 +59,22 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * each as an individual event.
    */
   boolean verbose = true // in Config.groovy auditLog.verbose = true
+
+	/**
+	 * The logIds flag flips on and off object id logging for assotiated objects.
+	 * If this is true then object Ids are logged into the newValue column.
+	 */
+	boolean logIds = false // in Config.groovy auditLog.logIds = false
   boolean transactional = false
   Long truncateLength
   SessionFactory sessionFactory
 
   String sessionAttribute
   String actorKey
-
   Closure actorClosure
+  String propertyMask = '**********' // string to log for properties' value defined in maskList
+	def replacementPatterns // in Config.groovy auditLog.replacementPatterns = ["pattern":"replacement"]
+
   void setActorClosure(Closure closure) {
     closure.delegate = this
     closure.properties.putAt("log",this.log) 
@@ -70,7 +82,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
   void init() {
-    if( Environment.getCurrent() != Environment.PRODUCTION && ConfigurationHolder.config.auditLog?.transactional == null ) {
+    if( Environment.getCurrent() != Environment.PRODUCTION && grailsApplication?.config.auditLog?.transactional == null ) {
       transactional = false
     }
 
@@ -110,6 +122,29 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     this.sessionFactory = sessionFactory
   }
 
+	void setTruncateLength(Long length){
+		// GPAUDITLOGGING-42
+		def oldValueMaxSize = AuditLogEvent.constraints.oldValue.maxSize
+		def newValueMaxSize = AuditLogEvent.constraints.newValue.maxSize
+		if (!oldValueMaxSize && length > 255){
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds oldValue column size 255. Ignoring.")
+			return
+		}
+		if (oldValueMaxSize && length > oldValueMaxSize){
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds oldValue column size ${oldValueMaxSize}. Ignoring.")
+			return
+		}
+		if (!newValueMaxSize && length > 255){
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds newValue column size 255. Ignoring.")
+			return
+		}
+		if (newValueMaxSize && length > newValueMaxSize){
+			log.error("auditLog.TRUNCATE_LENGTH $length exceeds newValue column size ${newValueMaxSize}. Ignoring.")
+			return
+		}
+		this.truncateLength = length
+	}
+
   /**
    * if verbose is set to 'true' then you get a log event on
    * each individually changed column/field sent to the database
@@ -118,6 +153,31 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   void setVerbose(final boolean verbose) {
     this.verbose = verbose
   }
+
+	/**
+	 * if  propertyMask is set, log this propertyMask String instead of the value
+	 * of all configured properties in the "mask" map of DomainClasses
+	 */
+	void setPropertyMask(final String configuredPropertyMask){
+		if (configuredPropertyMask) this.propertyMask = configuredPropertyMask
+	}
+
+	/**
+	 * if logIds is set to 'true' log the id of changed associated objects
+	 */
+	void setLogIds(final boolean doLogIds) {
+		this.logIds = doLogIds
+	}
+
+	/**
+	 * if replacementPatterns map is defined in the config,
+	 * replace the old / new value strings with the entry value.
+	 * Key = replacement regex pattern
+	 * Value = replacement String to use.
+	 */
+	void setReplacementPatterns(final def patternMap){
+		this.replacementPatterns = patternMap
+	}
 
   String getActor() {
     def actor = null
@@ -174,13 +234,12 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
   /**
-   * The default ignore field list is:  ['version','lastUpdated'] if you want
-   * to provide your own ignore list do so by specifying the ignore list like so:
+   * The default ignore field list is:  ['version','lastUpdated']
+	 * If you want to provide your own ignore list, specify in the DomainClass:
    *
    *   static auditable = [ignore:['version','lastUpdated','myField']]
    *
-   * ... if instead you really want to trigger on version and lastUpdated changes you
-   * may specify an empty ignore list ... like so ...
+   * If you really want to trigger on version and lastUpdated changes:
    *
    *   static auditable = [ignore:[]]
    *
@@ -198,6 +257,32 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     }
     return ignore
   }
+
+	/**
+	 * The default properties to mask list is:  ['password']
+	 * if you want to provide your own mask list, specify in the DomainClass:
+	 *
+	 *   static auditable = [mask:['password','myField']]
+	 *
+	 * If you really want to log password property change values
+	 * specify an empty mask list:
+	 *
+	 *   static auditable = [mask:[]]
+	 *
+	 */
+	List maskList(entity) {
+		def mask = ['password']
+		if (entity?.metaClass?.hasProperty(entity, 'auditable')) {
+			if (entity.auditable instanceof java.util.Map && entity.auditable.containsKey('mask')) {
+				log.debug "found a mask list one this entity ${entity.getClass()}"
+				def list = entity.auditable['mask']
+				if (list instanceof java.util.List) {
+					mask = list
+				}
+			}
+		}
+		return mask
+	}
 
   def getEntityId(event) {
     if (event && event.entity) {
@@ -253,7 +338,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
       Object[] state = event.getState()
       def map = makeMap(names, state)
       if (audit && !callHandlersOnly(event.getEntity())) {
-        log.debug "logging changes for auditable entity"
+        log.debug "logging insert for auditable entity"
         def entity = event.getEntity()
         def entityName = entity.getClass().getName()
         def entityId = getEntityId(event)
@@ -338,15 +423,19 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     def oldState = event.getOldState()
     def newState = event.getState()
 
-    def nameMap = event.getPersister().getPropertyNames()
+    def propertyNames = event.getPersister().getPropertyNames()
     def oldMap = [:]
     def newMap = [:]
 
-    if (nameMap) {
-      for (int ii = 0; ii < newState.length; ii++) {
-        if (nameMap[ii]) {
-          if (oldState) oldMap[nameMap[ii]] = oldState[ii]
-          if (newState) newMap[nameMap[ii]] = newState[ii]
+    if (propertyNames) {
+      for (int index = 0; index < newState.length; index++) {
+        if (propertyNames[index]) {
+					if (oldState) {
+						populateOldStateMap(oldState, oldMap, propertyNames[index], index)
+					}
+					if (newState) {
+						newMap[propertyNames[index]] = newState[index]
+					}
         }
       }
     }
@@ -378,13 +467,13 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    * ... this feels crufty... should be tighter...
    */
   def logChanges(newMap, oldMap, parentObject, persistedObjectId, eventName, className) {
-    log.trace "logging changes... "
     AuditLogEvent audit = null
     def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
     if (newMap) newMap.remove('version')
     if (oldMap) oldMap.remove('version')
+		// new+old
     if (newMap && oldMap) {
-      log.trace "there are new and old values to log"
+			log.trace "there are new and old values to log"
       newMap.each({key, val ->
         if (val != oldMap[key]) {
           audit = new AuditLogEvent(
@@ -395,15 +484,17 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   persistedObjectId: persistedObjectId?.toString(),
                   persistedObjectVersion: persistedObjectVersion?.toLong(),
                   propertyName: key,
-                  oldValue: truncate(oldMap[key]),
-                  newValue: truncate(newMap[key]),
+                  oldValue: conditionallyMaskAndTruncate(key, oldMap[key]),
+                  newValue: conditionallyMaskAndTruncate(key, newMap[key]),
           )
           saveAuditLog(audit)
         }
       })
+			return
     }
-    else if (newMap && verbose) {
-      log.trace "there are new values and logging is verbose ... "
+		//
+		if (newMap && verbose) {
+      log.trace "there are only new values and logging is verbose."
       newMap.each({key, val ->
         audit = new AuditLogEvent(
                 actor: this.getActor(),
@@ -414,13 +505,15 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 persistedObjectVersion: persistedObjectVersion?.toLong(),
                 propertyName: key,
                 oldValue: null,
-                newValue: truncate(val),
+                newValue: conditionallyMaskAndTruncate(key, val),
         )
         saveAuditLog(audit)
       })
+			return
     }
-    else if (oldMap && verbose) {
-        log.trace "there is only an old map of values available and logging is set to verbose... "
+		//
+    if (oldMap && verbose) {
+        log.trace "there is only an old map of values available and logging is verbose... "
         oldMap.each({key, val ->
           audit = new AuditLogEvent(
                   actor: this.getActor(),
@@ -430,26 +523,35 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   persistedObjectId: persistedObjectId?.toString(),
                   persistedObjectVersion: persistedObjectVersion?.toLong(),
                   propertyName: key,
-                  oldValue: truncate(val),
+                  oldValue: conditionallyMaskAndTruncate(key, val),
                   newValue: null
           )
           saveAuditLog(audit)
         })
+				return
       }
-      else {
-        log.trace "creating a basic audit logging event object."
-        audit = new AuditLogEvent(
-                actor: this.getActor(),
-                uri: this.getUri(),
-                className: className,
-                eventName: eventName,
-                persistedObjectId: persistedObjectId?.toString(),
-                persistedObjectVersion: persistedObjectVersion?.toLong()
-        )
-        saveAuditLog(audit)
-      }
+      // default
+			log.trace "creating a basic audit logging event object."
+			audit = new AuditLogEvent(
+							actor: this.getActor(),
+							uri: this.getUri(),
+							className: className,
+							eventName: eventName,
+							persistedObjectId: persistedObjectId?.toString(),
+							persistedObjectVersion: persistedObjectVersion?.toLong()
+			)
+			saveAuditLog(audit)
       return
   }
+
+	String conditionallyMaskAndTruncate(final String key, final obj){
+		if (maskList().contains(key)){
+			String maskedValue = propertyMask
+			log.trace("Masking property ${key} with ${propertyMask}")
+			return truncate(maskedValue)
+		}
+		truncate(obj)
+	}
 
   String truncate(final obj) {
     truncate(obj,truncateLength.toInteger())
@@ -458,6 +560,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   String truncate(final obj, int max) {
     log.trace "trimming object's string representation based on ${max} characters." 
     def str = "$obj".trim() // GPAUDITLOGGING-40
+		str = rework(str,obj)
     return (str?.length() > max) ? str?.substring(0, max) : str
   }
 
@@ -546,4 +649,55 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
     }
     return
   }
+
+	private populateOldStateMap(def oldState, Map oldMap, String keyName, int index) {
+		def oldPropertyState = oldState[index]
+		if (oldPropertyState instanceof PersistentCollection) {
+			PersistentCollection pc = (PersistentCollection) oldPropertyState;
+			PersistenceContext context = sessionFactory.getCurrentSession().getPersistenceContext();
+			CollectionEntry entry = context.getCollectionEntry(pc);
+			Object snapshot = entry.getSnapshot();
+			if (pc instanceof List) {
+				oldMap[keyName] = Collections.unmodifiableList((List) snapshot);
+			} else if (pc instanceof Map) {
+				oldMap[keyName] = Collections.unmodifiableMap((Map) snapshot);
+			} else if (pc instanceof Set) {
+				//Set snapshot is actually stored as a Map
+				if(snapshot){
+					Map snapshotMap = (Map) snapshot;
+					oldMap[keyName] = Collections.unmodifiableSet(new HashSet(snapshotMap?.values()));
+					log.trace(oldMap[keyName].class);
+				}else{
+					log.trace("Cannot get snapshot of $pc Entry: $entry for keyName: $keyName");
+					oldMap[keyName]=null
+				}
+			} else {
+				oldMap[keyName] = pc;
+			}
+		} else {
+			oldMap[keyName] = oldPropertyState
+		}
+	}
+
+	// Rework String based on configuration
+	private String rework(String str, final obj){
+		replacementPatterns?.each { k,v ->
+			str = str?.replace(k,v)
+		}
+		if (logIds){
+			/*if (obj instanceof Set){
+			 obj.each{
+					if (it.metaClass.respondsTo(it, "getId")){
+						str = "$str,[id:${it.id}]$it"
+					}
+				}
+				return str
+			}*/
+			if (obj?.metaClass?.respondsTo(obj, "getId")){
+				// add id of obj
+				str = "[id:${obj.id}]$str"
+			}
+		}
+		return str
+	}
 }

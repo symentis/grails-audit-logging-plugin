@@ -1,4 +1,7 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
+
+import grails.util.Holders
+
 /**
  * AuditLogEvents are reported to the AuditLog table
  * this requires you to set up a table or allow
@@ -9,7 +12,7 @@ class AuditLogEvent implements java.io.Serializable {
 
   static auditable = false
 
-  Date dateCreated
+	Date dateCreated
   Date lastUpdated
 
   String actor
@@ -31,13 +34,23 @@ class AuditLogEvent implements java.io.Serializable {
     persistedObjectVersion(nullable:true)
     eventName(nullable:true)
     propertyName(nullable:true)
-    oldValue(nullable:true)
-    newValue(nullable:true)
+		if(Holders.config.auditLog.largeValueColumnTypes){
+			oldValue(nullable:true, maxSize:65534)
+			newValue(nullable:true, maxSize:65534)
+		} else {
+			oldValue(nullable:true)
+			newValue(nullable:true)
+		}
   }
 
   static mapping = {
-    table 'audit_log'
-    cache usage:'read-only', include:'non-lazy'
+		// GPAUDITLOGGING-30
+		// configurable auditLog.tablename in your app's Config.groovy
+		table Holders.config.auditLog?.tablename ?:'audit_log'
+		// disable caching by setting auditLog.cacheDisabled = true in your app's Config.groovy
+		if (!Holders.config.auditLog?.cacheDisabled){
+			cache usage:'read-only', include:'non-lazy'
+		}
     version false
   }
 

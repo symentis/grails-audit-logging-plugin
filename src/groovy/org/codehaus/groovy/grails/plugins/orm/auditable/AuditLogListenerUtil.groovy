@@ -1,6 +1,5 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import org.springframework.web.context.request.RequestAttributes
 import javax.servlet.http.HttpSession
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 /*
@@ -20,7 +19,7 @@ public class AuditLogListenerUtil {
 
   /**
    * The original getActor method transplanted to the utility class as
-   * a closure. The closure takes two arguments one a RequestAttributes object
+   * a closure. The closure takes two arguments one a request object
    * the other is an HttpSession object.
    *
    * These are strongly typed here for the purpose of documentation.
