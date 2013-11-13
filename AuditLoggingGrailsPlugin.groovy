@@ -67,6 +67,7 @@ Stable Releases:
 	def license = "APACHE"
 	def organization = [name: "symentis", url: "http://www.symentis.com/"]
 	def scm = [url: "https://github.com/robertoschwald/grails-audit-logging-plugin/tree/0.5.5.1"]
+  def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
   def dependsOn = [:]
   def loadAfter = ['core','hibernate']
 
