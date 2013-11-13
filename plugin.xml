@@ -1,7 +1,7 @@
 <plugin name='audit-logging' version='0.5.5' grailsVersion='1.3 &gt; *'>
   <author>Robert Oschwald</author>
   <authorEmail>roos@symentis.com</authorEmail>
-  <title>adds auditable to GORM domain classes</title>
+  <title>Audit Logging Plugin</title>
   <description> Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
 Audit events off of them. The events include onSave, onUpdate, onChange and onDelete.
