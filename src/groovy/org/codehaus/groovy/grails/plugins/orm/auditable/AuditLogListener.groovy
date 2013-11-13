@@ -564,13 +564,35 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
   
   String truncate(final obj, int max) {
-    log.trace "trimming object's string representation based on ${max} characters." 
-    def str = "$obj".trim() // GPAUDITLOGGING-40
-		str = rework(str,obj)
+    log.trace "trimming object's string representation based on ${max} characters."
+		def str
+		// GPAUDITLOGGING-43
+		if (logIds){
+			if (obj instanceof Collection || obj instanceof Map){
+				obj?.each{
+					str = appendWithId(it, str)
+				}
+			} else {
+				str = appendWithId(obj, str)
+			}
+		} else {
+			str = "$obj".trim() // GPAUDITLOGGING-40
+		}
+		str = replaceByReplacementPatterns(str,obj)
     return (str?.length() > max) ? str?.substring(0, max) : str
   }
 
-  /**
+	private String appendWithId(obj, str) {
+		if (obj?.metaClass?.respondsTo(obj, "getId")) {
+			// add id of obj
+			str = str ? "$str, [id:${obj.id}]$obj" : "[id:${obj.id}]$obj"
+		} else {
+			str = str ? "$str,$obj" : "$obj"
+		}
+		str
+	}
+
+	/**
    * This calls defined entity handlers based on what was passed in to it.
    */
   def executeHandler(event, handler, oldState, newState) {
@@ -685,24 +707,10 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 		}
 	}
 
-	// Rework String based on configuration
-	private String rework(String str, final obj){
+	// Rework String based on configured replacementPatterns
+	private String replaceByReplacementPatterns(String str, final obj){
 		replacementPatterns?.each { k,v ->
 			str = str?.replace(k,v)
-		}
-		if (logIds){
-			if (obj instanceof Set){
-			 obj.each{
-					if (it.metaClass.respondsTo(it, "getId")){
-						str = "$str,[id:${it.id}]$it"
-					}
-				}
-				return str
-			}
-			if (obj?.metaClass?.respondsTo(obj, "getId")){
-				// add id of obj
-				str = "[id:${obj.id}]$str"
-			}
 		}
 		return str
 	}
