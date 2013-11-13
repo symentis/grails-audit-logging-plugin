@@ -159,15 +159,16 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
 	/**
-	 * if  propertyMask is set, log this propertyMask String instead of the value
-	 * of all configured properties in the "mask" map of DomainClasses
+	 * if propertyMask is set, mask the values of all configured properties
+	 * in the "mask" map of DomainClasses.
 	 */
 	void setPropertyMask(final String configuredPropertyMask){
 		if (configuredPropertyMask) this.propertyMask = configuredPropertyMask
 	}
 
 	/**
-	 * if logIds is set to 'true' log the id of changed associated objects
+	 * if logIds is set to 'true', log the id of changed associated objects
+	 * TODO logIds currently does not work for collection entries.
 	 */
 	void setLogIds(final boolean doLogIds) {
 		this.logIds = doLogIds
@@ -479,7 +480,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 		// new+old
     if (newMap && oldMap) {
 			log.trace "there are new and old values to log"
-      newMap.each({key, val ->
+      newMap.each{key, val ->
         if (val != oldMap[key]) {
           audit = new AuditLogEvent(
                   actor: this.getActor(),
@@ -494,13 +495,13 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
           )
           saveAuditLog(audit)
         }
-      })
+      }
 			return
     }
 		//
 		if (newMap && verbose) {
       log.trace "there are only new values and logging is verbose."
-      newMap.each({key, val ->
+      newMap.each{key, val ->
         audit = new AuditLogEvent(
                 actor: this.getActor(),
                 uri: this.getUri(),
@@ -513,13 +514,13 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                 newValue: conditionallyMaskAndTruncate(key, val),
         )
         saveAuditLog(audit)
-      })
+      }
 			return
     }
 		//
     if (oldMap && verbose) {
         log.trace "there is only an old map of values available and logging is verbose... "
-        oldMap.each({key, val ->
+        oldMap.each{key, val ->
           audit = new AuditLogEvent(
                   actor: this.getActor(),
                   uri: this.getUri(),
@@ -532,7 +533,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
                   newValue: null
           )
           saveAuditLog(audit)
-        })
+        }
 				return
       }
       // default
