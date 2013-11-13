@@ -325,7 +325,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
   /**
-   * I'm using the post insert event here instead of the pre-insert
+   * Using the post insert event here instead of the pre-insert
    * event so that I can log the id of the new entity after it
    * is saved. That does mean the the insert event handlers
    * can't work the way we want... but really it's the onChange
@@ -334,9 +334,10 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   public void onPostInsert(final PostInsertEvent event) {
     try {
       def audit = isAuditableEntity(event)
-      String[] names = event.getPersister().getPropertyNames()
+      String[] propertyNames = event.getPersister().getPropertyNames()
+			// TODO log assotiations as well. Currently they are omitted.
       Object[] state = event.getState()
-      def map = makeMap(names, state)
+      def map = makeMap(propertyNames, state)
       if (audit && !callHandlersOnly(event.getEntity())) {
         log.debug "logging insert for auditable entity"
         def entity = event.getEntity()
@@ -352,14 +353,14 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
       log.error "Audit Plugin unable to process INSERT event"
       e.printStackTrace()
     }
-    log.trace "... onPostInsert is finished."
+    log.trace "exit onPostInsert"
     return;
   }
 
-  private def makeMap(String[] names, Object[] state) {
+  private def makeMap(String[] propertyNames, Object[] state) {
     def map = [:]
-    for (int ii = 0; ii < names.length; ii++) {
-      map[names[ii]] = state[ii]
+    for (int index = 0; index < propertyNames.length; index++) {
+      map[propertyNames[index]] = state[index]
     }
     return map
   }
@@ -383,7 +384,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
    */
   public void onPostUpdate(final PostUpdateEvent event) {
     if (isAuditableEntity(event)) {
-      log.trace "${event.getClass()} onChange handler has been called"
+      log.trace "${event.getClass()} onChange handler will be called"
       onChange(event)
     }
   }
@@ -565,10 +566,10 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
   }
 
   /**
-   * This calls the handlers based on what was passed in to it.
+   * This calls defined entity handlers based on what was passed in to it.
    */
   def executeHandler(event, handler, oldState, newState) {
-    log.trace "calling execute handler ... "
+    log.trace "start executeHandler()"
     def entity = event.getEntity()
     if (isAuditableEntity(event) && entity.metaClass.hasProperty(entity, handler)) {
       log.trace "entity was auditable and had a handler property ${handler}"
@@ -592,7 +593,7 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
           entity."${handler}"(newState)
         }
     }
-    log.trace "... execute handler is finished."
+    log.trace "finish executeHandler()"
   }
 
   /**
@@ -685,14 +686,14 @@ public class AuditLogListener implements PreDeleteEventListener, PostInsertEvent
 			str = str?.replace(k,v)
 		}
 		if (logIds){
-			/*if (obj instanceof Set){
+			if (obj instanceof Set){
 			 obj.each{
 					if (it.metaClass.respondsTo(it, "getId")){
 						str = "$str,[id:${it.id}]$it"
 					}
 				}
 				return str
-			}*/
+			}
 			if (obj?.metaClass?.respondsTo(obj, "getId")){
 				// add id of obj
 				str = "[id:${obj.id}]$str"
