@@ -1,6 +1,6 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import grails.util.Holders
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 /**
  * AuditLogEvents are reported to the AuditLog table
@@ -34,7 +34,7 @@ class AuditLogEvent implements java.io.Serializable {
     persistedObjectVersion(nullable:true)
     eventName(nullable:true)
     propertyName(nullable:true)
-		if(Holders.config.auditLog.largeValueColumnTypes){
+		if(ConfigurationHolder.config.auditLog.largeValueColumnTypes){
 			oldValue(nullable:true, maxSize:65534)
 			newValue(nullable:true, maxSize:65534)
 		} else {
@@ -46,9 +46,9 @@ class AuditLogEvent implements java.io.Serializable {
   static mapping = {
 		// GPAUDITLOGGING-30
 		// configurable auditLog.tablename in your app's Config.groovy
-		table Holders.config.auditLog?.tablename ?:'audit_log'
+		table ConfigurationHolder.config.auditLog?.tablename ?:'audit_log'
 		// disable caching by setting auditLog.cacheDisabled = true in your app's Config.groovy
-		if (!Holders.config.auditLog?.cacheDisabled){
+		if (!ConfigurationHolder.config.auditLog?.cacheDisabled){
 			cache usage:'read-only', include:'non-lazy'
 		}
     version false
