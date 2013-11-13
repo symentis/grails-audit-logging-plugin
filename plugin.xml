@@ -1,27 +1,30 @@
-<plugin name='audit-logging' version='0.5.4' grailsVersion='1.1 &gt; *'>
-  <author>Shawn Hartsock</author>
-  <authorEmail>hartsock@acm.org</authorEmail>
+<plugin name='audit-logging' version='0.5.5' grailsVersion='1.3 &gt; *'>
+  <author>Robert Oschwald</author>
+  <authorEmail>roos@symentis.com</authorEmail>
   <title>adds auditable to GORM domain classes</title>
   <description> Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
-Audit events off of them. The events include onSave, onUpdate, onChange, onDelete and
-when called the event handlers have access to oldObj and newObj definitions that
+Audit events off of them. The events include onSave, onUpdate, onChange and onDelete.
+When called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
-
 Stable Releases:
     0.5.3 (Grails 1.2 or below)
     0.5.4 (Grails 1.3 or above)
-
+    0.5.5 (Grails 1.3 or above)
     </description>
+  <type>AuditLoggingGrailsPlugin</type>
   <resources>
-    <resource>UrlMappings</resource>
+    <resource>spring.resources</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEventController</resource>
     <resource>org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent</resource>
   </resources>
-  <dependencies>
-    <resolvers>
-      <resolver type='grailsPlugins' name='grailsPlugins' />
-    </resolvers>
-  </dependencies>
+  <repositories>
+    <repository name='grailsCentral' url='http://grails.org/plugins' />
+    <repository name='http://repo.grails.org/grails/core' url='http://repo.grails.org/grails/core/' />
+    <repository name='mavenCentral' url='http://repo1.maven.org/maven2/' />
+  </repositories>
+  <dependencies />
+  <plugins />
+  <runtimePluginRequirements />
   <behavior />
 </plugin>
