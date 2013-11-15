@@ -71,25 +71,26 @@ class AuditLoggingGrailsPlugin {
     def grailsVersion = '2.0 > *'
     def title = "Adds auditable to GORM domain classes"
     def description = """ Automatically log change events for domain objects.
-The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
-Audit events off of them. The events include onSave, onUpdate, onChange, onDelete and
-when called the event handlers have access to oldObj and newObj definitions that
+The Audit Logging plugin additionally adds an instance hook to domain objects that allows you to hang
+Audit events off of them. The events include onSave, onUpdate, onChange and onDelete.
+When called, the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
 Stable Releases:
     0.5.3 (Grails 1.2 or below)
     0.5.4 (Grails 1.3 or above)
+    0.5.5.2 (Grails 1.3 or above)
     1.0.0 (Grails 2.0 or above)
     """
     def loadAfter = ['core', 'hibernate']
 
     def documentation = 'http://grails.org/plugin/audit-logging'
     def license = 'APACHE'
+    def organization = [name: "symentis GmbH", url: "http://www.symentis.com/"]
     def developers = [
-        [name: 'Robert Oschwald', email: 'robertoschwald@googlemail.com'],
-        [name: 'Shawn Hartsock', email: 'hartsock@acm.org']
+        [name: 'Robert Oschwald', email: 'roos@symentis.com']
     ]
-    def issueManagement = [system: 'GITHUB', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
+    def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
 
     def doWithSpring = {
@@ -117,9 +118,10 @@ Stable Releases:
     def doWithApplicationContext = { applicationContext ->
         // pulls in the bean to inject and init
         AuditLogListener listener = applicationContext.auditLogListener
-        // allows user to over-ride the maximum length the value stored by the audit logger.
+        // allows to configure the Actor name Closure in the config
         listener.setActorClosure(application.config?.auditLog?.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter)
         listener.init()
+        // allows user to over-ride the maximum length the value stored by the audit logger.
         if (application.config?.auditLog?.TRUNCATE_LENGTH) {
             listener.truncateLength = Long.valueOf(application.config?.auditLog?.TRUNCATE_LENGTH)
         }
