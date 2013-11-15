@@ -1,6 +1,6 @@
+import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
-import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 
 /**
  * @author Shawn Hartsock
@@ -27,7 +27,7 @@ import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
  *
  * Release 0.4
  * <p/>
- * 		* custom serializable implementation for AuditLogEvent so events can happen
+ *      * custom serializable implementation for AuditLogEvent so events can happen
  *        inside a webflow context.
  * <p/>
  *      * tweak application.properties for loading in other grails versions
@@ -69,9 +69,7 @@ import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 class AuditLoggingGrailsPlugin {
     def version = "1.0.0-SNAPSHOT"
     def grailsVersion = '2.0 > *'
-    def author = "Shawn Hartsock"
-    def authorEmail = "hartsock@acm.org"
-    def title = "adds auditable to GORM domain classes"
+    def title = "Adds auditable to GORM domain classes"
     def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
 Audit events off of them. The events include onSave, onUpdate, onChange, onDelete and
@@ -83,8 +81,16 @@ Stable Releases:
     0.5.4 (Grails 1.3 or above)
     1.0.0 (Grails 2.0 or above)
     """
-    def dependsOn = [:]
     def loadAfter = ['core', 'hibernate']
+
+    def documentation = 'http://grails.org/plugin/audit-logging'
+    def license = 'APACHE'
+    def developers = [
+        [name: 'Robert Oschwald', email: 'robertoschwald@googlemail.com'],
+        [name: 'Shawn Hartsock', email: 'hartsock@acm.org']
+    ]
+    def issueManagement = [system: 'GITHUB', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
+    def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
 
     def doWithSpring = {
         if (manager?.hasGrailsPlugin("hibernate")) {
@@ -110,30 +116,12 @@ Stable Releases:
 
     def doWithApplicationContext = { applicationContext ->
         // pulls in the bean to inject and init
-        AuditLogListener listener = applicationContext.getBean("auditLogListener")
+        AuditLogListener listener = applicationContext.auditLogListener
         // allows user to over-ride the maximum length the value stored by the audit logger.
         listener.setActorClosure(application.config?.auditLog?.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter)
         listener.init()
         if (application.config?.auditLog?.TRUNCATE_LENGTH) {
-            listener.truncateLength = new Long(application.config?.auditLog?.TRUNCATE_LENGTH)
+            listener.truncateLength = Long.valueOf(application.config?.auditLog?.TRUNCATE_LENGTH)
         }
-    }
-
-    def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional)
-    }
-
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
-    def onChange = { event ->
-        // TODO Implement code that is executed when this class plugin class is changed  
-        // the event contains: event.application and event.applicationContext objects
-    }
-
-    def onApplicationChange = { event ->
-        // TODO Implement code that is executed when any class in a GrailsApplication changes
-        // the event contain: event.source, event.application and event.applicationContext objects
     }
 }
