@@ -63,7 +63,9 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * <p/>
  * Release 0.5.4 compatibility issues with Grails 1.3.x
  * <p/>
- * Release 1.0.0
+ * Release 0.5.5.2 collections logging, log ids, replacement patterns, property value masking, large fields support, fixes and enhancements
+ * <p/>
+ * Release 1.0.0  T.B.D.
  * <p/>
  */
 class AuditLoggingGrailsPlugin {
