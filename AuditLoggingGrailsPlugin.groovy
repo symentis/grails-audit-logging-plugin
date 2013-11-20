@@ -50,7 +50,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.5.3 Added ability to disable audit logging by config.
  */
 class AuditLoggingGrailsPlugin {
-  def version = "0.5.5.3"
+  def version = "0.5.5.4-SNAPSHOT"
   def grailsVersion = '1.3 > *'
 	def title = "Audit Logging Plugin"
 	def author = "Robert Oschwald"
