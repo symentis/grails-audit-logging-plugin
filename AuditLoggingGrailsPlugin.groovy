@@ -47,9 +47,10 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.5 collections logging, log ids, replacement patterns, property value masking, large fields support, fixes and enhancements
  * Release 0.5.5.1 Fixed the title. No changes in the plugin code.
  * Release 0.5.5.2 Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.
+ * Release 0.5.5.3 Added ability to disable audit logging by config.
  */
 class AuditLoggingGrailsPlugin {
-  def version = "0.5.5.2"
+  def version = "0.5.5.3"
   def grailsVersion = '1.3 > *'
 	def title = "Audit Logging Plugin"
 	def author = "Robert Oschwald"
@@ -63,11 +64,12 @@ Stable Releases:
     0.5.3 (Grails 1.2 or below)
     0.5.4 (Grails 1.3 or above)
     0.5.5.2 (Grails 1.3 or above)
+    0.5.5.3 (Grails 1.3 or above)
     """
 
 	def license = "APACHE"
 	def organization = [name: "symentis", url: "http://www.symentis.com/"]
-	def scm = [url: "https://github.com/robertoschwald/grails-audit-logging-plugin/tree/0.5.5.2"]
+	def scm = [url: "https://github.com/robertoschwald/grails-audit-logging-plugin/tree/0.5.5.3"]
   def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
   def dependsOn = [:]
   def loadAfter = ['core','hibernate']
