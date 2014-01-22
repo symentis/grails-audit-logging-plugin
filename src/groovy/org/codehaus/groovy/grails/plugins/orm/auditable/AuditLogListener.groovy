@@ -1,51 +1,39 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import grails.util.Environment
-
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.hibernate.HibernateException
-import org.hibernate.Session
-import org.hibernate.SessionFactory
-import org.hibernate.cfg.Configuration
-import org.hibernate.collection.PersistentCollection
-import org.hibernate.engine.CollectionEntry
-import org.hibernate.engine.PersistenceContext
-import org.hibernate.event.Initializable
-import org.hibernate.event.PostInsertEvent
-import org.hibernate.event.PostInsertEventListener
-import org.hibernate.event.PostUpdateEvent
-import org.hibernate.event.PostUpdateEventListener
-import org.hibernate.event.PreDeleteEvent
-import org.hibernate.event.PreDeleteEventListener
+import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
+import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
+import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
+import org.grails.datastore.mapping.engine.event.PostInsertEvent
+import org.grails.datastore.mapping.engine.event.PostUpdateEvent
+import org.grails.datastore.mapping.engine.event.PreDeleteEvent
+import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
+import org.springframework.context.ApplicationEvent
 import org.springframework.web.context.request.RequestContextHolder
 
+import groovy.util.logging.Commons
+
+import static org.grails.datastore.mapping.engine.event.EventType.*
+
 /**
- * Grails Hibernate Interceptor for logging
- * saves, updates, deletes and acting on
- * individual properties changes... and
- * delegating calls back to the Domain Class
- *
- * This class is based on the post at
- * http://www.hibernate.org/318.html
+ * Grails interceptor for logging saves, updates, deletes and acting on
+ * individual properties changes and delegating calls back to the Domain Class
  *
  * 2008-04-17 created initial version 0.1
- * 2008-04-21 changes for version 0.2 include simpler events
- *  ... config file ... removed 'onUpdate' event.
+ * 2008-04-21 changes for version 0.2 include simpler events, config file, removed 'onUpdate' event.
  * 2008-06-04 added ignore fields feature
  * 2009-07-04 fetches its own session from sessionFactory to avoid transaction munging
  * 2009-09-05 getActor as a closure to allow developers to supply their own security plugins
  * 2009-09-25 rewrite.
  * 2009-10-04 preparing beta release
  * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
- * @author shawn hartsock
+ *
+ * @author Shawn Hartsock
+ * @author Aaron Long
  */
-class AuditLogListener implements PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener, Initializable {
-
-    private static final Log log = LogFactory.getLog(this)
-
-    public static Long TRUNCATE_LENGTH = 255
+@Commons
+class AuditLogListener extends AbstractPersistenceEventListener {
+    def grailsApplication
 
     /**
      * The verbose flag flips on and off column by column change logging in
@@ -55,39 +43,55 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
      * If verbose is set to 'true' then you get a log event on
      * each individually changed column/field sent to the database
      * with a record of the old value and the new value.
+     *
+     * auditLog.verbose = true
      */
-    boolean verbose = true // in Config.groovy auditLog.verbose = true
-    boolean transactional = false
-    Long truncateLength
-    SessionFactory sessionFactory
+    Boolean verbose = true
+    Boolean transactional = false
 
+    Long truncateLength
     String sessionAttribute
     String actorKey
-
     Closure actorClosure
+
+    AuditLogListener(Datastore datastore) {
+        super(datastore)
+    }
+
+    @Override
+    protected void onPersistenceEvent(AbstractPersistenceEvent event) {
+        if (isAuditableEntity(event.entityObject)) {
+            log.trace "Audit logging: ${event.eventType.name()} for ${event.entity.name}"
+
+            switch(event.eventType) {
+                case PostInsert:
+                    onPostInsert(event as PostInsertEvent)
+                    break
+                case PostUpdate:
+                    onPostUpdate(event as PostUpdateEvent)
+                    break
+                case PreDelete:
+                    onPreDelete(event as PreDeleteEvent)
+                    break
+            }
+        }
+    }
+
+    @Override
+    boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
+        return eventType.isAssignableFrom(PostInsertEvent) ||
+               eventType.isAssignableFrom(PostUpdateEvent) ||
+               eventType.isAssignableFrom(PreDeleteEvent)
+    }
 
     void setActorClosure(Closure closure) {
         closure.delegate = this
-        closure.properties.putAt("log", log)
+        closure.properties['log'] = log
         actorClosure = closure
     }
 
-    void init() {
-        if (Environment.getCurrent() != Environment.PRODUCTION && ConfigurationHolder.config.auditLog?.transactional == null) {
-            transactional = false
-        }
-
-        log.info "$AuditLogListener.canonicalName initializing AuditLogListener... "
-        if (!truncateLength) {
-            truncateLength = TRUNCATE_LENGTH
-        }
-        else {
-            log.debug "truncate length set to ${truncateLength}"
-        }
-    }
-
     String getActor() {
-        def actor
+        def actor = null
         try {
             if (actorClosure) {
                 def attr = RequestContextHolder?.getRequestAttributes()
@@ -95,46 +99,56 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
                 if (attr && session) {
                     actor = actorClosure.call(attr, session)
                 }
-                else { // no session or attributes mean this is invoked from a Service, Quartz Job, or other headless-operation
+                else {
+                    // No session or attributes mean this is invoked from a Service, Quartz Job, or other headless-operation
                     actor = 'system'
                 }
             }
         }
-        catch (Exception ex) {
-            log.error "The auditLog.actorClosure threw this exception: ${ex.message}"
+        catch (ex) {
+            log.error "The auditLog.actorClosure threw this exception", ex
             log.error "The auditLog.actorClosure will be disabled now."
             actorClosure = null
         }
         return actor?.toString()
     }
 
-    def getUri() {
+    String getUri() {
         def attr = RequestContextHolder?.getRequestAttributes()
         return (attr?.currentRequest?.uri?.toString()) ?: null
     }
 
-    // returns true for auditable entities.
-    def isAuditableEntity(event) {
-        if (event && event.getEntity()) {
-            def entity = event.getEntity()
-            if (entity.metaClass.hasProperty(entity, 'auditable') && entity.'auditable') {
-                return true
-            }
-        }
-        return false
+    /**
+     * Returns true for auditable entities, false otherwise
+     */
+    boolean isAuditableEntity(domain) {
+        getAuditable(domain) != null && domain instanceof DirtyCheckable
     }
 
     /**
-     * We allow users to specify
-     *       static auditable = [handlersOnly:true]
-     *  if they don't want us to log events for them and instead have their own plan.
+     * The static auditable attribute for the given domain class or null if none exists
      */
-    boolean callHandlersOnly(entity) {
-        if (entity?.metaClass?.hasProperty(entity, 'auditable') && entity?.'auditable') {
-            if (entity.auditable instanceof Map && entity.auditable.containsKey('handlersOnly')) {
-                return (entity.auditable['handlersOnly']) ? true : false
-            }
-            return false
+    def getAuditable(domain) {
+        def cpf = ClassPropertyFetcher.forClass(domain.class)
+        cpf.getPropertyValue('auditable')
+    }
+
+    /**
+     * If auditable is defined as a Map, return it otherwise return null
+     */
+    Map getAuditableMap(domain) {
+        def auditable = getAuditable(domain)
+        auditable && auditable instanceof Map ? auditable as Map : null
+    }
+
+    /**
+     * We allow users to specify static auditable = [handlersOnly: true]
+     * if they don't want us to log events for them and instead have their own plan.
+     */
+    boolean callHandlersOnly(domain) {
+        Map auditableMap = getAuditableMap(domain)
+        if (auditableMap?.containsKey('handlersOnly')) {
+            return (auditableMap['handlersOnly']) ? true : false
         }
         return false
     }
@@ -151,56 +165,70 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
      *   static auditable = [ignore:[]]
      *
      */
-    List ignoreList(entity) {
+    List<String> ignoreList(domain) {
         def ignore = ['version', 'lastUpdated']
-        if (entity?.metaClass?.hasProperty(entity, 'auditable')) {
-            if (entity.auditable instanceof Map && entity.auditable.containsKey('ignore')) {
-                log.debug "found an ignore list one this entity ${entity.getClass()}"
-                def list = entity.auditable['ignore']
-                if (list instanceof List) {
-                    ignore = list
-                }
+
+        Map auditableMap = getAuditableMap(domain)
+        if (auditableMap?.containsKey('ignore')) {
+            log.debug "Found an ignore list on this entity ${domain.class}"
+            def list = auditableMap['ignore']
+            if (list instanceof List) {
+                ignore = list
             }
         }
+
         return ignore
     }
 
-    def getEntityId(event) {
-        if (event && event.entity) {
-            def entity = event.getEntity()
-            if (entity.metaClass.hasProperty(entity, 'id') && entity.'id') {
-                return entity.id.toString()
+    /**
+     * Get the Id to display for this entity when logging. Domain classes can override the property
+     * used by supplying a [displayKey] attribute in the auditable Map.
+     *
+     * @param event
+     * @return String key
+     */
+    def getEntityId(AbstractPersistenceEvent event) {
+        def domain = event.entityObject
+        def entity = event.entity
+
+        // If we have a display key, allow override of what shows as the entity id
+        Map auditableMap = getAuditableMap(domain)
+        if (auditableMap?.containsKey('displayKey')) {
+            def displayKey = auditableMap.displayKey
+            if (displayKey instanceof Closure) {
+                return displayKey.call(domain)
             }
-            // trying complex entity resolution
-            return event.getPersister().hasIdentifierProperty() ? event.getPersister().getIdentifier(event.getEntity(), event.getPersister().guessEntityMode(event.getEntity())) : null
+            else if (displayKey instanceof Collection) {
+                return displayKey.inject { id, prop -> id + ("|"+domain."${prop}")?.toString() }
+            }
         }
-        return null
+        else {
+            return domain."${entity.identity.name}" as String
+        }
     }
 
     /**
      * We must use the preDelete event if we want to capture
      * what the old object was like.
      */
-    boolean onPreDelete(final PreDeleteEvent event) {
+    private void onPreDelete(PreDeleteEvent event) {
         try {
-            def audit = isAuditableEntity(event)
-            String[] names = event.getPersister().getPropertyNames()
-            Object[] state = event.getDeletedState()
-            def map = makeMap(names, state)
-            if (audit && !callHandlersOnly(event.getEntity())) {
-                def entity = event.getEntity()
-                def entityName = entity.getClass().getName()
-                def entityId = getEntityId(event)
-                logChanges(null, map, null, entityId, 'DELETE', entityName)
-            }
-            if (audit) {
+            def entity = event.entity
+            def domain = event.entityObject
+
+            boolean auditable = isAuditableEntity(domain)
+            if (auditable) {
+                def map = makeMap(entity.persistentPropertyNames, domain)
+                if (!callHandlersOnly(domain)) {
+                    logChanges(null, map, getEntityId(event), 'DELETE', entity.name)
+                }
+
                 executeHandler(event, 'onDelete', map, null)
             }
         }
-        catch (HibernateException e) {
-            log.error "Audit Plugin unable to process DELETE event", e
+        catch (e) {
+            log.error "Audit plugin unable to process DELETE event for ${event.entity.name}", e
         }
-        return false
     }
 
     /**
@@ -210,36 +238,24 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
      * can't work the way we want... but really it's the onChange
      * event handler that does the magic for us.
      */
-    void onPostInsert(final PostInsertEvent event) {
+    private void onPostInsert(PostInsertEvent event) {
         try {
-            def audit = isAuditableEntity(event)
-            String[] names = event.getPersister().getPropertyNames()
-            Object[] state = event.getState()
-            def map = makeMap(names, state)
-            if (audit && !callHandlersOnly(event.getEntity())) {
-                log.debug "logging changes for auditable entity"
-                def entity = event.getEntity()
-                def entityName = entity.getClass().getName()
-                def entityId = getEntityId(event)
-                logChanges(map, null, null, entityId, 'INSERT', entityName)
-            }
-            if (audit) {
-                log.debug "calling event handlers for ${event.getEntity().getClass().getCanonicalName()}"
+            def entity = event.entity
+            def domain = event.entityObject
+
+            boolean auditable = isAuditableEntity(domain)
+            if (auditable) {
+                def map = makeMap(entity.persistentPropertyNames, domain)
+                if (!callHandlersOnly(domain)) {
+                    logChanges(map, null, getEntityId(event), 'INSERT', entity.name)
+                }
+
                 executeHandler(event, 'onSave', null, map)
             }
         }
-        catch (HibernateException e) {
-            log.error "Audit Plugin unable to process INSERT event", e
+        catch (e) {
+            log.error "Audit plugin unable to process INSERT event for ${event.entity.name}", e
         }
-        log.trace "... onPostInsert is finished."
-    }
-
-    private makeMap(String[] names, Object[] state) {
-        def map = [:]
-        for (int ii = 0; ii < names.length; ii++) {
-            map[names[ii]] = state[ii]
-        }
-        return map
     }
 
     /**
@@ -259,10 +275,36 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
      *
      * Needs complex type testing BTW.
      */
-    void onPostUpdate(final PostUpdateEvent event) {
-        if (isAuditableEntity(event)) {
-            log.trace "${event.getClass()} onChange handler has been called"
-            onChange(event)
+    private void onPostUpdate(PostUpdateEvent event) {
+        def entity = event.entity
+        def domain = event.entityObject
+
+        if (isAuditableEntity(domain)) {
+            // Dirty checkable is a requirement for auditability
+            DirtyCheckable dirtyCheckable = domain as DirtyCheckable
+
+            // Get all the dirty properties
+            List<String> dirtyProperties = dirtyCheckable.listDirtyPropertyNames()
+            if (dirtyProperties) {
+                // Get the prior values for everything that is dirty
+                Map oldMap = dirtyProperties.collectEntries { String property ->
+                    [property, dirtyCheckable.getOriginalValue(property)]
+                }
+
+                // Get the current values for everything that is dirty
+                Map newMap = makeMap(dirtyProperties, domain)
+
+                if (!significantChange(domain, oldMap, newMap)) {
+                    return
+                }
+
+                // Allow user to override whether you do auditing for them
+                if (!callHandlersOnly(domain)) {
+                    logChanges(newMap, oldMap, getEntityId(event), 'UPDATE', entity.name)
+                }
+
+                executeHandler(event, 'onChange', oldMap, newMap)
+            }
         }
     }
 
@@ -274,14 +316,14 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
      * event. So this feature uses the ignore parameter
      * to provide a list of fields for onChange to ignore.
      */
-    private boolean significantChange(entity, oldMap, newMap) {
-        def ignore = ignoreList(entity)
-        ignore?.each {key ->
+    private boolean significantChange(domain, Map oldMap, Map newMap) {
+        def ignore = ignoreList(domain)
+        ignore?.each { String key ->
             oldMap.remove(key)
             newMap.remove(key)
         }
         boolean changed = false
-        oldMap.each {k, v ->
+        oldMap.each { String k, Object v ->
             if (v != newMap[k]) {
                 changed = true
             }
@@ -289,102 +331,30 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
         return changed
     }
 
-    /**
-     * only if this is an auditable entity
-     */
-    private void onChange(final PostUpdateEvent event) {
-        def entity = event.getEntity()
-        String entityName = entity.getClass().getName()
-        def entityId = event.getId()
-
-        // object arrays representing the old and new state
-        def oldState = event.getOldState()
-        def newState = event.getState()
-
-        List<String> propertyNames = event.getPersister().getPropertyNames()
-        Map oldMap = [:]
-        Map newMap = [:]
-
-        if (propertyNames) {
-            for (int index = 0; index < newState.length; index++) {
-                if (propertyNames[index]) {
-                    if (oldState) {
-                        populateOldStateMap(oldState, oldMap, propertyNames[index], index)
-                    }
-                    if (newState) {
-                        newMap[propertyNames[index]] = newState[index]
-                    }
-                }
-            }
-        }
-
-        if (!significantChange(entity, oldMap, newMap)) {
-            return
-        }
-
-        // allow user's to over-ride whether you do auditing for them.
-        if (!callHandlersOnly(event.getEntity())) {
-            logChanges(newMap, oldMap, event, entityId, 'UPDATE', entityName)
-        }
-        /**
-         * Hibernate only saves changes when there are changes.
-         * That means the onUpdate event was the same as the
-         * onChange with no parameters. I've eliminated onUpdate.
-         */
-        executeHandler(event, 'onChange', oldMap, newMap)
-    }
-
-    private populateOldStateMap(oldState, Map oldMap, String keyName, index) {
-        def oldPropertyState = oldState[index]
-        if (oldPropertyState instanceof PersistentCollection) {
-            PersistentCollection pc = (PersistentCollection) oldPropertyState
-            PersistenceContext context = sessionFactory.getCurrentSession().getPersistenceContext()
-            CollectionEntry entry = context.getCollectionEntry(pc)
-            Object snapshot = entry.getSnapshot()
-            if (pc instanceof List) {
-                oldMap[keyName] = Collections.unmodifiableList((List) snapshot)
-            }
-            else if (pc instanceof Map) {
-                oldMap[keyName] = Collections.unmodifiableMap((Map) snapshot)
-            }
-            else if (pc instanceof Set) {
-                //Set snapshot is actually stored as a Map
-                Map snapshotMap = snapshot
-                oldMap[keyName] = Collections.unmodifiableSet(new HashSet(snapshotMap.values()))
-            }
-            else {
-                oldMap[keyName] = pc
-            }
-        }
-        else {
-            oldMap[keyName] = oldPropertyState
-        }
-    }
-
-    void initialize(final Configuration config) {
+    private makeMap(List<String> propertyNames, domain) {
+        propertyNames.collectEntries { [it, domain."${it}"] }
     }
 
     /**
      * Leans heavily on the "toString()" of a property
      * ... this feels crufty... should be tighter...
      */
-    def logChanges(newMap, oldMap, parentObject, persistedObjectId, eventName, className) {
-        log.trace "logging changes... "
-        AuditLogEvent audit
+    def logChanges(Map newMap, Map oldMap, persistedObjectId, eventName, className) {
         def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
-        if (newMap) newMap.remove('version')
-        if (oldMap) oldMap.remove('version')
+        newMap?.remove('version')
+        oldMap?.remove('version')
+
         if (newMap && oldMap) {
-            log.trace "there are new and old values to log"
+            log.trace "There are new and old values to log"
             newMap.each { key, val ->
                 if (val != oldMap[key]) {
-                    audit = new AuditLogEvent(
+                    def audit = new AuditLogEvent(
                         actor: getActor(),
                         uri: getUri(),
                         className: className,
                         eventName: eventName,
                         persistedObjectId: persistedObjectId?.toString(),
-                        persistedObjectVersion: persistedObjectVersion?.toLong(),
+                        persistedObjectVersion: persistedObjectVersion as Long,
                         propertyName: key,
                         oldValue: truncate(oldMap[key]),
                         newValue: truncate(newMap[key]))
@@ -395,13 +365,13 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
         else if (newMap && verbose) {
             log.trace "there are new values and logging is verbose ... "
             newMap.each { key, val ->
-                audit = new AuditLogEvent(
+                def audit = new AuditLogEvent(
                     actor: getActor(),
                     uri: getUri(),
                     className: className,
                     eventName: eventName,
                     persistedObjectId: persistedObjectId?.toString(),
-                    persistedObjectVersion: persistedObjectVersion?.toLong(),
+                    persistedObjectVersion: persistedObjectVersion as Long,
                     propertyName: key,
                     oldValue: null,
                     newValue: truncate(val))
@@ -411,13 +381,13 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
         else if (oldMap && verbose) {
             log.trace "there is only an old map of values available and logging is set to verbose... "
             oldMap.each { key, val ->
-                audit = new AuditLogEvent(
+                def audit = new AuditLogEvent(
                     actor: getActor(),
                     uri: getUri(),
                     className: className,
                     eventName: eventName,
                     persistedObjectId: persistedObjectId?.toString(),
-                    persistedObjectVersion: persistedObjectVersion?.toLong(),
+                    persistedObjectVersion: persistedObjectVersion as Long,
                     propertyName: key,
                     oldValue: truncate(val),
                     newValue: null)
@@ -426,13 +396,13 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
         }
         else {
             log.trace "creating a basic audit logging event object."
-            audit = new AuditLogEvent(
+            def audit = new AuditLogEvent(
                 actor: getActor(),
                 uri: getUri(),
                 className: className,
                 eventName: eventName,
                 persistedObjectId: persistedObjectId?.toString(),
-                persistedObjectVersion: persistedObjectVersion?.toLong())
+                persistedObjectVersion: persistedObjectVersion as Long)
             saveAuditLog(audit)
         }
     }
@@ -450,10 +420,13 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
     /**
      * This calls the handlers based on what was passed in to it.
      */
-    def executeHandler(event, handler, oldState, newState) {
+    def executeHandler(AbstractPersistenceEvent event, handler, oldState, newState) {
         log.trace "calling execute handler ... "
-        def entity = event.getEntity()
-        if (isAuditableEntity(event) && entity.metaClass.hasProperty(entity, handler)) {
+
+        def entity = event.entity
+        def domain = event.entityObject
+
+        if (domain.metaClass.hasProperty(domain, handler)) {
             log.trace "entity was auditable and had a handler property ${handler}"
             if (oldState && newState) {
                 log.trace "there was both an old state and a new state"
@@ -479,10 +452,7 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
     }
 
     /**
-     * Performs special logging and save actions for AuditLogEvent class. You cannot use
-     * the GORM save features to persist this class on transactional databases due to timing
-     * conflicts with the session. Due to problems in this routine on some databases
-     * this closure has comprehensive trace logging in it for your diagnostics.
+     * Save the audit log in a new session and optionally, in a transaction
      *
      * It has also been written as a closure for your sake so that you may over-ride the
      * save closure with your own code (should your particular database not work with this code)
@@ -497,39 +467,23 @@ class AuditLogListener implements PreDeleteEventListener, PostInsertEventListene
      */
     def saveAuditLog = { AuditLogEvent audit ->
         audit.with {
-            dateCreated = new Date()
-            lastUpdated = new Date()
+            dateCreated = lastUpdated = new Date()
         }
         log.info audit
         try {
-            // NOTE: you simply cannot use the session that GORM is using for some
-            // audit log events. That's because some audit events occur *after* a
-            // transaction has committed. Late session save actions can invalidate
-            // sessions or you can essentially roll-back your audit log saves. This is
-            // why you have to open your own session and transaction on some
-            // transactional databases and not others.
-            Session session = sessionFactory.openSession()
-            log.trace "opened new session for audit log persistence"
-            def trans
-            if (transactional) {
-                trans = session.beginTransaction()
-                log.trace " + began transaction "
+            AuditLogEvent.withNewSession {
+                if (transactional) {
+                    AuditLogEvent.withTransaction {
+                        audit.merge(flush: true, failOnError: true)
+                    }
+                }
+                else {
+                    audit.merge(flush: true, failOnError: true)
+                }
             }
-            def saved = session.merge(audit)
-            log.debug " + saved log entry id:'${saved.id}'."
-            session.flush()
-            log.trace " + flushed session"
-            if (transactional) {
-                trans?.commit()
-                log.trace " + committed transaction"
-            }
-            session.close()
-            log.trace "session closed"
         }
-        catch (HibernateException ex) {
-            log.error "AuditLogEvent save has failed!"
-            log.error ex.message
-            log.error audit.errors
+        catch (e) {
+            log.error "Failed to create AuditLogEvent for ${audit}", e
         }
     }
 }

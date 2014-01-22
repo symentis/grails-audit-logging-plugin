@@ -1,4 +1,3 @@
-import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 
@@ -65,7 +64,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * <p/>
  * Release 0.5.5.2 collections logging, log ids, replacement patterns, property value masking, large fields support, fixes and enhancements
  * <p/>
- * Release 1.0.0  T.B.D.
+ * Release 1.0.0 Remove strict hibernate dependency and use database agnostic approach
  * <p/>
  */
 class AuditLoggingGrailsPlugin {
@@ -79,12 +78,12 @@ When called, the event handlers have access to oldObj and newObj definitions tha
 will allow you to take action on what has changed.
 
 Stable Releases:
-    0.5.3 (Grails 1.2 or below)
-    0.5.4 (Grails 1.3 or above)
+    0.5.3   (Grails 1.2 or below)
+    0.5.4   (Grails 1.3 or above)
     0.5.5.2 (Grails 1.3 or above)
-    1.0.0 (Grails 2.0 or above)
+    1.0.0   (Grails 2.0 or above)
     """
-    def loadAfter = ['core', 'hibernate']
+    def loadAfter = ['core', 'dataSource']
 
     def documentation = 'http://grails.org/plugin/audit-logging'
     def license = 'APACHE'
@@ -95,37 +94,20 @@ Stable Releases:
     def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
 
-    def doWithSpring = {
-        if (manager?.hasGrailsPlugin("hibernate")) {
-            auditLogListener(AuditLogListener) {
-                sessionFactory = sessionFactory
-                verbose = application.config?.auditLog?.verbose ?: false
-                transactional = application.config?.auditLog?.transactional ?: false
-                sessionAttribute = application.config?.auditLog?.sessionAttribute ?: ""
-                actorKey = application.config?.auditLog?.actorKey ?: ""
-            }
-            //PreDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
-            hibernateEventListeners(HibernateEventListeners) {
-                listenerMap = [
-                        'post-insert': auditLogListener,
-                        'post-update': auditLogListener,
-                        'pre-delete': auditLogListener,
-                        'pre-collection-update': auditLogListener,
-                        'pre-collection-remove': auditLogListener,
-                        'post-collection-recreate': auditLogListener]
-            }
-        }
-    }
-
+    // Register generic GORM listener
     def doWithApplicationContext = { applicationContext ->
-        // pulls in the bean to inject and init
-        AuditLogListener listener = applicationContext.auditLogListener
-        // allows to configure the Actor name Closure in the config
-        listener.setActorClosure(application.config?.auditLog?.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter)
-        listener.init()
-        // allows user to over-ride the maximum length the value stored by the audit logger.
-        if (application.config?.auditLog?.TRUNCATE_LENGTH) {
-            listener.truncateLength = Long.valueOf(application.config?.auditLog?.TRUNCATE_LENGTH)
+        application.mainContext.eventTriggeringInterceptor.datastores.each { key, datastore ->
+            def listener = new AuditLogListener(datastore)
+            listener.with {
+                grailsApplication = application
+                verbose = application.config.auditLog.verbose ?: false
+                transactional = application.config.auditLog.transactional ?: false
+                sessionAttribute = application.config.auditLog.sessionAttribute ?: ""
+                actorKey = application.config.auditLog.actorKey ?: ""
+                truncateLength = application.config.auditLog.truncateLength ?: 255
+                actorClosure = application.config.auditLog.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter
+            }
+            applicationContext.addApplicationListener(listener)
         }
     }
 }
