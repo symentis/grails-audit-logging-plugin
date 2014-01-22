@@ -118,5 +118,5 @@ auditLog {
     verbose = true
     defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
     transactional = false
-
+    defaultMask = ['ssn']
 }

@@ -54,10 +54,13 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     Long truncateLength
     String sessionAttribute
     String actorKey
+    String propertyMask
     Closure actorClosure
 
     // Global list of attribute changes to ignore, defaults to ['version', 'lastUpdated']
     List<String> defaultIgnoreList
+    List<String> defaultMaskList
+    Map<String, String> replacementPatterns
 
     AuditLogListener(Datastore datastore) {
         super(datastore)
@@ -131,9 +134,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * a domain class may only be audited after it becomes Final and not while Pending.
      */
     boolean isAuditableEntity(domain, EventType eventType) {
-        def auditable = getAuditable(domain)
+        if (grailsApplication.config.auditLog.disabled) {
+            return false
+        }
 
         // Null or false is not auditable
+        def auditable = getAuditable(domain)
         if (!auditable) {
             return false
         }
@@ -171,6 +177,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * if they don't want us to log events for them and instead have their own plan.
      */
     boolean callHandlersOnly(domain) {
+        // Allow global configuration of handlers only
+        if (grailsApplication.config.auditLog.handlersOnly) {
+            return true
+        }
+
         Map auditableMap = getAuditableMap(domain)
         if (auditableMap?.containsKey('handlersOnly')) {
             return (auditableMap['handlersOnly']) ? true : false
@@ -203,7 +214,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
         Map auditableMap = getAuditableMap(domain)
         if (auditableMap?.containsKey('ignore')) {
-            log.debug "Found an ignore list on this entity ${domain.class}"
+            log.debug "Found an ignore list on this entity ${domain.class.name}"
             def list = auditableMap['ignore']
             if (list instanceof List) {
                 ignore = list
@@ -211,6 +222,37 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
 
         return ignore
+    }
+
+    /**
+     * The default properties to mask list is:  ['password']
+     * if you want to provide your own mask list, specify in the DomainClass:
+     *
+     *   static auditable = [mask:['password','myField']]
+     *
+     * If you really want to log password property change values
+     * specify an empty mask list:
+     *
+     *   static auditable = [mask:[]]
+     *
+     * Or globally:
+     *
+     *   auditLog.defaultMask = ['password']
+     *
+     */
+    List maskList(domain) {
+        def mask = defaultMaskList
+
+        Map auditableMap = getAuditableMap(domain)
+        if (auditableMap?.containsKey('mask')) {
+            log.debug "Found a mask list one this entity ${domain.class.name}"
+            def list = domain.auditable['mask']
+            if (list instanceof List) {
+                mask = list
+            }
+        }
+
+        return mask
     }
 
     /**
@@ -253,7 +295,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
             def map = makeMap(entity.persistentProperties*.name, domain)
             if (!callHandlersOnly(domain)) {
-                logChanges(null, map, getEntityId(event), 'DELETE', entity.name)
+                logChanges(domain, null, map, getEntityId(event), 'DELETE', entity.name)
             }
 
             executeHandler(domain, 'onDelete', map, null)
@@ -277,7 +319,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
             def map = makeMap(entity.persistentProperties*.name, domain)
             if (!callHandlersOnly(domain)) {
-                logChanges(map, null, getEntityId(event), 'INSERT', entity.name)
+                logChanges(domain, map, null, getEntityId(event), 'INSERT', entity.name)
             }
 
             executeHandler(domain, 'onSave', null, map)
@@ -326,7 +368,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                 // Allow user to override whether you do auditing for them
                 if (!callHandlersOnly(domain)) {
                     def entity = getDomainClass(domain)
-                    logChanges(newMap, oldMap, getEntityId(event), 'UPDATE', entity.name)
+                    logChanges(domain, newMap, oldMap, getEntityId(event), 'UPDATE', entity.name)
                 }
 
                 executeHandler(domain, 'onChange', oldMap, newMap)
@@ -372,14 +414,19 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * Leans heavily on the "toString()" of a property
      * ... this feels crufty... should be tighter...
      */
-    def logChanges(Map newMap, Map oldMap, persistedObjectId, eventName, className) {
+    def logChanges(domain, Map newMap, Map oldMap, persistedObjectId, eventName, className) {
+        List<String> maskList = maskList(domain)
+        maskList?.each {
+
+        }
+
         def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
         newMap?.remove('version')
         oldMap?.remove('version')
 
         if (newMap && oldMap) {
             log.trace "There are new and old values to log"
-            newMap.each { key, val ->
+            newMap.each { String key, val ->
                 if (val != oldMap[key]) {
                     def audit = new AuditLogEvent(
                         actor: getActor(),
@@ -389,15 +436,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                         persistedObjectId: persistedObjectId?.toString(),
                         persistedObjectVersion: persistedObjectVersion as Long,
                         propertyName: key,
-                        oldValue: truncate(oldMap[key]),
-                        newValue: truncate(newMap[key]))
+                        oldValue: conditionallyMaskAndTruncate(domain, key, oldMap[key]),
+                        newValue: conditionallyMaskAndTruncate(domain, key, newMap[key]))
                     saveAuditLog(audit)
                 }
             }
         }
         else if (newMap && verbose) {
             log.trace "there are new values and logging is verbose ... "
-            newMap.each { key, val ->
+            newMap.each { String key, val ->
                 def audit = new AuditLogEvent(
                     actor: getActor(),
                     uri: getUri(),
@@ -407,13 +454,13 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     persistedObjectVersion: persistedObjectVersion as Long,
                     propertyName: key,
                     oldValue: null,
-                    newValue: truncate(val))
+                    newValue: conditionallyMaskAndTruncate(domain, key, val))
                 saveAuditLog(audit)
             }
         }
         else if (oldMap && verbose) {
             log.trace "there is only an old map of values available and logging is set to verbose... "
-            oldMap.each { key, val ->
+            oldMap.each { String key, val ->
                 def audit = new AuditLogEvent(
                     actor: getActor(),
                     uri: getUri(),
@@ -422,7 +469,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     persistedObjectId: persistedObjectId?.toString(),
                     persistedObjectVersion: persistedObjectVersion as Long,
                     propertyName: key,
-                    oldValue: truncate(val),
+                    oldValue: conditionallyMaskAndTruncate(domain, key, val),
                     newValue: null)
                 saveAuditLog(audit)
             }
@@ -440,14 +487,42 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
     }
 
-    String truncate(final obj) {
-        truncate(obj, truncateLength.toInteger())
+    /**
+     * @param domain the auditable domain object
+     * @param key property name
+     * @param value the value of the property
+     * @return
+     */
+    String conditionallyMaskAndTruncate(domain, String key, value){
+        if (maskList(domain)?.contains(key)){
+            log.trace("Masking property ${key} with ${propertyMask}")
+            propertyMask
+        }
+        else {
+            truncate(value)
+        }
     }
 
-    String truncate(final obj, int max) {
+    String truncate(value) {
+        truncate(value, truncateLength.toInteger())
+    }
+
+    String truncate(value, int max) {
         log.trace "trimming object's string representation based on ${max} characters."
-        def str = obj?.toString()?.trim()
-        return (str?.length() > max) ? str?.substring(0, max) : str
+
+        // GPAUDITLOGGING-40
+        def str = replaceByReplacementPatterns("$value".trim())
+        (str?.length() > max) ? str?.substring(0, max) : str
+    }
+
+    String replaceByReplacementPatterns(String str) {
+        if (str == null) {
+            return null
+        }
+        replacementPatterns?.each { String from, String to ->
+            str = str.replace(from, to)
+        }
+        return str
     }
 
     /**

@@ -5,6 +5,9 @@ class Author {
     Long age
     Boolean famous = false
 
+    // This should get masked globally
+    String ssn = "123-456-7890"
+
     Date dateCreated
     Date lastUpdated
     String lastUpdatedBy

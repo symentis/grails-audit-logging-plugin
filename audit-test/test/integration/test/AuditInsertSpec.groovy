@@ -20,12 +20,18 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 7
+        events.size() == 8
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == null
         first.newValue == "37"
         first.eventName == 'INSERT'
+
+        and: "verify that ssn is masked"
+        def ssn = events.find { it.propertyName == 'ssn' }
+        ssn.oldValue == null
+        ssn.newValue == "**********"
+        ssn.eventName == 'INSERT'
     }
 
     void "Test insert logging with collection"() {
@@ -41,7 +47,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 7
+        events.size() == 8
 
         def bookEvents = AuditLogEvent.findAllByClassName('Book')
         bookEvents.size() == 5
@@ -109,7 +115,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 7
+        events.size() == 8
 
         and:
         author.handlerCalled == "onSave"

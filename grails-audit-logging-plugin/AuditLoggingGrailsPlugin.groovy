@@ -1,3 +1,4 @@
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 
@@ -104,12 +105,22 @@ Stable Releases:
                 transactional = application.config.auditLog.transactional ?: false
                 sessionAttribute = application.config.auditLog.sessionAttribute ?: ""
                 actorKey = application.config.auditLog.actorKey ?: ""
-                truncateLength = application.config.auditLog.truncateLength ?: 255
+                truncateLength = application.config.auditLog.truncateLength ?: determineDefaultTruncateLength()
                 actorKey = application.config.auditLog.actorKey ?: ""
                 actorClosure = application.config.auditLog.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter
                 defaultIgnoreList = application.config.auditLog.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
+                defaultMaskList = application.config.auditLog.defaultMask?.asImmutable() ?: ['password'].asImmutable()
+                propertyMask = application.config.auditLog.propertyMask ?: "**********"
+                replacementPatterns = application.config.auditLog.replacementPatterns
             }
             applicationContext.addApplicationListener(listener)
         }
+    }
+
+    /**
+     * The default truncate length is 255 unless we are using the largeValueColumnTypes, then we allow up to the column size
+     */
+    private Long determineDefaultTruncateLength() {
+        AuditLogEvent.constraints.oldValue?.maxSize ?: 255
     }
 }

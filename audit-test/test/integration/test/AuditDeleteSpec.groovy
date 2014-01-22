@@ -23,6 +23,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.handlerCalled = ""
     }
 
+    @IgnoreRest
     void "Test delete logging"() {
         given:
         def author = Author.findByName("Aaron")
@@ -32,7 +33,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 7
+        events.size() == 8
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == "37"
