@@ -1,10 +1,10 @@
 /cobertura.ser
 *.log
-/target
+target/
 /docs
-/plugin.xml
-/*.zip
-.idea
+plugin.xml
+*.zip
+.idea/
 *.iml
 *.iws
 *.ipr
@@ -13,4 +13,4 @@
 .classpath
 .project
 .DS_Store
-/web-app
+grails-audit-logging-plugin/web-app

@@ -1,7 +1,5 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
-
 class AuditLogEventController {
 
   // the delete, save and update actions only accept POST requests

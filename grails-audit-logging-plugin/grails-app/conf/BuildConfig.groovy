@@ -16,15 +16,16 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
+        /*
         runtime 'dom4j:dom4j:1.6.1', {
             excludes 'jaxen', 'jaxme-api', 'junitperf', 'pull-parser', 'relaxngDatatype', 'stax-api',
                      'stax-ri', 'xalan', 'xercesImpl', 'xpp3', 'xsdlib', 'xml-apis'
         }
+        */
     }
 
     plugins {
-        build(":release:3.0.1",
-              ":rest-client-builder:1.0.3") {
+        build(":release:3.0.1", ":rest-client-builder:1.0.3") {
             export = false
         }
     }
