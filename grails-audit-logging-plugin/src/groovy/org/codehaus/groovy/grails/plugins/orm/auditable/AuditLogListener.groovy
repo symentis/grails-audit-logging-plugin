@@ -9,13 +9,12 @@ import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PostInsertEvent
 import org.grails.datastore.mapping.engine.event.PreDeleteEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
-import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 import org.springframework.context.ApplicationEvent
 import org.springframework.web.context.request.RequestContextHolder
 
 import groovy.util.logging.Commons
 
-import static org.grails.datastore.mapping.engine.event.EventType.*
+import static org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil.*
 
 /**
  * Grails interceptor for logging saves, updates, deletes and acting on
@@ -72,13 +71,13 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
 
             switch(event.eventType) {
-                case PostInsert:
+                case EventType.PostInsert:
                     onPostInsert(event as PostInsertEvent)
                     break
-                case PreUpdate:
+                case EventType.PreUpdate:
                     onPreUpdate(event as PreUpdateEvent)
                     break
-                case PreDelete:
+                case EventType.PreDelete:
                     onPreDelete(event as PreDeleteEvent)
                     break
             }
@@ -124,52 +123,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     String getUri() {
         def attr = RequestContextHolder?.getRequestAttributes()
         return (attr?.currentRequest?.uri?.toString()) ?: null
-    }
-
-    /**
-     * Returns true for auditable entities, false otherwise.
-     *
-     * Domain classes can use the 'isAuditable' attribute to provide a closure
-     * that will be called in order to determine instance level auditability. For example,
-     * a domain class may only be audited after it becomes Final and not while Pending.
-     */
-    boolean isAuditableEntity(domain, EventType eventType) {
-        if (grailsApplication.config.auditLog.disabled) {
-            return false
-        }
-
-        // Null or false is not auditable
-        def auditable = getAuditable(domain)
-        if (!auditable) {
-            return false
-        }
-
-        // If we have a map, see if we have an instance-level closure to check
-        if (auditable instanceof Map) {
-            def map = auditable as Map
-            if (map?.containsKey('isAuditable')) {
-                return map.isAuditable.call(eventType, domain)
-            }
-        }
-
-        // Anything that get's this far is auditable
-        return true
-    }
-
-    /**
-     * The static auditable attribute for the given domain class or null if none exists
-     */
-    def getAuditable(domain) {
-        def cpf = ClassPropertyFetcher.forClass(domain.class)
-        cpf.getPropertyValue('auditable')
-    }
-
-    /**
-     * If auditable is defined as a Map, return it otherwise return null
-     */
-    Map getAuditableMap(domain) {
-        def auditable = getAuditable(domain)
-        auditable && auditable instanceof Map ? auditable as Map : null
     }
 
     /**

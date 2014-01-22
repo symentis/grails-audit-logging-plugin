@@ -1,6 +1,9 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
+import grails.util.Holders
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.datastore.mapping.engine.event.EventType
+import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 
 import javax.servlet.http.HttpSession
 
@@ -15,6 +18,52 @@ import javax.servlet.http.HttpSession
  * @author Shawn Hartsock
  */
 class AuditLogListenerUtil {
+    /**
+     * Returns true for auditable entities, false otherwise.
+     *
+     * Domain classes can use the 'isAuditable' attribute to provide a closure
+     * that will be called in order to determine instance level auditability. For example,
+     * a domain class may only be audited after it becomes Final and not while Pending.
+     */
+    static boolean isAuditableEntity(domain, EventType eventType) {
+        if (Holders.config.auditLog.disabled) {
+            return false
+        }
+
+        // Null or false is not auditable
+        def auditable = getAuditable(domain)
+        if (!auditable) {
+            return false
+        }
+
+        // If we have a map, see if we have an instance-level closure to check
+        if (auditable instanceof Map) {
+            def map = auditable as Map
+            if (map?.containsKey('isAuditable')) {
+                return map.isAuditable.call(eventType, domain)
+            }
+        }
+
+        // Anything that get's this far is auditable
+        return true
+    }
+
+    /**
+     * The static auditable attribute for the given domain class or null if none exists
+     */
+    static getAuditable(domain) {
+        def cpf = ClassPropertyFetcher.forClass(domain.class)
+        cpf.getPropertyValue('auditable')
+    }
+
+    /**
+     * If auditable is defined as a Map, return it otherwise return null
+     */
+    static Map getAuditableMap(domain) {
+        def auditable = getAuditable(domain)
+        auditable && auditable instanceof Map ? auditable as Map : null
+    }
+
     /**
      * The original getActor method transplanted to the utility class as
      * a closure. The closure takes two arguments one a RequestAttributes object

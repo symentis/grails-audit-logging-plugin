@@ -2,7 +2,6 @@ package test
 
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
-import spock.lang.IgnoreRest
 
 class AuditDeleteSpec extends IntegrationSpec {
     void setup() {
@@ -23,7 +22,6 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.handlerCalled = ""
     }
 
-    @IgnoreRest
     void "Test delete logging"() {
         given:
         def author = Author.findByName("Aaron")
@@ -77,7 +75,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 7
+        events.size() == 8
 
         and:
         author.handlerCalled == "onDelete"
