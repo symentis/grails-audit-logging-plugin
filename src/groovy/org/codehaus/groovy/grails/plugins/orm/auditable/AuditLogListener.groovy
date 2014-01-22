@@ -1,12 +1,14 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
+import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PostInsertEvent
-import org.grails.datastore.mapping.engine.event.PostUpdateEvent
 import org.grails.datastore.mapping.engine.event.PreDeleteEvent
+import org.grails.datastore.mapping.engine.event.PreUpdateEvent
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 import org.springframework.context.ApplicationEvent
 import org.springframework.web.context.request.RequestContextHolder
@@ -54,21 +56,24 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     String actorKey
     Closure actorClosure
 
+    // Global list of attribute changes to ignore, defaults to ['version', 'lastUpdated']
+    List<String> defaultIgnoreList
+
     AuditLogListener(Datastore datastore) {
         super(datastore)
     }
 
     @Override
     protected void onPersistenceEvent(AbstractPersistenceEvent event) {
-        if (isAuditableEntity(event.entityObject)) {
-            log.trace "Audit logging: ${event.eventType.name()} for ${event.entity.name}"
+        if (isAuditableEntity(event.entityObject, event.eventType)) {
+            log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
 
             switch(event.eventType) {
                 case PostInsert:
                     onPostInsert(event as PostInsertEvent)
                     break
-                case PostUpdate:
-                    onPostUpdate(event as PostUpdateEvent)
+                case PreUpdate:
+                    onPreUpdate(event as PreUpdateEvent)
                     break
                 case PreDelete:
                     onPreDelete(event as PreDeleteEvent)
@@ -80,7 +85,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     @Override
     boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
         return eventType.isAssignableFrom(PostInsertEvent) ||
-               eventType.isAssignableFrom(PostUpdateEvent) ||
+               eventType.isAssignableFrom(PreUpdateEvent) ||
                eventType.isAssignableFrom(PreDeleteEvent)
     }
 
@@ -119,10 +124,30 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
 
     /**
-     * Returns true for auditable entities, false otherwise
+     * Returns true for auditable entities, false otherwise.
+     *
+     * Domain classes can use the 'isAuditable' attribute to provide a closure
+     * that will be called in order to determine instance level auditability. For example,
+     * a domain class may only be audited after it becomes Final and not while Pending.
      */
-    boolean isAuditableEntity(domain) {
-        getAuditable(domain) != null && domain instanceof DirtyCheckable
+    boolean isAuditableEntity(domain, EventType eventType) {
+        def auditable = getAuditable(domain)
+
+        // Null or false is not auditable
+        if (!auditable) {
+            return false
+        }
+
+        // If we have a map, see if we have an instance-level closure to check
+        if (auditable instanceof Map) {
+            def map = auditable as Map
+            if (map?.containsKey('isAuditable')) {
+                return map.isAuditable.call(eventType, domain)
+            }
+        }
+
+        // Anything that get's this far is auditable
+        return true
     }
 
     /**
@@ -154,19 +179,27 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
 
     /**
-     * The default ignore field list is:  ['version','lastUpdated'] if you want
+     * The default ignore field list is: ['version','lastUpdated'] if you want
      * to provide your own ignore list do so by specifying the ignore list like so:
      *
      *   static auditable = [ignore:['version','lastUpdated','myField']]
      *
-     * ... if instead you really want to trigger on version and lastUpdated changes you
-     * may specify an empty ignore list ... like so ...
+     * You may change the default ignore list by setting:
+     *
+     *   auditLog.defaultIgnore = ['version', 'lastUpdated', 'myOtherField']
+     *
+     * If instead you really want to trigger on version and lastUpdated changes you
+     * may specify an empty ignore list:
      *
      *   static auditable = [ignore:[]]
      *
+     * Or globally:
+     *
+     *   auditLog.defaultIgnore = []
+     *
      */
     List<String> ignoreList(domain) {
-        def ignore = ['version', 'lastUpdated']
+        def ignore = defaultIgnoreList
 
         Map auditableMap = getAuditableMap(domain)
         if (auditableMap?.containsKey('ignore')) {
@@ -182,29 +215,31 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     /**
      * Get the Id to display for this entity when logging. Domain classes can override the property
-     * used by supplying a [displayKey] attribute in the auditable Map.
+     * used by supplying a [entityId] attribute in the auditable Map.
      *
      * @param event
      * @return String key
      */
-    def getEntityId(AbstractPersistenceEvent event) {
+    String getEntityId(AbstractPersistenceEvent event) {
         def domain = event.entityObject
-        def entity = event.entity
+        def entity = getDomainClass(domain)
 
         // If we have a display key, allow override of what shows as the entity id
         Map auditableMap = getAuditableMap(domain)
-        if (auditableMap?.containsKey('displayKey')) {
-            def displayKey = auditableMap.displayKey
-            if (displayKey instanceof Closure) {
-                return displayKey.call(domain)
+        if (auditableMap?.containsKey('entityId')) {
+            def entityId = auditableMap.entityId
+            if (entityId instanceof Closure) {
+                return entityId.call(domain) as String
             }
-            else if (displayKey instanceof Collection) {
-                return displayKey.inject { id, prop -> id + ("|"+domain."${prop}")?.toString() }
+            else if (entityId instanceof Collection) {
+                return entityId.inject { id, prop -> id + ("|"+domain."${prop}")?.toString() }
+            }
+            else if (entityId instanceof String) {
+                return domain."${entityId}" as String
             }
         }
-        else {
-            return domain."${entity.identity.name}" as String
-        }
+
+        return domain."${entity.identifier.name}" as String
     }
 
     /**
@@ -212,22 +247,19 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * what the old object was like.
      */
     private void onPreDelete(PreDeleteEvent event) {
+        def domain = event.entityObject
         try {
-            def entity = event.entity
-            def domain = event.entityObject
+            def entity = getDomainClass(domain)
 
-            boolean auditable = isAuditableEntity(domain)
-            if (auditable) {
-                def map = makeMap(entity.persistentPropertyNames, domain)
-                if (!callHandlersOnly(domain)) {
-                    logChanges(null, map, getEntityId(event), 'DELETE', entity.name)
-                }
-
-                executeHandler(event, 'onDelete', map, null)
+            def map = makeMap(entity.persistentProperties*.name, domain)
+            if (!callHandlersOnly(domain)) {
+                logChanges(null, map, getEntityId(event), 'DELETE', entity.name)
             }
+
+            executeHandler(domain, 'onDelete', map, null)
         }
         catch (e) {
-            log.error "Audit plugin unable to process DELETE event for ${event.entity.name}", e
+            log.error "Audit plugin unable to process DELETE event for ${domain.class.name}", e
         }
     }
 
@@ -239,22 +271,19 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * event handler that does the magic for us.
      */
     private void onPostInsert(PostInsertEvent event) {
+        def domain = event.entityObject
         try {
-            def entity = event.entity
-            def domain = event.entityObject
+            def entity = getDomainClass(domain)
 
-            boolean auditable = isAuditableEntity(domain)
-            if (auditable) {
-                def map = makeMap(entity.persistentPropertyNames, domain)
-                if (!callHandlersOnly(domain)) {
-                    logChanges(map, null, getEntityId(event), 'INSERT', entity.name)
-                }
-
-                executeHandler(event, 'onSave', null, map)
+            def map = makeMap(entity.persistentProperties*.name, domain)
+            if (!callHandlersOnly(domain)) {
+                logChanges(map, null, getEntityId(event), 'INSERT', entity.name)
             }
+
+            executeHandler(domain, 'onSave', null, map)
         }
         catch (e) {
-            log.error "Audit plugin unable to process INSERT event for ${event.entity.name}", e
+            log.error "Audit plugin unable to process INSERT event for ${domain.class.name}", e
         }
     }
 
@@ -275,20 +304,16 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      *
      * Needs complex type testing BTW.
      */
-    private void onPostUpdate(PostUpdateEvent event) {
-        def entity = event.entity
+    private void onPreUpdate(PreUpdateEvent event) {
         def domain = event.entityObject
-
-        if (isAuditableEntity(domain)) {
-            // Dirty checkable is a requirement for auditability
-            DirtyCheckable dirtyCheckable = domain as DirtyCheckable
-
+        try {
             // Get all the dirty properties
-            List<String> dirtyProperties = dirtyCheckable.listDirtyPropertyNames()
+            List<String> dirtyProperties = domain.dirtyPropertyNames
             if (dirtyProperties) {
+
                 // Get the prior values for everything that is dirty
                 Map oldMap = dirtyProperties.collectEntries { String property ->
-                    [property, dirtyCheckable.getOriginalValue(property)]
+                    [property, domain.getPersistentValue(property)]
                 }
 
                 // Get the current values for everything that is dirty
@@ -300,11 +325,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
                 // Allow user to override whether you do auditing for them
                 if (!callHandlersOnly(domain)) {
+                    def entity = getDomainClass(domain)
                     logChanges(newMap, oldMap, getEntityId(event), 'UPDATE', entity.name)
                 }
 
-                executeHandler(event, 'onChange', oldMap, newMap)
+                executeHandler(domain, 'onChange', oldMap, newMap)
             }
+        }
+        catch (e) {
+            log.error "Audit plugin unable to process UPDATE event for ${domain.class.name}", e
         }
     }
 
@@ -333,6 +362,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     private makeMap(List<String> propertyNames, domain) {
         propertyNames.collectEntries { [it, domain."${it}"] }
+    }
+
+    private GrailsDomainClass getDomainClass(domain) {
+        grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
     }
 
     /**
@@ -420,32 +453,29 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     /**
      * This calls the handlers based on what was passed in to it.
      */
-    def executeHandler(AbstractPersistenceEvent event, handler, oldState, newState) {
+    def executeHandler(domain, handler, oldState, newState) {
         log.trace "calling execute handler ... "
-
-        def entity = event.entity
-        def domain = event.entityObject
 
         if (domain.metaClass.hasProperty(domain, handler)) {
             log.trace "entity was auditable and had a handler property ${handler}"
             if (oldState && newState) {
                 log.trace "there was both an old state and a new state"
-                if (entity."${handler}".maximumNumberOfParameters == 2) {
+                if (domain."${handler}".maximumNumberOfParameters == 2) {
                     log.trace "there are two parameters to the handler so I'm sending old and new value maps"
-                    entity."${handler}"(oldState, newState)
+                    domain."${handler}"(oldState, newState)
                 }
                 else {
                     log.trace "only one parameter on the closure I'm sending oldMap and newMap as part of a Map parameter"
-                    entity."${handler}"([oldMap: oldState, newMap: newState])
+                    domain."${handler}"([oldMap: oldState, newMap: newState])
                 }
             }
             else if (oldState) {
                 log.trace "sending old state into ${handler}"
-                entity."${handler}"(oldState)
+                domain."${handler}"(oldState)
             }
             else if (newState) {
                 log.trace "sending new state into ${handler}"
-                entity."${handler}"(newState)
+                domain."${handler}"(newState)
             }
         }
         log.trace "... execute handler is finished."

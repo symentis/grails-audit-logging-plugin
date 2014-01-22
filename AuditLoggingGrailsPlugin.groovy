@@ -105,7 +105,9 @@ Stable Releases:
                 sessionAttribute = application.config.auditLog.sessionAttribute ?: ""
                 actorKey = application.config.auditLog.actorKey ?: ""
                 truncateLength = application.config.auditLog.truncateLength ?: 255
+                actorKey = application.config.auditLog.actorKey ?: ""
                 actorClosure = application.config.auditLog.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter
+                defaultIgnoreList = application.config.auditLog.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
             }
             applicationContext.addApplicationListener(listener)
         }
