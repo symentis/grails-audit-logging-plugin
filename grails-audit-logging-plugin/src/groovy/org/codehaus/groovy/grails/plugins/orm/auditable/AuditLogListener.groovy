@@ -210,7 +210,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * We must use the preDelete event if we want to capture
      * what the old object was like.
      */
-    private void onPreDelete(PreDeleteEvent event) {
+    protected void onPreDelete(PreDeleteEvent event) {
         def domain = event.entityObject
         try {
             def entity = getDomainClass(domain)
@@ -234,7 +234,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * can't work the way we want... but really it's the onChange
      * event handler that does the magic for us.
      */
-    private void onPostInsert(PostInsertEvent event) {
+    protected void onPostInsert(PostInsertEvent event) {
         def domain = event.entityObject
         try {
             def entity = getDomainClass(domain)
@@ -268,7 +268,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      *
      * Needs complex type testing BTW.
      */
-    private void onPreUpdate(PreUpdateEvent event) {
+    protected void onPreUpdate(PreUpdateEvent event) {
         def domain = event.entityObject
         try {
             def entity = getDomainClass(domain)
@@ -345,7 +345,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * event. So this feature uses the ignore parameter
      * to provide a list of fields for onChange to ignore.
      */
-    private boolean significantChange(domain, Map oldMap, Map newMap) {
+    protected boolean significantChange(domain, Map oldMap, Map newMap) {
         def ignore = ignoreList(domain)
         ignore?.each { String key ->
             oldMap.remove(key)
