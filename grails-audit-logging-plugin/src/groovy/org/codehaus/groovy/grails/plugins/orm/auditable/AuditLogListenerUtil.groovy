@@ -27,10 +27,6 @@ class AuditLogListenerUtil {
      * a domain class may only be audited after it becomes Final and not while Pending.
      */
     static boolean isAuditableEntity(domain, String eventName) {
-        if (Holders.config.auditLog.disabled) {
-            return false
-        }
-
         // Null or false is not auditable
         def auditable = getAuditable(domain)
         if (!auditable) {

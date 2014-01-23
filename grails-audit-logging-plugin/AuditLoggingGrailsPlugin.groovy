@@ -48,16 +48,17 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.5.1 Fixed the title. No changes in the plugin code.
  * Release 0.5.5.2 Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.
  * Release 0.5.5.3 Added ability to disable audit logging by config.
+ * Release 1.0.0 Make database agnostic, major cleanup and new features
  */
 class AuditLoggingGrailsPlugin {
     def version = "1.0.0-SNAPSHOT"
-    def grailsVersion = '2.0 > *'
+    def grailsVersion = '2.3 > *'
     def title = "Audit Logging Plugin"
     def author = "Robert Oschwald"
     def authorEmail = "roos@symentis.com"
     def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin additionally adds an instance hook to domain objects that allows you to hang
-Audit events off of them. The events include onSave, onUpdate, onChange and onDelete.
+Audit events off of them. The events include onSave, onChange, and onDelete.
 When called, the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 
@@ -66,9 +67,8 @@ Stable Releases:
     0.5.4   (Grails 1.3 or above)
     0.5.5.2 (Grails 1.3 or above)
     0.5.5.3 (Grails 1.3 or above)
-    1.0.0   (Grails 2.0 or above)
+    1.0.0   (Grails 2.3 or above)
     """
-    def loadAfter = ['core', 'dataSource']
 
     def documentation = 'http://grails.org/plugin/audit-logging'
     def license = 'APACHE'
@@ -78,6 +78,8 @@ Stable Releases:
     ]
     def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
+    def dependsOn = [:]
+    def loadAfter = ['core', 'dataSource']
 
     // Register generic GORM listener
     def doWithApplicationContext = { applicationContext ->
