@@ -120,7 +120,7 @@ Stable Releases:
     /**
      * The default truncate length is 255 unless we are using the largeValueColumnTypes, then we allow up to the column size
      */
-    private Long determineDefaultTruncateLength() {
+    private Integer determineDefaultTruncateLength() {
         AuditLogEvent.constraints.oldValue?.maxSize ?: 255
     }
 }

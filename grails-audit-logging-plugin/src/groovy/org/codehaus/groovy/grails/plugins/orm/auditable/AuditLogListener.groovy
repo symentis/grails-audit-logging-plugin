@@ -28,7 +28,6 @@ import static org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerU
  * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
  *
  * @author Shawn Hartsock
- * @author Aaron Long
  */
 @Commons
 class AuditLogListener extends AbstractPersistenceEventListener {
@@ -46,9 +45,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * auditLog.verbose = true
      */
     Boolean verbose = true
-    Boolean transactional = false
 
-    Long truncateLength
+    Boolean transactional = false
+    Integer truncateLength
     String sessionAttribute
     String actorKey
     String propertyMask
@@ -223,7 +222,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             executeHandler(domain, 'onDelete', map, null)
         }
         catch (e) {
-            log.error "Audit plugin unable to process DELETE event for ${domain.class.name}", e
+            log.error "Audit plugin unable to process delete event for ${domain.class.name}", e
         }
     }
 
@@ -247,7 +246,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             executeHandler(domain, 'onSave', null, map)
         }
         catch (e) {
-            log.error "Audit plugin unable to process INSERT event for ${domain.class.name}", e
+            log.error "Audit plugin unable to process insert event for ${domain.class.name}", e
         }
     }
 
@@ -346,11 +345,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * ... this feels crufty... should be tighter...
      */
     def logChanges(domain, Map newMap, Map oldMap, persistedObjectId, eventName, className) {
-        List<String> maskList = maskList(domain)
-        maskList?.each {
-
-        }
-
         def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
         newMap?.remove('version')
         oldMap?.remove('version')
@@ -429,13 +423,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             log.trace("Masking property ${key} with ${propertyMask}")
             propertyMask
         }
-        else {
-            truncate(value)
+        else if (truncateLength) {
+            truncate(value, truncateLength)
         }
-    }
-
-    String truncate(value) {
-        truncate(value, truncateLength.toInteger())
+        else {
+            truncate(value, Integer.MAX_VALUE)
+        }
     }
 
     String truncate(value, int max) {
