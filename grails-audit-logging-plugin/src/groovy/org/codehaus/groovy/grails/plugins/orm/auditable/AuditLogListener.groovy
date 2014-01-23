@@ -1,7 +1,5 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
@@ -209,35 +207,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
 
     /**
-     * Get the Id to display for this entity when logging. Domain classes can override the property
-     * used by supplying a [entityId] attribute in the auditable Map.
-     *
-     * @param event
-     * @return String key
-     */
-    String getEntityId(AbstractPersistenceEvent event) {
-        def domain = event.entityObject
-        def entity = getDomainClass(domain)
-
-        // If we have a display key, allow override of what shows as the entity id
-        Map auditableMap = getAuditableMap(domain)
-        if (auditableMap?.containsKey('entityId')) {
-            def entityId = auditableMap.entityId
-            if (entityId instanceof Closure) {
-                return entityId.call(domain) as String
-            }
-            else if (entityId instanceof Collection) {
-                return entityId.inject { id, prop -> id + ("|"+domain."${prop}")?.toString() }
-            }
-            else if (entityId instanceof String) {
-                return domain."${entityId}" as String
-            }
-        }
-
-        return domain."${entity.identifier.name}" as String
-    }
-
-    /**
      * We must use the preDelete event if we want to capture
      * what the old object was like.
      */
@@ -248,7 +217,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
             def map = makeMap(entity.persistentProperties*.name, domain)
             if (!callHandlersOnly(domain)) {
-                logChanges(domain, null, map, getEntityId(event), getEventName(event), entity.name)
+                logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
             }
 
             executeHandler(domain, 'onDelete', map, null)
@@ -272,7 +241,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
             def map = makeMap(entity.persistentProperties*.name, domain)
             if (!callHandlersOnly(domain)) {
-                logChanges(domain, map, null, getEntityId(event), getEventName(event), entity.name)
+                logChanges(domain, map, null, getEntityId(domain), getEventName(event), entity.name)
             }
 
             executeHandler(domain, 'onSave', null, map)
@@ -321,7 +290,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                 // Allow user to override whether you do auditing for them
                 if (!callHandlersOnly(domain)) {
                     def entity = getDomainClass(domain)
-                    logChanges(domain, newMap, oldMap, getEntityId(event), getEventName(event), entity.name)
+                    logChanges(domain, newMap, oldMap, getEntityId(domain), getEventName(event), entity.name)
                 }
 
                 executeHandler(domain, 'onChange', oldMap, newMap)
@@ -357,10 +326,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     private makeMap(List<String> propertyNames, domain) {
         propertyNames.collectEntries { [it, domain."${it}"] }
-    }
-
-    private GrailsDomainClass getDomainClass(domain) {
-        grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
     }
 
     private String getEventName(AbstractPersistenceEvent event) {

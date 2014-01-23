@@ -1,6 +1,8 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import grails.util.Holders
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 
@@ -61,6 +63,43 @@ class AuditLogListenerUtil {
     static Map getAuditableMap(domain) {
         def auditable = getAuditable(domain)
         auditable && auditable instanceof Map ? auditable as Map : null
+    }
+
+    /**
+     * Get the Id to display for this entity when logging. Domain classes can override the property
+     * used by supplying a [entityId] attribute in the auditable Map.
+     *
+     * @param event
+     * @return String key
+     */
+    static String getEntityId(domain) {
+        def entity = getDomainClass(domain)
+
+        // If we have a display key, allow override of what shows as the entity id
+        Map auditableMap = getAuditableMap(domain)
+        if (auditableMap?.containsKey('entityId')) {
+            def entityId = auditableMap.entityId
+            if (entityId instanceof Closure) {
+                return entityId.call(domain) as String
+            }
+            else if (entityId instanceof Collection) {
+                return entityId.inject { id, prop -> id + ("|"+domain."${prop}")?.toString() }
+            }
+            else if (entityId instanceof String) {
+                return domain."${entityId}" as String
+            }
+        }
+
+        domain."${entity.identifier.name}" as String
+    }
+
+    /**
+     * Return the grails domain class for the given domain object.
+     *
+     * @param domain the domain instance
+     */
+    static GrailsDomainClass getDomainClass(domain) {
+        Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
     }
 
     /**
