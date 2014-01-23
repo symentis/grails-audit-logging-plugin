@@ -40,6 +40,24 @@ class AuditUpdateSpec extends IntegrationSpec {
         first.eventName == "UPDATE"
     }
 
+    void "Test update to-one association"() {
+        given:
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.publisher = Publisher.findByName("Random House")
+        author.save(flush: true, failOnError: true)
+
+        then:
+        def events = AuditLogEvent.findAllByClassName('Author')
+        events.size() == 1
+
+        def first = events.find { it.propertyName == 'publisher' }
+        first.oldValue == null
+        first.newValue ==~ /\[id:ABC123]test\.Publisher : \d+/
+        first.eventName == "UPDATE"
+    }
+
     void "Test two saves, one flush"() {
         given:
         def author = Author.findByName("Aaron")

@@ -20,7 +20,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 8
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == null
@@ -49,7 +49,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 8
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def bookEvents = AuditLogEvent.findAllByClassName('Book')
         bookEvents.size() == 5
@@ -117,7 +117,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 8
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         and:
         author.handlerCalled == "onSave"

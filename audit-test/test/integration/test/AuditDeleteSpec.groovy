@@ -31,7 +31,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 8
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == "37"
@@ -40,10 +40,10 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         and: 'all books are deleted'
         def b1Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('Book', 'Hunger Games')
-        b1Events.size() == 5
+        b1Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
 
         def b2Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('Book', 'Catching Fire')
-        b2Events.size() == 5
+        b2Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
     }
 
     void "Test conditional delete logging"() {
@@ -75,7 +75,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        events.size() == 8
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         and:
         author.handlerCalled == "onDelete"
