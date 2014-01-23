@@ -67,7 +67,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     @Override
     protected void onPersistenceEvent(AbstractPersistenceEvent event) {
-        if (isAuditableEntity(event.entityObject, event.eventType)) {
+        if (isAuditableEntity(event.entityObject, getEventName(event))) {
             log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
 
             switch(event.eventType) {
@@ -248,7 +248,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
             def map = makeMap(entity.persistentProperties*.name, domain)
             if (!callHandlersOnly(domain)) {
-                logChanges(domain, null, map, getEntityId(event), 'DELETE', entity.name)
+                logChanges(domain, null, map, getEntityId(event), getEventName(event), entity.name)
             }
 
             executeHandler(domain, 'onDelete', map, null)
@@ -272,7 +272,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
             def map = makeMap(entity.persistentProperties*.name, domain)
             if (!callHandlersOnly(domain)) {
-                logChanges(domain, map, null, getEntityId(event), 'INSERT', entity.name)
+                logChanges(domain, map, null, getEntityId(event), getEventName(event), entity.name)
             }
 
             executeHandler(domain, 'onSave', null, map)
@@ -321,14 +321,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                 // Allow user to override whether you do auditing for them
                 if (!callHandlersOnly(domain)) {
                     def entity = getDomainClass(domain)
-                    logChanges(domain, newMap, oldMap, getEntityId(event), 'UPDATE', entity.name)
+                    logChanges(domain, newMap, oldMap, getEntityId(event), getEventName(event), entity.name)
                 }
 
                 executeHandler(domain, 'onChange', oldMap, newMap)
             }
         }
         catch (e) {
-            log.error "Audit plugin unable to process UPDATE event for ${domain.class.name}", e
+            log.error "Audit plugin unable to process update event for ${domain.class.name}", e
         }
     }
 
@@ -361,6 +361,19 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     private GrailsDomainClass getDomainClass(domain) {
         grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
+    }
+
+    private String getEventName(AbstractPersistenceEvent event) {
+        switch(event.eventType) {
+            case EventType.PostInsert:
+                return "INSERT"
+            case EventType.PreUpdate:
+                return "UPDATE"
+            case EventType.PreDelete:
+                return "DELETE"
+            default:
+                throw new IllegalStateException("Unknown event type: ${event.eventType}")
+        }
     }
 
     /**

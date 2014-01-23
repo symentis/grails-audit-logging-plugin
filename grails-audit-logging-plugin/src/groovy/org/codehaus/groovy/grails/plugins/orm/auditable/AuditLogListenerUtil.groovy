@@ -2,7 +2,6 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import grails.util.Holders
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 
 import javax.servlet.http.HttpSession
@@ -25,7 +24,7 @@ class AuditLogListenerUtil {
      * that will be called in order to determine instance level auditability. For example,
      * a domain class may only be audited after it becomes Final and not while Pending.
      */
-    static boolean isAuditableEntity(domain, EventType eventType) {
+    static boolean isAuditableEntity(domain, String eventName) {
         if (Holders.config.auditLog.disabled) {
             return false
         }
@@ -40,7 +39,7 @@ class AuditLogListenerUtil {
         if (auditable instanceof Map) {
             def map = auditable as Map
             if (map?.containsKey('isAuditable')) {
-                return map.isAuditable.call(eventType, domain)
+                return map.isAuditable.call(eventName, domain)
             }
         }
 

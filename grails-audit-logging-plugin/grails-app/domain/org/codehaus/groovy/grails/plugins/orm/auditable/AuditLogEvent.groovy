@@ -47,9 +47,10 @@ class AuditLogEvent implements Serializable {
 
     static mapping = {
         // GPAUDITLOGGING-30
-        table Holders.config.auditLog?.tablename ?: 'audit_log'
+        table Holders.config.auditLog.tablename ?: 'audit_log'
+
         // Disable caching by setting auditLog.cacheDisabled = true in your app's Config.groovy
-        if(!Holders.config.auditLog?.cacheDisabled) {
+        if (!Holders.config.auditLog.cacheDisabled) {
             cache usage: 'read-only', include: 'non-lazy'
         }
 
