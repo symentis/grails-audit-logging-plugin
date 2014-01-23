@@ -6,8 +6,9 @@ class Publisher {
 
     boolean active = false
 
-    // Only audit if active, show the code, not the id
-    static auditable = [entityId: 'code', isAuditable: { event, obj ->
+    // Only audit if active
+    // Provide a list of id's instead of just a single id, these are concatenated with a '|'
+    static auditable = [entityId: ['code', 'name'], isAuditable: { event, obj ->
         obj.active == true
     }]
 

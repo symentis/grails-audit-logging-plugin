@@ -54,7 +54,7 @@ class AuditUpdateSpec extends IntegrationSpec {
 
         def first = events.find { it.propertyName == 'publisher' }
         first.oldValue == null
-        first.newValue ==~ /\[id:ABC123]test\.Publisher : \d+/
+        first.newValue ==~ /\[id:ABC123\|Random House]test\.Publisher : \d+/
         first.eventName == "UPDATE"
     }
 
@@ -106,7 +106,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         events.size() == 1
 
         def first = events.first()
-        first.persistedObjectId == 'ABC123'
+        first.persistedObjectId == 'ABC123|Spring'
         first.oldValue == 'Random House'
         first.newValue == 'Spring'
         first.propertyName == 'name'

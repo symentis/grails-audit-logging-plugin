@@ -70,7 +70,7 @@ class AuditInsertSpec extends IntegrationSpec {
         events.size() == 3
 
         def first = events.find { it.propertyName == 'name' }
-        first.persistedObjectId == 'ABC123'
+        first.persistedObjectId == 'ABC123|Random House'
         first.newValue == 'Random House'
         first.eventName == 'INSERT'
     }

@@ -77,7 +77,7 @@ class AuditLogListenerUtil {
                 return entityId.call(domain) as String
             }
             else if (entityId instanceof Collection) {
-                return entityId.inject { id, prop -> id + ("|"+domain."${prop}")?.toString() }
+                return entityId.collect { domain."${it}" }.join("|")
             }
             else if (entityId instanceof String) {
                 return domain."${entityId}" as String
