@@ -8,7 +8,7 @@ import grails.util.Holders
  * Grails to create a table for you.
  */
 class AuditLogEvent implements Serializable {
-    private static final long serialVersionUID = 1
+    private static final long serialVersionUID = 1L
 
     static auditable = false
 
@@ -92,7 +92,8 @@ class AuditLogEvent implements Serializable {
     }
 
     String toString() {
-        "audit log ${dateCreated} ${actor ? 'user ${actor}' : 'user ?'} " +
+        String actorStr = actor ? "user ${actor}" : "user ?"
+        "audit log ${dateCreated} ${actorStr} " +
                 "${eventName} ${className} " +
                 "id:${persistedObjectId} version:${persistedObjectVersion}"
     }

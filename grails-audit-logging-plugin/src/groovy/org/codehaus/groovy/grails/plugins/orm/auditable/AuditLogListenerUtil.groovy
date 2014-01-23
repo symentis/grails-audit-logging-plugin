@@ -73,8 +73,6 @@ class AuditLogListenerUtil {
      * @return String key
      */
     static String getEntityId(domain) {
-        def entity = getDomainClass(domain)
-
         // If we have a display key, allow override of what shows as the entity id
         Map auditableMap = getAuditableMap(domain)
         if (auditableMap?.containsKey('entityId')) {
@@ -90,7 +88,9 @@ class AuditLogListenerUtil {
             }
         }
 
-        domain."${entity.identifier.name}" as String
+        // Use the identifier property if this is a domain class or just 'id' if not
+        def identifier = getDomainClass(domain)?.identifier?.name ?: 'id'
+        domain."${identifier}" as String
     }
 
     /**
@@ -99,7 +99,12 @@ class AuditLogListenerUtil {
      * @param domain the domain instance
      */
     static GrailsDomainClass getDomainClass(domain) {
-        Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
+        if (Holders.grailsApplication.isDomainClass(domain.class)) {
+            Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
+        }
+        else {
+            null
+        }
     }
 
     /**

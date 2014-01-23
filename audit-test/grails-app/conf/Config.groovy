@@ -119,4 +119,6 @@ auditLog {
     defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
     transactional = false
     defaultMask = ['ssn']
+    logIds = true
+    defaultActor = 'SYS'
 }

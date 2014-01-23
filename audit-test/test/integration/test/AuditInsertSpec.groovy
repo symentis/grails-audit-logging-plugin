@@ -26,12 +26,14 @@ class AuditInsertSpec extends IntegrationSpec {
         first.oldValue == null
         first.newValue == "37"
         first.eventName == 'INSERT'
+        first.actor == 'SYS'
 
         and: "verify that ssn is masked"
         def ssn = events.find { it.propertyName == 'ssn' }
         ssn.oldValue == null
         ssn.newValue == "**********"
         ssn.eventName == 'INSERT'
+        ssn.actor == 'SYS'
     }
 
     void "Test insert logging with collection"() {

@@ -1,5 +1,6 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
@@ -45,7 +46,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * auditLog.verbose = true
      */
     Boolean verbose = true
-
+    Boolean logIds = false
     Boolean transactional = false
     Integer truncateLength
     String sessionAttribute
@@ -96,23 +97,23 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     String getActor() {
         def actor = null
-        try {
-            if (actorClosure) {
-                def attr = RequestContextHolder?.getRequestAttributes()
-                def session = attr?.session
-                if (attr && session) {
+        if (actorClosure) {
+            def attr = RequestContextHolder.getRequestAttributes()
+            def session = attr?.session
+            if (attr && session) {
+                try {
                     actor = actorClosure.call(attr, session)
                 }
-                else {
-                    // No session or attributes mean this is invoked from a Service, Quartz Job, or other headless-operation
-                    actor = 'system'
+                catch(ex) {
+                    log.error "The auditLog.actorClosure threw this exception", ex
+                    log.error "The auditLog.actorClosure will be disabled now."
+                    actorClosure = null
                 }
             }
-        }
-        catch (ex) {
-            log.error "The auditLog.actorClosure threw this exception", ex
-            log.error "The auditLog.actorClosure will be disabled now."
-            actorClosure = null
+            // If we couldn't find an actor, use the configured default or just 'system'
+            if (!actor) {
+                actor = grailsApplication.config.auditLog.defaultActor ?: 'system'
+            }
         }
         return actor?.toString()
     }
@@ -214,7 +215,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         try {
             def entity = getDomainClass(domain)
 
-            def map = makeMap(entity.persistentProperties*.name, domain)
+            def map = makeMap(entity.persistentProperties*.name as Set, domain)
             if (!callHandlersOnly(domain)) {
                 logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
             }
@@ -238,7 +239,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         try {
             def entity = getDomainClass(domain)
 
-            def map = makeMap(entity.persistentProperties*.name, domain)
+            def map = makeMap(entity.persistentProperties*.name as Set, domain)
             if (!callHandlersOnly(domain)) {
                 logChanges(domain, map, null, getEntityId(domain), getEventName(event), entity.name)
             }
@@ -270,13 +271,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     private void onPreUpdate(PreUpdateEvent event) {
         def domain = event.entityObject
         try {
-            // Get all the dirty properties
-            List<String> dirtyProperties = domain.dirtyPropertyNames
-            if (dirtyProperties) {
+            def entity = getDomainClass(domain)
 
+            // Get all the dirty properties
+            Set<String> dirtyProperties = getDirtyPropertyNames(domain, entity)
+            if (dirtyProperties) {
                 // Get the prior values for everything that is dirty
                 Map oldMap = dirtyProperties.collectEntries { String property ->
-                    [property, domain.getPersistentValue(property)]
+                    [property, getPersistentValue(domain, property, entity)]
                 }
 
                 // Get the current values for everything that is dirty
@@ -288,7 +290,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
                 // Allow user to override whether you do auditing for them
                 if (!callHandlersOnly(domain)) {
-                    def entity = getDomainClass(domain)
                     logChanges(domain, newMap, oldMap, getEntityId(domain), getEventName(event), entity.name)
                 }
 
@@ -298,6 +299,42 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         catch (e) {
             log.error "Audit plugin unable to process update event for ${domain.class.name}", e
         }
+    }
+
+    /**
+     * Get the persistent value for the given domain.property. This method includes
+     * some special case handling for hasMany properties, which don't follow normal rules.
+     *
+     * TODO - Need a way to load the old value generically for a collection
+     */
+    protected getPersistentValue(domain, String property, GrailsDomainClass entity) {
+        if (entity.isOneToMany(property)) {
+            "N/A"
+        }
+        else {
+            domain.getPersistentValue(property)
+        }
+    }
+
+    /**
+     * Return dirty property names for the given domain class. This method includes some
+     * special case logic for hasMany properties, which don't follow normal isDirty rules.
+     */
+    protected Set<String> getDirtyPropertyNames(domain, GrailsDomainClass entity) {
+        Set<String> dirtyProperties = domain.dirtyPropertyNames ?: []
+
+        // In some cases, collections aren't listed as being dirty in the dirty property names.
+        // We need to check them individually.
+        entity.associationMap.each { String associationName, value ->
+            if (entity.isOneToMany(associationName)) {
+                def collection = domain."${associationName}"
+                if (collection?.respondsTo('isDirty') && collection?.isDirty()) {
+                    dirtyProperties << associationName
+                }
+            }
+        }
+
+        dirtyProperties
     }
 
     /**
@@ -323,7 +360,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         return changed
     }
 
-    private makeMap(List<String> propertyNames, domain) {
+    private makeMap(Set<String> propertyNames, domain) {
         propertyNames.collectEntries { [it, domain."${it}"] }
     }
 
@@ -432,14 +469,53 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
 
     String truncate(value, int max) {
+        if (value == null) {
+            return null
+        }
+
         log.trace "trimming object's string representation based on ${max} characters."
 
-        // GPAUDITLOGGING-40
-        def str = replaceByReplacementPatterns("$value".trim())
+        // GPAUDITLOGGING-43
+        def str = null
+        if (logIds) {
+            if (value instanceof Collection || value instanceof Map) {
+                value.each {
+                    str = appendWithId(it, str)
+                }
+            }
+            else {
+                str = appendWithId(value, str)
+            }
+        }
+        else {
+            str = "$value".trim() // GPAUDITLOGGING-40
+        }
+
+        str = replaceByReplacementPatterns(str)
         (str?.length() > max) ? str?.substring(0, max) : str
     }
 
-    String replaceByReplacementPatterns(String str) {
+    private String appendWithId(obj, str) {
+        // If this is a domain object, use the standard entity id which
+        // allows the domain class to determine what property to use
+        def objId = null
+        if (obj && grailsApplication.isDomainClass(obj.class)) {
+            objId = getEntityId(obj)
+        }
+        else if (obj?.respondsTo("getId")) {
+            objId = obj.id
+        }
+
+        // If we have an object id, use it otherwise just fallback to toString()
+        if (objId) {
+            str ? "$str, [id:${objId}]$obj" : "[id:${objId}]$obj"
+        }
+        else {
+            str ? "$str,$obj" : "$obj"
+        }
+    }
+
+    private String replaceByReplacementPatterns(String str) {
         if (str == null) {
             return null
         }
