@@ -78,20 +78,27 @@ class AuditLogListenerUtil {
                 return entityId.call(domain) as String
             }
             else if (entityId instanceof Collection) {
-                return entityId.collect {
-                    def val = domain."${it}"
-                    getDomainClass(val) ? getEntityId(val) : val as String
-                }.join("|")
+                return entityId.collect { getIdProperty(domain, it) }.join("|")
             }
             else if (entityId instanceof String) {
-                def val = domain."${entityId}"
-                return getDomainClass(val) ? getEntityId(val) : val as String
+                return getIdProperty(domain, entityId)
             }
         }
 
         // Use the identifier property if this is a domain class or just 'id' if not
         def identifier = getDomainClass(domain)?.identifier?.name ?: 'id'
         domain."${identifier}" as String
+    }
+
+    private static String getIdProperty(domain, property) {
+        def val = domain."${property}"
+        if (val instanceof Enum) {
+            return val.name()
+        }
+        if (getDomainClass(val)) {
+            return getEntityId(val)
+        }
+        val as String
     }
 
     /**
