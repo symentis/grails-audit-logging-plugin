@@ -6,6 +6,7 @@ class Book {
     Date published
     Long pages
 
+    static hasMany = [reviews: Review]
     static belongsTo = [author: Author]
 
     // Show title instead of id

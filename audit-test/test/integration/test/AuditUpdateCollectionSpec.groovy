@@ -90,7 +90,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
 
         and: "the book inserted is logged too"
         def bookEvents = AuditLogEvent.findAllByClassName('Book')
-        bookEvents.size() == 5
+        bookEvents.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
         bookEvents.first().eventName == 'INSERT'
     }
 

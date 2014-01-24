@@ -73,14 +73,19 @@ class AuditLogListenerUtil {
         Map auditableMap = getAuditableMap(domain)
         if (auditableMap?.containsKey('entityId')) {
             def entityId = auditableMap.entityId
+
             if (entityId instanceof Closure) {
                 return entityId.call(domain) as String
             }
             else if (entityId instanceof Collection) {
-                return entityId.collect { domain."${it}" }.join("|")
+                return entityId.collect {
+                    def val = domain."${it}"
+                    getDomainClass(val) ? getEntityId(val) : val as String
+                }.join("|")
             }
             else if (entityId instanceof String) {
-                return domain."${entityId}" as String
+                def val = domain."${entityId}"
+                return getDomainClass(val) ? getEntityId(val) : val as String
             }
         }
 
@@ -95,7 +100,7 @@ class AuditLogListenerUtil {
      * @param domain the domain instance
      */
     static GrailsDomainClass getDomainClass(domain) {
-        if (Holders.grailsApplication.isDomainClass(domain.class)) {
+        if (domain && Holders.grailsApplication.isDomainClass(domain.class)) {
             Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
         }
         else {
@@ -151,7 +156,7 @@ class AuditLogListenerUtil {
                     res = res."${it}"
                 }
             }
-            catch(MissingPropertyException mpe) {
+            catch(MissingPropertyException ignored) {
                 log.debug """\
 AuditLogListener:
 

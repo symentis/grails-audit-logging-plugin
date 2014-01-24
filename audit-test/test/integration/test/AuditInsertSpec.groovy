@@ -36,6 +36,27 @@ class AuditInsertSpec extends IntegrationSpec {
         ssn.actor == 'SYS'
     }
 
+    void "Test override entity id with recursive domain class property"() {
+        given:
+        def author = new Author(name: "Aaron", age: 37, famous: true)
+        def book = new Book(title: 'Hunger Games', description: 'Blah', pages: 400)
+        book.addToReviews(new Review(name: 'The Post'))
+        author.addToBooks(book)
+
+        when:
+        author.save(flush: true, failOnError: true)
+
+        then: "review log is created"
+        def events = AuditLogEvent.findAllByClassName('Review')
+        events.size() == Review.gormPersistentEntity.persistentPropertyNames.size()
+
+        and: "the object id uses the naem from Review and the title from Book"
+        def first = events.first()
+        first.oldValue == null
+        first.eventName == 'INSERT'
+        first.persistedObjectId == 'The Post|Hunger Games'
+    }
+
     void "Test insert logging with collection"() {
         given:
         def author = new Author(name: "Aaron", age: 37, famous: true)
@@ -52,7 +73,7 @@ class AuditInsertSpec extends IntegrationSpec {
         events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def bookEvents = AuditLogEvent.findAllByClassName('Book')
-        bookEvents.size() == 5
+        bookEvents.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
     }
 
     void "Test logging with a different id"() {
