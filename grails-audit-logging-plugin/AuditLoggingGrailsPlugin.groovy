@@ -54,7 +54,7 @@ class AuditLoggingGrailsPlugin {
     def version = "1.0.0-SNAPSHOT"
     def grailsVersion = '2.3 > *'
     def title = "Audit Logging Plugin"
-    def author = "Robert Oschwald"
+    // def author = "Robert Oschwald"
     def authorEmail = "roos@symentis.com"
     def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin additionally adds an instance hook to domain objects that allows you to hang
@@ -74,7 +74,9 @@ Stable Releases:
     def license = 'APACHE'
     def organization = [name: "symentis GmbH", url: "http://www.symentis.com/"]
     def developers = [
-        [name: 'Robert Oschwald', email: 'roos@symentis.com']
+        [ name: 'Robert Oschwald', email: 'roos@symentis.com' ],
+        [ name: 'Elmar Kretzer', email: 'elkr@symentis.com' ],
+        [ name: 'Aaron Long', email: 'roos@symentis.com' ]
     ]
     def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
