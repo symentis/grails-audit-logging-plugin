@@ -76,7 +76,7 @@ Stable Releases:
     def developers = [
         [ name: 'Robert Oschwald', email: 'roos@symentis.com' ],
         [ name: 'Elmar Kretzer', email: 'elkr@symentis.com' ],
-        [ name: 'Aaron Long', email: 'roos@symentis.com' ]
+        [ name: 'Aaron Long', email: 'longwa@gmail.com' ]
     ]
     def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
