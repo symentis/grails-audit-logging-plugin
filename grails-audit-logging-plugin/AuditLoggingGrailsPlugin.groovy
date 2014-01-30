@@ -87,7 +87,7 @@ Stable Releases:
     def doWithApplicationContext = { applicationContext ->
         application.mainContext.eventTriggeringInterceptor.datastores.each { key, datastore ->
             // Don't register the listener if we are disabled
-            if (!application.config.auditLog.disabled) {
+            if (!application.config.auditLog.disabled && !datastore.config.auditLog.disabled) {
                 def listener = new AuditLogListener(datastore)
                 listener.with {
                     grailsApplication = application
