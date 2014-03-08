@@ -48,6 +48,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.5.1 Fixed the title. No changes in the plugin code.
  * Release 0.5.5.2 Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.
  * Release 0.5.5.3 Added ability to disable audit logging by config.
+ * Snapshot 0.5.5.4 Fix GPAUDITLOGGING-53
  */
 class AuditLoggingGrailsPlugin {
   def version = "0.5.5.4-SNAPSHOT"
@@ -55,6 +56,11 @@ class AuditLoggingGrailsPlugin {
 	def title = "Audit Logging Plugin"
 	def author = "Robert Oschwald"
 	def authorEmail = "roos@symentis.com"
+  def developers = [
+      [ name: 'Robert Oschwald', email: 'roos@symentis.com' ],
+      [ name: 'Elmar Kretzer', email: 'elkr@symentis.com' ],
+      [ name: 'Aaron Long', email: 'longwa@gmail.com' ]
+  ]
   def description = """ Automatically log change events for domain objects.
 The Audit Logging plugin adds an instance hook to domain objects that allows you to hang
 Audit events off of them. The events include onSave, onUpdate, onChange and onDelete.
@@ -62,11 +68,9 @@ When called the event handlers have access to oldObj and newObj definitions that
 will allow you to take action on what has changed.
 Stable Releases:
     0.5.3 (Grails 1.2 or below)
-    0.5.4 (Grails 1.3 or above)
-    0.5.5.2 (Grails 1.3 or above)
     0.5.5.3 (Grails 1.3 or above)
     """
-
+  def documentation = "http://grails.org/plugin/audit-logging"
 	def license = "APACHE"
 	def organization = [name: "symentis", url: "http://www.symentis.com/"]
 	def scm = [url: "https://github.com/robertoschwald/grails-audit-logging-plugin/tree/0.5.5.3"]
@@ -78,7 +82,7 @@ Stable Releases:
       if (manager?.hasGrailsPlugin("hibernate")) {
         auditLogListener(AuditLogListener) {
 					grailsApplication = ref('grailsApplication')
-          sessionFactory   = sessionFactory
+          sessionFactory   = ref("sessionFactory")
           verbose          = application.config?.auditLog?.verbose?:false
           transactional    = application.config?.auditLog?.transactional?:false
           sessionAttribute = application.config?.auditLog?.sessionAttribute?:""
