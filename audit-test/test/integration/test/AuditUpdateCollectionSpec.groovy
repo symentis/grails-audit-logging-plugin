@@ -23,7 +23,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
     void "Test update property on an instance saved via cascade"() {
         given:
         def author = Author.findByName("Aaron")
-        def book = author.books.first()
+        def book = author.books.asList().first() // do not use first() directly on books, as this tests needs to run on Grails 2.x, too
 
         when:
         book.description = "Woo"
