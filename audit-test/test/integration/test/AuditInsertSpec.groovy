@@ -4,7 +4,9 @@ import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 
 class AuditInsertSpec extends IntegrationSpec {
-    void setup() {
+		def grailsApplication
+
+		void setup() {
         Author.auditable = true
     }
 
@@ -162,4 +164,26 @@ class AuditInsertSpec extends IntegrationSpec {
         and:
         author.handlerCalled == "onSave"
     }
+
+		void "Test auditing disabled in runtime"() {
+			given:
+			def author = new Author(name: "Robert", age: 100, famous: true)
+			grailsApplication.config.auditLog.disabled = true
+
+			when:
+			author.save(flush: true, failOnError: true)
+
+			then: "author is saved"
+			author.id
+
+			and: "nothing logged"
+			def events = AuditLogEvent.findAllByClassName('Author')
+			events.size() == 0
+
+			and:
+			author.handlerCalled == "onSave"
+
+			cleanup: "reenable audit logging"
+			grailsApplication.config.auditLog.disabled = false
+		}
 }

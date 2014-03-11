@@ -112,6 +112,8 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+
+		// trace 'org.codehaus.groovy.grails.plugins.orm.auditable'
 }
 
 auditLog {
