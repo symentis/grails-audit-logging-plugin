@@ -382,11 +382,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * ... this feels crufty... should be tighter...
      */
     def logChanges(domain, Map newMap, Map oldMap, persistedObjectId, eventName, className) {
-				// ability to enable / disable logging by runtime
-				if (grailsApplication.config.auditLog?.disabled == true) {
-					log.debug("Auditing disabled in config.")
-					return
-				}
+        // ability to enable / disable logging by runtime
+        if (grailsApplication.config.auditLog?.disabled == true) {
+          log.debug("Auditing disabled in config.")
+          return
+        }
         def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
         newMap?.remove('version')
         oldMap?.remove('version')
