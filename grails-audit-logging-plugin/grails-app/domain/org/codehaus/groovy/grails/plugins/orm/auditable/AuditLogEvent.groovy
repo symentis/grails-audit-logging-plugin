@@ -3,8 +3,8 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
 import grails.util.Holders
 
 /**
- * AuditLogEvents are reported to the AuditLog table
- * this requires you to set up a table or allow
+ * AuditLogEvents are reported to the AuditLog table.
+ * This requires you to set up a table or allow
  * Grails to create a table for you.
  */
 class AuditLogEvent implements Serializable {

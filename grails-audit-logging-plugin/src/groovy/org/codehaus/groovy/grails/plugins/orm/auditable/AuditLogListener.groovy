@@ -105,7 +105,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     actor = actorClosure.call(attr, session)
                 }
                 catch(ex) {
-                    log.error "The auditLog.actorClosure threw this exception", ex
+                    log.error "The auditLog.actorClosure threw this exception: ", ex
                     log.error "The auditLog.actorClosure will be disabled now."
                     actorClosure = null
                 }
