@@ -1,5 +1,6 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
+import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
@@ -387,6 +388,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
           log.debug("Auditing disabled in config.")
           return
         }
+
+        // to be able to dynamically switch verbose flag
+        grailsApplication.config.auditLog?.verbose != null ? verbose = grailsApplication.config.auditLog?.verbose: verbose
+
         def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
         newMap?.remove('version')
         oldMap?.remove('version')
@@ -596,4 +601,32 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             log.error "Failed to create AuditLogEvent for ${audit}", e
         }
     }
+
+  /*
+  Execute given Closure without verbose logging.
+  You MUST wrap your CRUD by this closure if you explicitely set flush:true and
+  use verbose=true (the default), otherwise you might receive Hibernate exceptions.
+  */
+  static withoutVerboseAuditLog = { Closure c ->
+    def orgConf = Holders.config.auditLog?.verbose
+    Holders.config.auditLog?.verbose = false
+    try {
+      c.call()
+    } finally {
+      Holders.config.auditLog?.verbose = orgConf
+    }
+  }
+
+  /*
+  Execute given Closure without any audit logging.
+  */
+  static withoutAuditLog = { Closure c ->
+    def orgConf = Holders.config.auditLog?.disabled
+    Holders.config.auditLog?.disabled = true
+    try {
+      c.call()
+    } finally {
+      Holders.config.auditLog?.disabled = orgConf
+    }
+  }
 }
