@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
 /**
  * @author Shawn Hartsock
  * @author Robert Oschwald
+ * @author Aaron Long
  *
  * Credit is due to the following other projects,
  * first is Kevin Burke's HibernateEventsGrailsPlugin
@@ -51,7 +52,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 1.0.0 Grails >= 2.0 ORM agnostic implementation, major cleanup and new features
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.0-SNAPSHOT"
+    def version = "1.0.0"
     def grailsVersion = '2.0 > *'
     def title = "Audit Logging Plugin"
     // def author = "Robert Oschwald"
