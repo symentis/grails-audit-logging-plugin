@@ -1,8 +1,16 @@
 #!/bin/sh
 rm -rf grails-audit-logging-plugin/target/release
-mkdir grails-audit-logging-plugin/target/release
+mkdir -p grails-audit-logging-plugin/target/release
 cd grails-audit-logging-plugin/target/release
 git clone https://github.com/robertoschwald/grails-audit-logging-plugin.git
+if [ "$1" != "" ]; then
+    echo "Switching to branch $1"
+    git checkout $1
+    if [ $? != 0 ]; then
+        echo "Switching to branch $1 failed. Aborting"
+        exit 1
+    fi
+fi
 cd grails-audit-logging-plugin/grails-audit-logging-plugin
 grails clean
 grails compile
