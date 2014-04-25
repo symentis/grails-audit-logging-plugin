@@ -51,7 +51,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 1.0.0 Grails >= 2.0 ORM agnostic implementation, major cleanup and new features
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.0-SNAPSHOT"
+    def version = "1.0.1-SNAPSHOT"
     def grailsVersion = '2.0 > *'
     def title = "Audit Logging Plugin"
     // def author = "Robert Oschwald"
@@ -60,15 +60,6 @@ class AuditLoggingGrailsPlugin {
 The Audit Logging plugin additionally adds an instance hook to domain objects that allows you to hang
 Audit events off of them. The events include onSave, onChange, and onDelete.
 When called, the event handlers have access to oldObj and newObj definitions that will allow you to take action on what has changed.
-
-<p>
-Stable Releases:
-<ul>
-   <li>0.5.3   (Grails 1.2 or below)</li>
-   <li>0.5.5.3 (Grails 1.3 or above)</li>
-   <li>1.0.0   (Grails 2.0 or above)</li>
-</ul>
-</p>
     """
 
     def documentation = 'http://grails.org/plugin/audit-logging'
