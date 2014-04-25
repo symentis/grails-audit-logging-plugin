@@ -2,6 +2,8 @@ package test
 
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
+import spock.lang.Unroll
 
 class AuditInsertSpec extends IntegrationSpec {
 		def grailsApplication
@@ -165,25 +167,67 @@ class AuditInsertSpec extends IntegrationSpec {
         author.handlerCalled == "onSave"
     }
 
-		void "Test auditing disabled in runtime"() {
-			given:
-			def author = new Author(name: "Robert", age: 100, famous: true)
-			grailsApplication.config.auditLog.disabled = true
+    @Unroll
+		void "Test auditing disabled in closure"() {
 
 			when:
-			author.save(flush: true, failOnError: true)
+      println AuditLogEvent.findAllByClassName('Author')
+      def author = new Author(name: name, age: 100, famous: true)
+      if (enabled){
+        author.save(flush: true, failOnError: true)
+      } else {
+        AuditLogListener.withoutAuditLog {
+          author.save(flush: true, failOnError: true)
+        }
+      }
 
 			then: "author is saved"
 			author.id
 
-			and: "nothing logged"
+			and: "check logged"
 			def events = AuditLogEvent.findAllByClassName('Author')
-			events.size() == 0
+			enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 0
 
 			and:
 			author.handlerCalled == "onSave"
 
-			cleanup: "reenable audit logging"
-			grailsApplication.config.auditLog.disabled = false
+      where:
+      name              | enabled
+      'enabledLogging'  | true
+      'disabledLogging' | false
+      'againEnabled'    | true
+      'againDisabled'   | false
 		}
+
+  @Unroll
+  void "Test verbose auditing disabled in closure"() {
+
+    when:
+    println AuditLogEvent.findAllByClassName('Author')
+    def author = new Author(name: name, age: 100, famous: true)
+    if (enabled){
+      author.save(flush: true, failOnError: true)
+    } else {
+      AuditLogListener.withoutVerboseAuditLog {
+        author.save(flush: true, failOnError: true)
+      }
+    }
+
+    then: "author is saved"
+    author.id
+
+    and: "check logged"
+    def events = AuditLogEvent.findAllByClassName('Author')
+    enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 1
+
+    and:
+    author.handlerCalled == "onSave"
+
+    where:
+    name              | enabled
+    'enabledVerbose'  | true
+    'disabledVerbose' | false
+    'againV'          | true
+    'againDisabledV'  | false
+  }
 }
