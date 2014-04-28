@@ -233,7 +233,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       executeHandler(domain, 'onDelete', map, null)
     }
     catch (e) {
-      log.error "Audit plugin unable to process delete event for ${domain.class.name}", e
+      log.error "Audit plugin unable to process delete event for ${domain.class.name}: ", e
     }
   }
 
@@ -474,6 +474,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    * @return
    */
   String conditionallyMaskAndTruncate(domain, String key, value) {
+    try {
+      if (!value){
+        return null
+      }
+    } catch (Exception e){
+      // ignore (GPAUDITLOGGING-61)
+      return
+    }
+
     if (maskList(domain)?.contains(key)) {
       log.trace("Masking property ${key} with ${propertyMask}")
       propertyMask
