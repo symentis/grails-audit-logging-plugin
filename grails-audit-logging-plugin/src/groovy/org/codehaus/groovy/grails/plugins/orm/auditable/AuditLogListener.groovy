@@ -214,12 +214,13 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     def domain = event.entityObject
     try {
       def entity = getDomainClass(domain)
-
       def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
-        logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
+        // do not verbosely log deletes. See http://jira.grails.org/browse/GPAUDITLOGGING-61
+        withoutVerboseAuditLog {
+          logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
+        }
       }
-
       executeHandler(domain, 'onDelete', map, null)
     }
     catch (e) {
@@ -586,7 +587,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       }
     }
     catch (e) {
-      log.error "Failed to create AuditLogEvent for ${audit}", e
+      log.error "Failed to create AuditLogEvent for ${audit}: ${e.message}"
     }
   }
 
