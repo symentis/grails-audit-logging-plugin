@@ -6,7 +6,6 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import spock.lang.Unroll
 
 class AuditInsertSpec extends IntegrationSpec {
-		def grailsApplication
 
 		void setup() {
         Author.auditable = true
