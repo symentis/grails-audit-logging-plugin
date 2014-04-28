@@ -27,6 +27,7 @@ import static org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerU
  * 2009-09-25 rewrite.
  * 2009-10-04 preparing beta release
  * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
+ * 2014-04-28 GPAUDITLOGGING-61: allow to set nonVerboseDelete by config, to log deletes non-verbose even when verbose=true
  *
  * @author Shawn Hartsock
  */
@@ -44,8 +45,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    * with a record of the old value and the new value.
    *
    * auditLog.verbose = true
+   *
+   * If nonVerboseDelete is set to "true" then delete events are never verbosely logged,
+   * even when "verbose=true".
    */
   Boolean verbose = true
+  Boolean nonVerboseDelete = false
   Boolean logIds = false
   Boolean transactional = false
   Integer truncateLength
@@ -216,8 +221,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       def entity = getDomainClass(domain)
       def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
-        // do not verbosely log deletes. See http://jira.grails.org/browse/GPAUDITLOGGING-61
-        withoutVerboseAuditLog {
+        if (nonVerboseDelete) {
+          log.debug("Forced Non-Verbose logging by config onPreDelete.")
+          withoutVerboseAuditLog {
+            logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
+          }
+        } else {
           logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
         }
       }

@@ -31,26 +31,19 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        // events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
-        // GPAUDITLOGGING-61: for now, all deletes are non-verbose
-        events.size() == 1
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
-        // GPAUDITLOGGING-61: for now, all deletes are non-verbose, therefore we cannot get properties
-        // def first = events.find { it.propertyName == 'age' }
-        // first.oldValue == "37"
-        // first.newValue == null
-        // first.eventName == 'DELETE'
+        def first = events.find { it.propertyName == 'age' }
+        first.oldValue == "37"
+        first.newValue == null
+        first.eventName == 'DELETE'
 
         and: 'all books are deleted'
         def b1Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('Book', 'Hunger Games')
-        // b1Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
-        // GPAUDITLOGGING-61: for now, all deletes are non-verbose
-        b1Events.size() == 1
+        b1Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
 
         def b2Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('Book', 'Catching Fire')
-        // b2Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
-        // GPAUDITLOGGING-61: for now, all deletes are non-verbose
-        b2Events.size() == 1
+        b2Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
     }
 
     void "Test conditional delete logging"() {
@@ -70,9 +63,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         where: "publisher active flag determines logging"
         activeFlag << [false, true]
-        // resultCount << [0, 3]
-        // GPAUDITLOGGING-61: for now, all deletes are non-verbose
-        resultCount << [0, 1]
+        resultCount << [0, 3]
     }
 
     void "Test handler is called"() {
@@ -84,11 +75,9 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "verbose audit logging is created"
         def events = AuditLogEvent.findAllByClassName('Author')
-        // events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
-        // GPAUDITLOGGING-61: for now, all deletes are non-verbose
-        events.size() == 1
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
-      and:
+        and:
         author.handlerCalled == "onDelete"
     }
 
@@ -107,5 +96,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         and:
         author.handlerCalled == "onDelete"
     }
+
+
 }
 

@@ -49,6 +49,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.5.2 Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.
  * Release 0.5.5.3 Added ability to disable audit logging by config.
  * Release 1.0.0 Grails >= 2.0 ORM agnostic implementation, major cleanup and new features
+ * Release 1.0.1 closures, nonVerboseDelete property
  */
 class AuditLoggingGrailsPlugin {
     def version = "1.0.1-SNAPSHOT"
@@ -84,6 +85,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 listener.with {
                     grailsApplication = application
                     verbose = application.config.auditLog.verbose ?: false
+                    nonVerboseDelete = application.config.auditLog.nonVerboseDelete ?: false
                     transactional = application.config.auditLog.transactional ?: false
                     sessionAttribute = application.config.auditLog.sessionAttribute ?: ""
                     actorKey = application.config.auditLog.actorKey ?: ""
