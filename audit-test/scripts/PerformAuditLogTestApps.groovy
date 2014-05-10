@@ -196,7 +196,7 @@ private void callGrails(String grailsHome, String dir, String env, String action
   String outputproperty = 'execOutput' + System.currentTimeMillis()
 
   println "Running 'grails $env $action ${extraArgs?.join(' ') ?: ''}'"
-
+  println "Dir: $dir"
   ant.exec(executable: "${grailsHome}/bin/grails", dir: dir, failonerror: false,
       resultproperty: resultproperty, outputproperty: outputproperty) {
     ant.env key: 'GRAILS_HOME', value: grailsHome
