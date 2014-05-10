@@ -252,6 +252,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
         logChanges(domain, map, null, getEntityId(domain), getEventName(event), entity.name)
+      } else {
+          def identifier = entity.identifier.name
+          if( !map.containsKey(identifier) && domain."$identifier" ) {
+              map << [(identifier) : domain."$identifier"]
+          }
       }
 
       executeHandler(domain, 'onSave', null, map)

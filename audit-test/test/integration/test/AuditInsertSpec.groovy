@@ -7,7 +7,7 @@ import spock.lang.Unroll
 
 class AuditInsertSpec extends IntegrationSpec {
 
-		void setup() {
+    void setup() {
         Author.auditable = true
     }
 
@@ -167,66 +167,66 @@ class AuditInsertSpec extends IntegrationSpec {
     }
 
     @Unroll
-		void "Test auditing disabled in closure"() {
+    void "Test auditing disabled in closure"() {
 
-			when:
-      println AuditLogEvent.findAllByClassName('Author')
-      def author = new Author(name: name, age: 100, famous: true)
-      if (enabled){
-        author.save(flush: true, failOnError: true)
-      } else {
-        AuditLogListener.withoutAuditLog {
-          author.save(flush: true, failOnError: true)
+        when:
+        println AuditLogEvent.findAllByClassName('Author')
+        def author = new Author(name: name, age: 100, famous: true)
+        if (enabled) {
+            author.save(flush: true, failOnError: true)
+        } else {
+            AuditLogListener.withoutAuditLog {
+                author.save(flush: true, failOnError: true)
+            }
         }
-      }
 
-			then: "author is saved"
-			author.id
+        then: "author is saved"
+        author.id
 
-			and: "check logged"
-			def events = AuditLogEvent.findAllByClassName('Author')
-			enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 0
+        and: "check logged"
+        def events = AuditLogEvent.findAllByClassName('Author')
+        enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 0
 
-			and:
-			author.handlerCalled == "onSave"
+        and:
+        author.handlerCalled == "onSave"
 
-      where:
-      name              | enabled
-      'enabledLogging'  | true
-      'disabledLogging' | false
-      'againEnabled'    | true
-      'againDisabled'   | false
-		}
-
-  @Unroll
-  void "Test verbose auditing disabled in closure"() {
-
-    when:
-    println AuditLogEvent.findAllByClassName('Author')
-    def author = new Author(name: name, age: 100, famous: true)
-    if (enabled){
-      author.save(flush: true, failOnError: true)
-    } else {
-      AuditLogListener.withoutVerboseAuditLog {
-        author.save(flush: true, failOnError: true)
-      }
+        where:
+        name              | enabled
+        'enabledLogging'  | true
+        'disabledLogging' | false
+        'againEnabled'    | true
+        'againDisabled'   | false
     }
 
-    then: "author is saved"
-    author.id
+    @Unroll
+    void "Test verbose auditing disabled in closure"() {
 
-    and: "check logged"
-    def events = AuditLogEvent.findAllByClassName('Author')
-    enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 1
+        when:
+        println AuditLogEvent.findAllByClassName('Author')
+        def author = new Author(name: name, age: 100, famous: true)
+        if (enabled) {
+            author.save(flush: true, failOnError: true)
+        } else {
+            AuditLogListener.withoutVerboseAuditLog {
+                author.save(flush: true, failOnError: true)
+            }
+        }
 
-    and:
-    author.handlerCalled == "onSave"
+        then: "author is saved"
+        author.id
 
-    where:
-    name              | enabled
-    'enabledVerbose'  | true
-    'disabledVerbose' | false
-    'againV'          | true
-    'againDisabledV'  | false
-  }
+        and: "check logged"
+        def events = AuditLogEvent.findAllByClassName('Author')
+        enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 1
+
+        and:
+        author.handlerCalled == "onSave"
+
+        where:
+        name              | enabled
+        'enabledVerbose'  | true
+        'disabledVerbose' | false
+        'againV'          | true
+        'againDisabledV'  | false
+    }
 }
