@@ -2,7 +2,7 @@ package test
 
 import groovy.transform.EqualsAndHashCode
 
-@EqualsAndHashCode(includes = ['tag', 'code'])
+@EqualsAndHashCode(includes = "tag, code")
 class Code implements Serializable {
     String tag
     Integer code
