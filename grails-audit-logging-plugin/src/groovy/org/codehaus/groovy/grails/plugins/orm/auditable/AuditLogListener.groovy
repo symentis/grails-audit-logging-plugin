@@ -402,7 +402,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       return
     }
 
-    def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
+    Object persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
     newMap?.remove('version')
     oldMap?.remove('version')
 
@@ -416,7 +416,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
               className:className,
               eventName:eventName,
               persistedObjectId:persistedObjectId?.toString(),
-              persistedObjectVersion:persistedObjectVersion as Long,
+              persistedObjectVersion:persistedObjectVersion,
               propertyName:key,
               oldValue:conditionallyMaskAndTruncate(domain, key, oldMap[key]),
               newValue:conditionallyMaskAndTruncate(domain, key, newMap[key]))
@@ -434,7 +434,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             className:className,
             eventName:eventName,
             persistedObjectId:persistedObjectId?.toString(),
-            persistedObjectVersion:persistedObjectVersion as Long,
+            persistedObjectVersion:persistedObjectVersion,
             propertyName:key,
             oldValue:null,
             newValue:conditionallyMaskAndTruncate(domain, key, val))
@@ -451,7 +451,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             className:className,
             eventName:eventName,
             persistedObjectId:persistedObjectId?.toString(),
-            persistedObjectVersion:persistedObjectVersion as Long,
+            persistedObjectVersion:persistedObjectVersion,
             propertyName:key,
             oldValue:conditionallyMaskAndTruncate(domain, key, val),
             newValue:null)
@@ -467,12 +467,20 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         className:className,
         eventName:eventName,
         persistedObjectId:persistedObjectId?.toString(),
-        persistedObjectVersion:persistedObjectVersion as Long)
+        persistedObjectVersion:persistedObjectVersion)
     saveAuditLog(audit)
 
   }
 
-  /**
+  Long getPersistedObjectVersion(domain, Map newMap, Map oldMap) {
+    def persistedObjectVersion = (newMap?.version) ?: oldMap?.version
+    if (null == persistedObjectVersion && domain.hasProperty("version")) {
+      persistedObjectVersion = domain.version
+    }
+    persistedObjectVersion as Long
+  }
+
+    /**
    * @param domain the auditable domain object
    * @param key property name
    * @param value the value of the property
