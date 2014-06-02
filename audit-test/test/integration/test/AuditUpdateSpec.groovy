@@ -15,11 +15,46 @@ class AuditUpdateSpec extends IntegrationSpec {
         def publisher = new Publisher(code: 'ABC123', name: 'Random House', active: true)
         publisher.save(flush: true, failOnError: true)
 
+        def heliport = new Heliport(code: 'EGLW', name: 'Battersea Heliport')
+        heliport.save(flush: true, failOnError: true)
+
         // Remove all logging of the inserts, we are focused on updates here
         AuditLogEvent.where { id != null }.deleteAll()
         assert AuditLogEvent.count() == 0
 
         author.handlerCalled = ""
+    }
+
+    void "Test persistedObjectVersion in update logging"() {
+        given:
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.age = 40
+        author.save(flush: true, failOnError: true)
+
+        then:
+        def events = AuditLogEvent.findAllByClassName('Author')
+        events.size() == 1
+
+        def first = events.find { it.propertyName == 'age' }
+        first.persistedObjectVersion == author.version - 1
+    }
+
+    void "Test persistedObjectVersion in update logging for domain class without version"() {
+        given:
+        def heliport = Heliport.findByCode('EGLW')
+
+        when:
+        heliport.name = "London Heliport"
+        heliport.save(flush: true, failOnError: true)
+
+        then:
+        def events = AuditLogEvent.findAllByClassName('Heliport')
+        events.size() == 1
+
+        def first = events.find { it.propertyName == 'name' }
+        first.persistedObjectVersion == null
     }
 
     void "Test basic update logging"() {
