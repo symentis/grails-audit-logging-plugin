@@ -14,3 +14,5 @@ plugin.xml
 .project
 .DS_Store
 grails-audit-logging-plugin/web-app
+
+/audit-test/atlassian-ide-plugin.xml
