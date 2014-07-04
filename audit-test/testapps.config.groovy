@@ -11,6 +11,14 @@ v20 {
 	grailsHome = grailsHomeRoot + '/grails-' + grailsVersion
 }
 
+v211 {
+    grailsVersion = '2.1.1' // 2.1.5 has a plugin i18n bug
+    pluginVersion = version
+    dotGrails = dotGrailsCommon
+    projectDir = projectDirCommon
+    grailsHome = grailsHomeRoot + '/grails-' + grailsVersion
+}
+
 v21 {
 	grailsVersion = '2.1.4' // 2.1.5 has a plugin i18n bug
 	pluginVersion = version
