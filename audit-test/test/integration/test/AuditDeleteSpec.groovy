@@ -30,7 +30,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.delete(flush: true, failOnError: true)
 
         then: "audit logging is created"
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def first = events.find { it.propertyName == 'age' }
@@ -39,10 +39,10 @@ class AuditDeleteSpec extends IntegrationSpec {
         first.eventName == 'DELETE'
 
         and: 'all books are deleted'
-        def b1Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('Book', 'Hunger Games')
+        def b1Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('test.Book', 'Hunger Games')
         b1Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
 
-        def b2Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('Book', 'Catching Fire')
+        def b2Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('test.Book', 'Catching Fire')
         b2Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
     }
 
@@ -58,7 +58,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         !Publisher.get(publisher.id)
 
         and:
-        def events = AuditLogEvent.findAllByClassName('Publisher')
+        def events = AuditLogEvent.findAllByClassName('test.Publisher')
         events.size() == resultCount
 
         where: "publisher active flag determines logging"
@@ -74,7 +74,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.delete(flush: true, failOnError: true)
 
         then: "verbose audit logging is created"
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         and:
@@ -90,7 +90,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.delete(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 0
 
         and:

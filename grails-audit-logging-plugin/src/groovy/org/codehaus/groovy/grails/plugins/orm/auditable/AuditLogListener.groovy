@@ -53,6 +53,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
   Boolean nonVerboseDelete = false
   Boolean logIds = false
   Boolean transactional = false
+  Boolean logFullClassName = false
   Integer truncateLength
   String sessionAttribute
   String actorKey
@@ -224,10 +225,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (nonVerboseDelete) {
           log.debug("Forced Non-Verbose logging by config onPreDelete.")
           withoutVerboseAuditLog {
-            logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
+            logChanges(domain, null, map, getEntityId(domain), getEventName(event), getClassName(entity))
           }
         } else {
-          logChanges(domain, null, map, getEntityId(domain), getEventName(event), entity.name)
+          logChanges(domain, null, map, getEntityId(domain), getEventName(event), getClassName(entity))
         }
       }
       executeHandler(domain, 'onDelete', map, null)
@@ -251,7 +252,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
       def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
-        logChanges(domain, map, null, getEntityId(domain), getEventName(event), entity.name)
+        logChanges(domain, map, null, getEntityId(domain), getEventName(event), getClassName(entity))
       } else {
           def identifier = entity.identifier.name
           if( !map.containsKey(identifier) && domain."$identifier" ) {
@@ -305,7 +306,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
         // Allow user to override whether you do auditing for them
         if (!callHandlersOnly(domain)) {
-          logChanges(domain, newMap, oldMap, getEntityId(domain), getEventName(event), entity.name)
+          logChanges(domain, newMap, oldMap, getEntityId(domain), getEventName(event), getClassName(entity))
         }
 
         executeHandler(domain, 'onChange', oldMap, newMap)
@@ -314,6 +315,17 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     catch (e) {
       log.error "Audit plugin unable to process update event for ${domain.class.name}", e
     }
+  }
+
+  /**
+   * Get the class name to log.
+   *
+   * @param entity A {@link GrailsDomainClass} instance.
+   * @return The {@link GrailsDomainClass#getFullName()}, if {@link #logFullClassName} is true,
+   *         {@link GrailsDomainClass#getName()}, otherwise.
+   */
+  protected String getClassName(GrailsDomainClass entity) {
+      logFullClassName ? entity.fullName : entity.name
   }
 
   /**

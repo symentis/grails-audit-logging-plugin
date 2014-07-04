@@ -34,7 +34,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -50,7 +50,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         heliport.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('Heliport')
+        def events = AuditLogEvent.findAllByClassName('test.Heliport')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'name' }
@@ -66,7 +66,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -84,7 +84,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'publisher' }
@@ -104,7 +104,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -123,7 +123,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         publisher.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('Publisher')
+        def events = AuditLogEvent.findAllByClassName('test.Publisher')
         events.size() == 0
     }
 
@@ -137,7 +137,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         publisher.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('Publisher')
+        def events = AuditLogEvent.findAllByClassName('test.Publisher')
         events.size() == 1
 
         def first = events.first()
@@ -157,7 +157,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 0
     }
 
@@ -170,7 +170,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then: "verbose audit logging is created"
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         and:
@@ -187,7 +187,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = AuditLogEvent.findAllByClassName('Author')
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == 0
 
         and:

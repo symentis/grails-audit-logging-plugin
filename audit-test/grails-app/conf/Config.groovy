@@ -119,6 +119,7 @@ log4j = {
 auditLog {
     verbose = true
     defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
+    logFullClassName = true
     transactional = false
     defaultMask = ['ssn']
     logIds = true

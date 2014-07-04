@@ -50,7 +50,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.5.5.3 Added ability to disable audit logging by config.
  * Release 1.0.0 Grails >= 2.0 ORM agnostic implementation, major cleanup and new features
  * Release 1.0.1 closures, nonVerboseDelete property, provide domain identifier to onSave() handler
- * Release 1.0.2 GPAUDITLOGGING-63
+ * Release 1.0.2 GPAUDITLOGGING-63, logFullClassName property
  */
 class AuditLoggingGrailsPlugin {
     def version = "1.0.2-SNAPSHOT"
@@ -87,6 +87,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                     grailsApplication = application
                     verbose = application.config.auditLog.verbose ?: false
                     nonVerboseDelete = application.config.auditLog.nonVerboseDelete ?: false
+                    logFullClassName = application.config.auditLog.logFullClassName ?: false
                     transactional = application.config.auditLog.transactional ?: false
                     sessionAttribute = application.config.auditLog.sessionAttribute ?: ""
                     actorKey = application.config.auditLog.actorKey ?: ""
