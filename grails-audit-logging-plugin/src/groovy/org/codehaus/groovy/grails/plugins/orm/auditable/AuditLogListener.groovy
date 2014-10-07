@@ -631,8 +631,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     AuditLogListenerThreadLocal.auditLogNonVerbose = true
     try {
       c.call()
-    } catch(Exception e){
-			log.error("Error in withoutVerboseAuditLog: " + e)
 		} finally {
       AuditLogListenerThreadLocal.clearAuditLogNonVerbose()
     }
@@ -645,8 +643,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     AuditLogListenerThreadLocal.auditLogDisabled = true
     try {
       c.call()
-    } catch(Exception e){
-			log.error("Error in withoutAuditLog: " + e)
 		} finally {
       AuditLogListenerThreadLocal.clearAuditLogDisabled()
     }
