@@ -90,8 +90,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
   @Override
   boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
     return eventType.isAssignableFrom(PostInsertEvent) ||
-        eventType.isAssignableFrom(PreUpdateEvent) ||
-        eventType.isAssignableFrom(PreDeleteEvent)
+      eventType.isAssignableFrom(PreUpdateEvent) ||
+      eventType.isAssignableFrom(PreDeleteEvent)
   }
 
   void setActorClosure(Closure closure) {
@@ -253,10 +253,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       if (!callHandlersOnly(domain)) {
         logChanges(domain, map, null, getEntityId(domain), getEventName(event), entity.name)
       } else {
-          def identifier = entity.identifier.name
-          if( !map.containsKey(identifier) && domain."$identifier" ) {
-              map << [(identifier) : domain."$identifier"]
-          }
+        def identifier = entity.identifier.name
+        if (!map.containsKey(identifier) && domain."$identifier") {
+          map << [(identifier):domain."$identifier"]
+        }
       }
 
       executeHandler(domain, 'onSave', null, map)
@@ -397,7 +397,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    */
   def logChanges(domain, Map newMap, Map oldMap, persistedObjectId, eventName, className) {
     // ability to enable / disable logging by runtime
-    if (AuditLogListenerThreadLocal.auditLogDisabled){
+    if (AuditLogListenerThreadLocal.auditLogDisabled) {
       log.debug("Auditing disabled by runtime.")
       return
     }
@@ -411,15 +411,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       newMap.each { String key, val ->
         if (val != oldMap[key]) {
           def audit = new AuditLogEvent(
-              actor:getActor(),
-              uri:getUri(),
-              className:className,
-              eventName:eventName,
-              persistedObjectId:persistedObjectId?.toString(),
-              persistedObjectVersion:persistedObjectVersion,
-              propertyName:key,
-              oldValue:conditionallyMaskAndTruncate(domain, key, oldMap[key]),
-              newValue:conditionallyMaskAndTruncate(domain, key, newMap[key]))
+            actor:getActor(),
+            uri:getUri(),
+            className:className,
+            eventName:eventName,
+            persistedObjectId:persistedObjectId?.toString(),
+            persistedObjectVersion:persistedObjectVersion,
+            propertyName:key,
+            oldValue:conditionallyMaskAndTruncate(domain, key, oldMap[key]),
+            newValue:conditionallyMaskAndTruncate(domain, key, newMap[key]))
           saveAuditLog(audit)
         }
       }
@@ -429,15 +429,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       log.trace "there are new values and logging is verbose ... "
       newMap.each { String key, val ->
         def audit = new AuditLogEvent(
-            actor:getActor(),
-            uri:getUri(),
-            className:className,
-            eventName:eventName,
-            persistedObjectId:persistedObjectId?.toString(),
-            persistedObjectVersion:persistedObjectVersion,
-            propertyName:key,
-            oldValue:null,
-            newValue:conditionallyMaskAndTruncate(domain, key, val))
+          actor:getActor(),
+          uri:getUri(),
+          className:className,
+          eventName:eventName,
+          persistedObjectId:persistedObjectId?.toString(),
+          persistedObjectVersion:persistedObjectVersion,
+          propertyName:key,
+          oldValue:null,
+          newValue:conditionallyMaskAndTruncate(domain, key, val))
         saveAuditLog(audit)
       }
       return
@@ -446,15 +446,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       log.trace "there is only an old map of values available and logging is set to verbose... "
       oldMap.each { String key, val ->
         def audit = new AuditLogEvent(
-            actor:getActor(),
-            uri:getUri(),
-            className:className,
-            eventName:eventName,
-            persistedObjectId:persistedObjectId?.toString(),
-            persistedObjectVersion:persistedObjectVersion,
-            propertyName:key,
-            oldValue:conditionallyMaskAndTruncate(domain, key, val),
-            newValue:null)
+          actor:getActor(),
+          uri:getUri(),
+          className:className,
+          eventName:eventName,
+          persistedObjectId:persistedObjectId?.toString(),
+          persistedObjectVersion:persistedObjectVersion,
+          propertyName:key,
+          oldValue:conditionallyMaskAndTruncate(domain, key, val),
+          newValue:null)
         saveAuditLog(audit)
       }
       return
@@ -462,12 +462,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     // default
     log.trace "creating a basic audit logging event object."
     def audit = new AuditLogEvent(
-        actor:getActor(),
-        uri:getUri(),
-        className:className,
-        eventName:eventName,
-        persistedObjectId:persistedObjectId?.toString(),
-        persistedObjectVersion:persistedObjectVersion)
+      actor:getActor(),
+      uri:getUri(),
+      className:className,
+      eventName:eventName,
+      persistedObjectId:persistedObjectId?.toString(),
+      persistedObjectVersion:persistedObjectVersion)
     saveAuditLog(audit)
 
   }
@@ -480,7 +480,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     persistedObjectVersion as Long
   }
 
-    /**
+  /**
    * @param domain the auditable domain object
    * @param key property name
    * @param value the value of the property
@@ -488,10 +488,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    */
   String conditionallyMaskAndTruncate(domain, String key, value) {
     try {
-      if (!value){
+      if (!value) {
         return null
       }
-    } catch (Exception e){
+    } catch (Exception e) {
       // ignore (GPAUDITLOGGING-61)
       return
     }
@@ -631,7 +631,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     AuditLogListenerThreadLocal.auditLogNonVerbose = true
     try {
       c.call()
-		} finally {
+    } finally {
       AuditLogListenerThreadLocal.clearAuditLogNonVerbose()
     }
   }
@@ -643,7 +643,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     AuditLogListenerThreadLocal.auditLogDisabled = true
     try {
       c.call()
-		} finally {
+    } finally {
       AuditLogListenerThreadLocal.clearAuditLogDisabled()
     }
   }
