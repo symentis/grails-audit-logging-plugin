@@ -9,5 +9,5 @@ For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-loggi
 See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA")
 
 ##**Continuous Integration Server**##
-CI server see https://robertoschwald.ci.cloudbees.com/job/grails-audit-logging/
+[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
 
