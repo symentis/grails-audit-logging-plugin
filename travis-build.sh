@@ -24,7 +24,7 @@ grails clean
 if [ ${GRAILS_VERSION} == 2.[0-3].* ]; then
     grails upgrade --non-interactive
 else
-    echo "Setting Grails version ${GRAILS_VERSION}"
+    echo "set-grails-version ${GRAILS_VERSION}"
     grails set-grails-version ${GRAILS_VERSION}
 fi
 
