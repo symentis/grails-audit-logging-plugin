@@ -11,7 +11,7 @@ before_script:
 - rm -rf audit-test/target
 
 
-script: travis-build.sh
+script: ./travis-build.sh
 
 
 
