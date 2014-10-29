@@ -21,12 +21,13 @@ fi
 
 grails clean
 
-if [ ${GRAILS_VERSION} == 2.[0-3].* ]; then
+if [[ ${GRAILS_VERSION} < "2.4.0" ]]; then
+    echo "grails upgrade --non-interactive"
     grails upgrade --non-interactive
 else
-    echo "set-grails-version ${GRAILS_VERSION}"
+    echo "grails set-grails-version ${GRAILS_VERSION}"
     grails set-grails-version ${GRAILS_VERSION}
 fi
 
-echo "Start test..."
+echo "grails test-app --non-interactive --stacktrace."
 grails test-app --non-interactive --stacktrace
