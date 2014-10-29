@@ -70,6 +70,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
   @Override
   protected void onPersistenceEvent(AbstractPersistenceEvent event) {
+    // GPAUDITLOGGING-64: Even we register AuditLogListeners per datasource, at least up to Grails 2.4.2 events for other datasources
+    // get triggered in all other listeners.
+    if (event.source != this.datastore){
+      log.trace("Event received for other datastore. Ignoring event")
+      return
+    }
     if (isAuditableEntity(event.entityObject, getEventName(event))) {
       log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
 
