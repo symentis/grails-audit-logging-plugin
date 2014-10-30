@@ -20,9 +20,18 @@ environments {
         }
     }
     test {
+        // we test with several configured datasources. See GPAUDITLOGGING-64
         dataSource {
             dbCreate = "update"
             url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+        }
+        datasource_2 {
+            dbCreate = "update"
+            url = "jdbc:h2:mem:testDb2;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+        }
+        datasource_3 {
+            dbCreate = "update"
+            url = "jdbc:h2:mem:testDb3;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     production {

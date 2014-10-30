@@ -1,0 +1,28 @@
+language: groovy
+
+jdk:
+- oraclejdk7
+
+env:
+  - GRAILS_VERSION=2.3.5
+
+branches:
+  only:
+    - master
+
+before_install:
+- rm -rf ~/.gvm
+- curl -s get.gvmtool.net > ~/install_gvm.sh
+- chmod 775 ~/install_gvm.sh
+- ~/install_gvm.sh
+- echo "gvm_auto_answer=true" > ~/.gvm/etc/config
+- source ~/.gvm/bin/gvm-init.sh
+- gvm install grails $GRAILS_VERSION || true
+
+before_script:
+- rm -rf audit-test/target
+
+script: ./travis-build.sh
+
+
+

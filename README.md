@@ -8,3 +8,6 @@ For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-loggi
 ##**Issue Management**##
 See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA")
 
+##**Continuous Integration Server**##
+[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
+

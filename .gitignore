@@ -16,3 +16,5 @@ plugin.xml
 grails-audit-logging-plugin/web-app
 
 /audit-test/atlassian-ide-plugin.xml
+
+/atlassian-ide-plugin.xml
