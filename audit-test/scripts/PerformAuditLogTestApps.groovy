@@ -204,7 +204,7 @@ private void callGrails(String grailsHome, String dir, String env, String action
     ant.arg value: action
     extraArgs.each { ant.arg value: it }
     ant.arg value: '--stacktrace'
-    //ant.arg value: '-verbose'
+    ant.arg value: '-verbose'
   }
 
   println ant.project.getProperty(outputproperty)
