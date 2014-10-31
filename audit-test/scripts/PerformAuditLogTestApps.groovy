@@ -132,6 +132,7 @@ private void configureApp() {
     defaultMask = ['ssn']
     logIds = true
     defaultActor = 'SYS'
+    logFullClassName = true
   }
   '''
 }
