@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+*/
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -18,18 +36,6 @@ import static org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerU
 /**
  * Grails interceptor for logging saves, updates, deletes and acting on
  * individual properties changes and delegating calls back to the Domain Class
- *
- * 2008-04-17 created initial version 0.1
- * 2008-04-21 changes for version 0.2 include simpler events, config file, removed 'onUpdate' event.
- * 2008-06-04 added ignore fields feature
- * 2009-07-04 fetches its own session from sessionFactory to avoid transaction munging
- * 2009-09-05 getActor as a closure to allow developers to supply their own security plugins
- * 2009-09-25 rewrite.
- * 2009-10-04 preparing beta release
- * 2010-10-13 add a transactional config so transactions can be manually toggled by a user OR automatically disabled for testing
- * 2014-04-28 GPAUDITLOGGING-61: allow to set nonVerboseDelete by config, to log deletes non-verbose even when verbose=true
- *
- * @author Shawn Hartsock
  */
 @Commons
 class AuditLogListener extends AbstractPersistenceEventListener {
