@@ -36,7 +36,7 @@ v22 {
 }
 
 v23 {
-	grailsVersion = '2.3.5'
+	grailsVersion = '2.3.11'
 	pluginVersion = version
 	dotGrails = dotGrailsCommon
 	projectDir = projectDirCommon
