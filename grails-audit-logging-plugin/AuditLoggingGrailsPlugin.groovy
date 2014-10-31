@@ -71,10 +71,11 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 1.0.0 Grails >= 2.0 ORM agnostic implementation, major cleanup and new features
  * Release 1.0.1 closures, nonVerboseDelete property, provide domain identifier to onSave() handler
  * Release 1.0.2 GPAUDITLOGGING-66
- * Release 1.0.3 GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource, GPAUDITLOGGING-63 logFullClassName property
+ * Release 1.0.3 GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource,
+ *               GPAUDITLOGGING-63 logFullClassName property
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.3-SNAPSHOT"
+    def version = "1.0.3"
     def grailsVersion = '2.0 > *'
     def title = "Audit Logging Plugin"
     // def author = "Robert Oschwald"
