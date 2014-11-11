@@ -23,4 +23,10 @@ class Aircraft {
 
         this.handlersMap = newMap
     }
+
+    def onDelete = { oldMap ->
+        assert oldMap
+
+        this.handlersMap = oldMap
+    }
 }

@@ -17,4 +17,10 @@ class Airport {
 
         this.handlerMap = newMap
     }
+
+    def onDelete = { oldMap ->
+        assert oldMap
+
+        this.handlerMap = oldMap
+    }
 }
