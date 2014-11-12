@@ -136,7 +136,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     return actor?.toString()
   }
 
-  String getUri() {
+  String getUri(domain = null) {
+    if (domain?.metaClass?.hasProperty(domain, "getAuditLogUri")){
+      return domain."getAuditLogUri"()?.toString()
+    }
+    return this.requestUri
+  }
+
+  private String getRequestUri(){
     def attr = RequestContextHolder?.getRequestAttributes()
     return (attr?.currentRequest?.uri?.toString()) ?: null
   }
