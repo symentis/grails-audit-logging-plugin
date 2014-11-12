@@ -443,7 +443,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (val != oldMap[key]) {
           def audit = new AuditLogEvent(
             actor:getActor(),
-            uri:getUri(),
+            uri:getUri(domain),
             className:className,
             eventName:eventName,
             persistedObjectId:persistedObjectId?.toString(),
@@ -461,7 +461,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       newMap.each { String key, val ->
         def audit = new AuditLogEvent(
           actor:getActor(),
-          uri:getUri(),
+          uri:getUri(domain),
           className:className,
           eventName:eventName,
           persistedObjectId:persistedObjectId?.toString(),
@@ -478,7 +478,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       oldMap.each { String key, val ->
         def audit = new AuditLogEvent(
           actor:getActor(),
-          uri:getUri(),
+          uri:getUri(domain),
           className:className,
           eventName:eventName,
           persistedObjectId:persistedObjectId?.toString(),
@@ -494,7 +494,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     log.trace "creating a basic audit logging event object."
     def audit = new AuditLogEvent(
       actor:getActor(),
-      uri:getUri(),
+      uri:getUri(domain),
       className:className,
       eventName:eventName,
       persistedObjectId:persistedObjectId?.toString(),
