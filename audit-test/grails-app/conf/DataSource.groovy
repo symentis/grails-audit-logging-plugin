@@ -25,11 +25,12 @@ environments {
             dbCreate = "update"
             url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
-        datasource_2 {
+        datasource_disabledauditlog {
             dbCreate = "update"
             url = "jdbc:h2:mem:testDb2;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            auditLog.disabled = true
         }
-        datasource_3 {
+        datasource_dsthree {
             dbCreate = "update"
             url = "jdbc:h2:mem:testDb3;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
