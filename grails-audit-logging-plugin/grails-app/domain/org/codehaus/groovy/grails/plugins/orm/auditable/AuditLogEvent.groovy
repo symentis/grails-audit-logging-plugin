@@ -28,6 +28,8 @@ import grails.util.Holders
 class AuditLogEvent implements Serializable {
     private static final long serialVersionUID = 1L
 
+    Object id // id can be configured type since 1.0.4 (depending on mapping config)
+
     static auditable = false
 
     Date dateCreated
@@ -72,6 +74,15 @@ class AuditLogEvent implements Serializable {
             cache usage: 'read-only', include: 'non-lazy'
         }
 
+        // Define your own id mapping in config and set auditLog.useConfigIdMapping = true in your app's Config.groovy
+        if (!Holders.config.auditLog.useConfigIdMapping) {
+          id generator:'increment', type:'long' // default id mapping
+        }
+
+        if (Holders.config.auditLog.useDatasources){
+          datasource Holders.config.auditLog.useDatasources as List
+        }
+        autoImport false
         version false
     }
 
