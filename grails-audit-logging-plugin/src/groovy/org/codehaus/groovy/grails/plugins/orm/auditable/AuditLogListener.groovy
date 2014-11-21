@@ -249,6 +249,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         } else {
           logChanges(domain, null, map, getEntityId(domain), getEventName(event), getClassName(entity))
         }
+      } else {
+        def identifier = entity.identifier.name
+        if (!map.containsKey(identifier) && domain."$identifier") {
+          map << [(identifier): domain."$identifier"]
+        }
       }
       executeHandler(domain, 'onDelete', map, null)
     }
