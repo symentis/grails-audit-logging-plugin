@@ -30,11 +30,6 @@ import javax.servlet.http.HttpSession
  * Provides simple AuditLogListener utilities that
  * can be used as either templates for your own extensions to
  * the plugin or as default utilities.
- *
- * TODO: write a howto for the grails website on how to set up a closure
- * for the AuditLogListener and feed it to the Listener's configurator...
- *
- * @author Shawn Hartsock
  */
 class AuditLogListenerUtil {
     /**
@@ -162,8 +157,7 @@ class AuditLogListenerUtil {
     }
 
     /**
-     * The resolve method was my attempt at being clever. It would attempt to
-     * resolve the attribute you wanted from the RequestAttributes object passed
+     * Attempt to resolve the attribute from the RequestAttributes object passed
      * to it. This did not always work for people since on some designs
      * users are not *always* logged in to the system.
      *
@@ -180,8 +174,7 @@ class AuditLogListenerUtil {
                 if(res) {
                     res = res."${it}"
                 }
-            }
-            catch(MissingPropertyException ignored) {
+            } catch(MissingPropertyException ignored) {
                 log.debug """\
 AuditLogListener:
 

@@ -73,7 +73,8 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 1.0.2 GPAUDITLOGGING-66
  * Release 1.0.3 GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource,
  *               GPAUDITLOGGING-63 logFullClassName property
- * Release 1.0.4 GPAUDITLOGGING-69 allow to set uri per domain object
+ * Release 1.0.4 GPAUDITLOGGING-69 allow to set uri per domain object,
+ *               GPAUDITLOGGING-62 Add identifier in handler map
  */
 class AuditLoggingGrailsPlugin {
     def version = "1.0.4-SNAPSHOT"
