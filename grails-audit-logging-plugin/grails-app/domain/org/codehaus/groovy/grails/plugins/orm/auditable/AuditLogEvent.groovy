@@ -74,14 +74,16 @@ class AuditLogEvent implements Serializable {
             cache usage: 'read-only', include: 'non-lazy'
         }
 
+        // GPAUDITLOGGING-29 Datasource name to use for AuditLogEvent
+        if (Holders.config.auditLog.useDatasource){
+          datasource "$Holders.config.auditLog.useDatasource"
+        }
+
         // Define your own id mapping in config and set auditLog.useConfigIdMapping = true in your app's Config.groovy
         if (!Holders.config.auditLog.useConfigIdMapping) {
           id generator:'increment', type:'long' // default id mapping
         }
 
-        if (Holders.config.auditLog.useDatasources){
-          datasource Holders.config.auditLog.useDatasources as List
-        }
         autoImport false
         version false
     }

@@ -9,4 +9,7 @@ class Review {
 
     static constraints = {
     }
+    static mapping = {
+      id generator:"increment", type:"long" // we have a default "uuid" mapping in the config
+    }
 }

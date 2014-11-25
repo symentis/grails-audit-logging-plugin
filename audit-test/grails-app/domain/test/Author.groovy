@@ -25,6 +25,10 @@ class Author {
         publisher nullable: true
     }
 
+    static mapping = {
+      id generator:"increment", type:"long" // we have a default "uuid" mapping in the config
+    }
+
     // Event handlers
     def onSave = { newMap ->
         assert newMap

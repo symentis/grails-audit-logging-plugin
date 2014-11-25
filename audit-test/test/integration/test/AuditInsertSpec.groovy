@@ -21,6 +21,7 @@ package test
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
+import org.springframework.util.StringUtils
 import spock.lang.Unroll
 
 class AuditInsertSpec extends IntegrationSpec {
@@ -39,8 +40,8 @@ class AuditInsertSpec extends IntegrationSpec {
         then: "author is saved"
         author.id
 
-        and: "verbose audit logging is created"
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        and: "verbose audit logging is created in second datasource"
+        def events = AuditLogEvent.second.findAllByClassName('test.Author')
         events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def first = events.find { it.propertyName == 'age' }
@@ -48,6 +49,8 @@ class AuditInsertSpec extends IntegrationSpec {
         first.newValue == "37"
         first.eventName == 'INSERT'
         first.actor == 'SYS'
+        first.id instanceof String // must be a String - see Config.groovy gorm mapping
+        StringUtils.countOccurrencesOf((String)first.id, "-") == 4 // must be UUID format - see Config.groovy
 
         and: "verify that ssn is masked"
         def ssn = events.find { it.propertyName == 'ssn' }

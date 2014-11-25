@@ -8,5 +8,6 @@ class Heliport {
 
     static mapping = {
         version false
+        id generator:"increment", type:"long" // we have a default "uuid" mapping in the config
     }
 }

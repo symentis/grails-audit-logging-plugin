@@ -17,6 +17,10 @@ environments {
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
+        dataSource_second {
+          dbCreate = "update"
+          url = "jdbc:h2:mem:testDb2;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+        }
     }
     test {
         // we test with several configured datasources. See GPAUDITLOGGING-64
@@ -27,11 +31,6 @@ environments {
         dataSource_second {
             dbCreate = "update"
             url = "jdbc:h2:mem:testDb2;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-            auditLog.disabled = true
-        }
-        dataSource_third {
-            dbCreate = "update"
-            url = "jdbc:h2:mem:testDb3;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     production {
@@ -49,6 +48,10 @@ environments {
                validationQuery="SELECT 1"
                jdbcInterceptors="ConnectionState"
             }
+        }
+        dataSource_second {
+          dbCreate = "update"
+          url = "jdbc:h2:mem:testDb2;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
 }
