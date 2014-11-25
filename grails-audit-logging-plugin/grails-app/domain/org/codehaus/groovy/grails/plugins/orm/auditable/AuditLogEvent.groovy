@@ -79,9 +79,11 @@ class AuditLogEvent implements Serializable {
           datasource "$Holders.config.auditLog.useDatasource"
         }
 
-        // Define your own id mapping in config and set auditLog.useConfigIdMapping = true in your app's Config.groovy
-        if (!Holders.config.auditLog.useConfigIdMapping) {
-          id generator:'increment', type:'long' // default id mapping
+        if (Holders.config.auditLog.idMapping) {
+          def map = Holders.config.auditLog.idMapping
+          id generator:map.generator, type:map.type, length:map.length
+        } else {
+          id generator:'increment', type:'long' // default
         }
 
         autoImport false

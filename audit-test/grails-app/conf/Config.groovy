@@ -83,9 +83,10 @@ grails.exceptionresolver.params.exclude = ['password']
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
 
-grails.gorm.default.mapping = {
-  id generator:"uuid2", type:"string", length:36 // globally use UUID as id generator for this datasource
-}
+
+//grails.gorm.default.mapping = {
+//  id generator:"uuid2", type:"string", length:36 // globally use UUID as id generator for this datasource
+//}
 
 environments {
     development {
@@ -129,5 +130,5 @@ auditLog {
     logIds = true
     defaultActor = 'SYS'
     useDatasource = 'second' // store in "second" datasource
-    useConfigIdMapping = true // use global config id mapping. See above.
+    idMapping = [generator:"uuid2", type:"string", length:36] // UUID id-type for AuditLogEvent
 }
