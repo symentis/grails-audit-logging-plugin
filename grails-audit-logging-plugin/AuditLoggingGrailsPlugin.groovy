@@ -77,7 +77,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  *               GPAUDITLOGGING-62 Add identifier in handler map
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.4-SNAPSHOT"
+    def version = "1.0.4.EXP-SNAPSHOT"
     def grailsVersion = '2.0 > *'
     def title = "Audit Logging Plugin"
     // def author = "Robert Oschwald"
