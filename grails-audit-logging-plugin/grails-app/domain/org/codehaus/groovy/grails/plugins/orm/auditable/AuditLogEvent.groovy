@@ -74,11 +74,12 @@ class AuditLogEvent implements Serializable {
             cache usage: 'read-only', include: 'non-lazy'
         }
 
-        // GPAUDITLOGGING-29 Datasource name to use for AuditLogEvent
+        // GPAUDITLOGGING-70 configurable Datasource name to use for AuditLogEvent
         if (Holders.config.auditLog.useDatasource){
           datasource "$Holders.config.auditLog.useDatasource"
         }
 
+        // GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
         if (Holders.config.auditLog.idMapping) {
           def map = Holders.config.auditLog.idMapping
           id generator:map.generator, type:map.type, length:map.length

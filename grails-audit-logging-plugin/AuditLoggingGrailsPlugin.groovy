@@ -42,17 +42,14 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  * Release 0.3
  *      * actorKey and username features allow for the logging of
  *        user or userPrincipal for most security systems.
- *
  * Release 0.4
  *      * custom serializable implementation for AuditLogEvent so events can happen
  *        inside a webflow context.
  *      * tweak application.properties for loading in other grails versions
  *      * update to views to show URI in an event
  *      * fix missing oldState bug in change event
- *
  * Release 0.4.1
  *      * repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181
- *
  * Release 0.5_ALPHA see GRAILSPLUGINS-391
  *      * changes to AuditLogEvent domain object uses composite id to simplify logging
  *      * changes to AuditLogListener uses new domain model with separate transaction
@@ -75,6 +72,9 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  *               GPAUDITLOGGING-63 logFullClassName property
  * Release 1.0.4 GPAUDITLOGGING-69 allow to set uri per domain object,
  *               GPAUDITLOGGING-62 Add identifier in handler map
+ *               GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
+ *               GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent
+ *
  */
 class AuditLoggingGrailsPlugin {
     def version = "1.0.4.EXP-SNAPSHOT"
