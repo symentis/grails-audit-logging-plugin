@@ -19,9 +19,11 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import grails.util.Holders
+
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.datastore.mapping.engine.event.EventType;
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 
 import javax.servlet.http.HttpSession
@@ -57,7 +59,21 @@ class AuditLogListenerUtil {
         // Anything that get's this far is auditable
         return true
     }
-
+	
+	static isStampable(domain,EventType eventType) {
+		boolean stampable =  isStampable(eventType)
+		if(stampable){
+			def cpf = ClassPropertyFetcher.forClass(domain.class)
+			stampable = cpf.getPropertyValue('stampable')
+		}
+		stampable
+	}
+	
+	static isStampable(EventType eventType){
+		eventType == EventType.PreDelete || eventType == EventType.PreUpdate || eventType == EventType.PreInsert
+	}
+	
+	
     /**
      * The static auditable attribute for the given domain class or null if none exists
      */

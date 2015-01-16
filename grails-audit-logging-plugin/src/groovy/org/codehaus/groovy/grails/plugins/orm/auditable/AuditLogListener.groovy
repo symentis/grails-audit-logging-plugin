@@ -18,6 +18,9 @@
 */
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
+import static org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil.*
+import groovy.util.logging.Commons
+
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
@@ -25,13 +28,10 @@ import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListene
 import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PostInsertEvent
 import org.grails.datastore.mapping.engine.event.PreDeleteEvent
+import org.grails.datastore.mapping.engine.event.PreInsertEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
 import org.springframework.context.ApplicationEvent
 import org.springframework.web.context.request.RequestContextHolder
-
-import groovy.util.logging.Commons
-
-import static org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil.*
 
 /**
  * Grails interceptor for logging saves, updates, deletes and acting on
@@ -66,6 +66,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
   String propertyMask
   Closure actorClosure
 
+  
+  Boolean stampEnabled = true
+  Boolean stampAlways = false
+  String stampCreatedBy
+  String stampLastUpdatedBy
+  
   // Global list of attribute changes to ignore, defaults to ['version', 'lastUpdated']
   List<String> defaultIgnoreList
   List<String> defaultMaskList
@@ -83,6 +89,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       log.trace("Event received for other datastore. Ignoring event")
       return
     }
+	if(stampEnabled && (stampAlways || isStampable(event.entityObject,event.eventType))){
+		stamp(event.entityObject,event.eventType);
+	}	
     if (isAuditableEntity(event.entityObject, getEventName(event))) {
       log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
 
@@ -99,10 +108,21 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       }
     }
   }
-
+  
+  void stamp(entity,EventType eventType){
+	  if(EventType.PreInsert == eventType){
+		  stampCreatedBy(entity)
+		  stampLastUpdatedBy(entity)
+	  }
+	  else{
+		  stampLastUpdatedBy(entity)
+	  }
+  }
+  
   @Override
   boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
     return eventType.isAssignableFrom(PostInsertEvent) ||
+	  eventType.isAssignableFrom(PreInsertEvent) ||
       eventType.isAssignableFrom(PreUpdateEvent) ||
       eventType.isAssignableFrom(PreDeleteEvent)
   }
@@ -230,6 +250,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     return mask
   }
+  
+  protected stampCreatedBy(entity){
+	  entity."${stampCreatedBy}" = getActor()
+  }
+  
+  protected stampLastUpdatedBy(entity){
+	  entity."${stampLastUpdatedBy}" = getActor()
+  }
 
   /**
    * We must use the preDelete event if we want to capture
@@ -239,7 +267,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     def domain = event.entityObject
     try {
       def entity = getDomainClass(domain)
-      def map = makeMap(entity.persistentProperties*.name as Set, domain)
+	  
+	  def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
         if (nonVerboseDelete) {
           log.debug("Forced Non-Verbose logging by config onPreDelete.")
@@ -261,7 +290,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       log.error "Audit plugin unable to process delete event for ${domain.class.name}: ", e
     }
   }
-
+	    
   /**
    * I'm using the post insert event here instead of the pre-insert
    * event so that I can log the id of the new entity after it
@@ -273,8 +302,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     def domain = event.entityObject
     try {
       def entity = getDomainClass(domain)
-
-      def map = makeMap(entity.persistentProperties*.name as Set, domain)
+	  
+	  def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
         logChanges(domain, map, null, getEntityId(domain), getEventName(event), getClassName(entity))
       } else {
@@ -312,7 +341,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     def domain = event.entityObject
     try {
       def entity = getDomainClass(domain)
-
+	  
       // Get all the dirty properties
       Set<String> dirtyProperties = getDirtyPropertyNames(domain, entity)
       if (dirtyProperties) {
@@ -416,6 +445,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
   private String getEventName(AbstractPersistenceEvent event) {
     switch (event.eventType) {
+      case EventType.PreInsert:
+        return "PREINSERT"
       case EventType.PostInsert:
         return "INSERT"
       case EventType.PreUpdate:
