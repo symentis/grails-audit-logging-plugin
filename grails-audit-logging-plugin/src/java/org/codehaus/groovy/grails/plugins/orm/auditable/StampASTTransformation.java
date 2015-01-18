@@ -36,8 +36,4 @@ public class StampASTTransformation extends AbstractASTTransformation{
 		T result = (T) InvokerHelper.invokeMethod(stampInfo, field, new Object[]{});
 		return result!=null ? result:defaultValue;
 	}
-	
-	public void out(Object value){
-		System.out.println(value);
-	}
 }
