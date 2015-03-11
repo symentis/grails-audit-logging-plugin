@@ -58,7 +58,25 @@ class AuditUpdateSpec extends IntegrationSpec {
         def first = events.find { it.propertyName == 'age' }
         first.persistedObjectVersion == author.version - 1
     }
+    
+    void "Test false/null differentiation"() {
+        given:
+        def author = Author.findByName("Aaron")
 
+        when:
+        author.famous = false
+        author.save(flush: true, failOnError: true)
+
+        then:
+        def events = AuditLogEvent.findAllByClassName('test.Author')
+        events.size() == 1
+
+        def first = events.find { it.propertyName == 'famous' }
+        first.oldValue == 'true'
+        first.newValue == 'false'
+        first.eventName == 'UPDATE'
+    }
+    
     void "Test persistedObjectVersion in update logging for domain class without version"() {
         given:
         def heliport = Heliport.findByCode('EGLW')
