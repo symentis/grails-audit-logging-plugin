@@ -555,7 +555,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    */
   String conditionallyMaskAndTruncate(domain, String key, value) {
     try {
-      if (!value) {
+      if (value == null) {
         return null
       }
     } catch (Exception e) {
