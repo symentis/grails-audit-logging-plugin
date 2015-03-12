@@ -4,7 +4,7 @@ jdk:
 - oraclejdk7
 
 env:
-  - GRAILS_VERSION=2.3.5
+  - GRAILS_VERSION=2.3.11
 
 branches:
   only:
