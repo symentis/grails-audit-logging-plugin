@@ -109,7 +109,12 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 def listener = new AuditLogListener(datastore)
                 listener.with {
                     grailsApplication = application
-                    verbose = application.config.auditLog.verbose ?: false
+					
+					stampEnabled = application.config.auditLog.stampEnabled ?: true
+					stampAlways = application.config.auditLog.stampAlways ?: false
+					stampCreatedBy = application.config.auditLog.stampCreatedBy ?: 'createdBy'
+					stampLastUpdatedBy = application.config.auditLog.stampLastUpdatedBy ?: 'lastUpdatedBy'
+					verbose = application.config.auditLog.verbose ?: false
                     nonVerboseDelete = application.config.auditLog.nonVerboseDelete ?: false
                     logFullClassName = application.config.auditLog.logFullClassName ?: false
                     transactional = application.config.auditLog.transactional ?: false
