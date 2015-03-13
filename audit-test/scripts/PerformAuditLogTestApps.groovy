@@ -1,3 +1,5 @@
+import org.yaml.snakeyaml.Yaml
+
 /* Copyright 2011-2013 SpringSource.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +17,7 @@
 
 /**
  * Creates test applications for tests.
+ * See testapps.config.groovy file for all configured Grails versions the tests will run on.
  */
 includeTargets << grailsScript('_GrailsBootstrap')
 
@@ -133,6 +136,7 @@ private void configureApp() {
     logIds = true
     defaultActor = 'SYS'
     logFullClassName = true
+    useDatasource = 'second' // store in "second" datasource
   }
   '''
 }
@@ -141,17 +145,28 @@ private void createProjectFiles() {
   String source = "$basedir"
   float grailsMinorVersion = grailsVersion[0..2] as float
 
-  ant.copy(todir:"$testprojectRoot/test/integration/test") {
-    fileset(dir:"$source/test/integration/test")
+  // copy sources to target Grails project
+  println "** Copy sources to $testprojectRoot"
+  ant.copy(todir:"$testprojectRoot/test/integration") {
+    fileset(dir:"$source/test/integration")
   }
+  ant.copy(todir:"$testprojectRoot/grails-app/domain") {
+    fileset(dir:"$source/grails-app/domain")
+  }
+  ant.copy(file:"$source/grails-app/conf/DataSource.groovy",
+    tofile:"$testprojectRoot/grails-app/conf/DataSource.groovy")
 
   ant.copy(todir:"$testprojectRoot/grails-app/domain/test") {
     fileset(dir:"$source/grails-app/domain/test")
   }
 
+  ant.copy(todir:"$testprojectRoot/src") {
+    fileset(dir:"$source/src")
+  }
+
   if (grailsMinorVersion < 2.3f) {
     // rework test groovy files. (Spock package name differs)
-    println "Grails version: ${grailsMinorVersion}, using SPOCK package name 'grails.plugin.spock'"
+    println "** Grails version: ${grailsMinorVersion}, using SPOCK package name 'grails.plugin.spock'"
     new File("$testprojectRoot/test/integration/test").listFiles().each { file ->
       println "Reworking spock package name in $file"
       String contents = file.text
