@@ -1,5 +1,3 @@
-import org.yaml.snakeyaml.Yaml
-
 /* Copyright 2011-2013 SpringSource.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -145,21 +143,15 @@ private void createProjectFiles() {
   String source = "$basedir"
   float grailsMinorVersion = grailsVersion[0..2] as float
 
-  // copy sources to target Grails project
   println "** Copy sources to $testprojectRoot"
-  ant.copy(todir:"$testprojectRoot/test/integration") {
-    fileset(dir:"$source/test/integration")
-  }
   ant.copy(todir:"$testprojectRoot/grails-app/domain") {
     fileset(dir:"$source/grails-app/domain")
   }
+  ant.copy(todir:"$testprojectRoot/test/integration") {
+    fileset(dir:"$source/test/integration")
+  }
   ant.copy(file:"$source/grails-app/conf/DataSource.groovy",
     tofile:"$testprojectRoot/grails-app/conf/DataSource.groovy")
-
-  ant.copy(todir:"$testprojectRoot/grails-app/domain/test") {
-    fileset(dir:"$source/grails-app/domain/test")
-  }
-
   ant.copy(todir:"$testprojectRoot/src") {
     fileset(dir:"$source/src")
   }
