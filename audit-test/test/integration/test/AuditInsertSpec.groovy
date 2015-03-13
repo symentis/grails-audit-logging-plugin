@@ -40,8 +40,8 @@ class AuditInsertSpec extends IntegrationSpec {
         then: "author is saved"
         author.id
 
-        and: "verbose audit logging is created in second datasource"
-        def events = AuditLogEvent.second.findAllByClassName('test.Author')
+        and: "verbose audit logging is created"
+        def events = AuditLogEvent.findAllByClassName('test.Author')
         events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def first = events.find { it.propertyName == 'age' }
