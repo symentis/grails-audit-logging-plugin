@@ -8,6 +8,13 @@ For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-loggi
 ##**Issue Management**##
 See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA")
 
+##**Pull Requests**##
+Pull requests are highly appreciated and welcome!
+Please add integration tests for new features in the audit-test application.
+Execute "grails perform-audit-log-test-apps" in the audit-test directory. This tests the plugin against several Grails versions to ensure compatibility.
+Before placing a pull request, please create an issue in Jira and state the issue# in the pull request.
+
+
 ##**Continuous Integration Server**##
 [![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
 
