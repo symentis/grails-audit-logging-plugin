@@ -22,6 +22,7 @@ includeTargets << grailsScript('_GrailsBootstrap')
 grailsHome = null
 dotGrails = null
 grailsVersion = null
+grailsMajorVersion = null
 projectDir = null
 appName = null
 testprojectRoot = null
@@ -69,6 +70,7 @@ private void init(String name, config) {
   appName = 'grails-audit-logging-test-' + name
   testprojectRoot = "$projectDir/$appName"
   grailsVersion = config.grailsVersion
+  grailsMajorVersion = grailsVersion[0..2] as float
   dotGrails = config.dotGrails + '/' + grailsVersion
 }
 
@@ -95,12 +97,11 @@ private void installPlugins() {
   contents = contents.replace('grails.project.dependency.resolution =', '''grails.plugin.location.'audit-logging'="../../../grails-audit-logging-plugin"\ngrails.project.dependency.resolution =''')
   contents = contents.replace('grails.project.fork', 'grails.project.forkDISABLED')
 
-  float grailsMinorVersion = grailsVersion[0..2] as float
 
-  if (grailsMinorVersion < 2.3f) {
+  if (grailsMajorVersion < 2.3f) {
     // need to add Spock as plugin
-    String spockDependency = grailsMinorVersion > 2.1f ? '		test "org.spockframework:spock-grails-support:0.7-groovy-2.0"' : ''
-    String spockExclude = grailsMinorVersion > 2.1f ? '			exclude "spock-grails-support"' : ''
+    String spockDependency = grailsMajorVersion > 2.1f ? '		test "org.spockframework:spock-grails-support:0.7-groovy-2.0"' : ''
+    String spockExclude = grailsMajorVersion > 2.1f ? '			exclude "spock-grails-support"' : ''
 
     println "Adding spock dependency.."
     contents = contents.replace('dependencies {', """
@@ -125,23 +126,30 @@ private void installPlugins() {
 
 private void configureApp() {
   File config = new File(testprojectRoot, 'grails-app/conf/Config.groovy')
-  config << '''
+  String auditConfig = '''
   auditLog {
     verbose = true
     defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
+    logFullClassName = true
     transactional = false
     defaultMask = ['ssn']
     logIds = true
     defaultActor = 'SYS'
-    logFullClassName = true
     useDatasource = 'second' // store in "second" datasource
+    idMapping = [generator:"uuid2", type:"string", length:36] // UUID id-type for AuditLogEvent
   }
   '''
+  if (grailsMajorVersion < 2.3f) {
+    // Due to GRAILS-9771, we do not test different datasources in Grails < 2.3
+    println "** using default dataSource as Grails < 2.3.x to avoid GRAILS-9771"
+    auditConfig = auditConfig - "useDatasource = 'second'"
+  }
+  config << auditConfig
 }
 
 private void createProjectFiles() {
   String source = "$basedir"
-  float grailsMinorVersion = grailsVersion[0..2] as float
+  float grailsMajorVersion = grailsVersion[0..2] as float
 
   println "** Copy sources to $testprojectRoot"
   ant.copy(todir:"$testprojectRoot/grails-app/domain") {
@@ -156,9 +164,9 @@ private void createProjectFiles() {
     fileset(dir:"$source/src")
   }
 
-  if (grailsMinorVersion < 2.3f) {
+  if (grailsMajorVersion < 2.3f) {
     // rework test groovy files. (Spock package name differs)
-    println "** Grails version: ${grailsMinorVersion}, using SPOCK package name 'grails.plugin.spock'"
+    println "** Grails version: ${grailsMajorVersion}, using SPOCK package name 'grails.plugin.spock'"
     new File("$testprojectRoot/test/integration/test").listFiles().each { file ->
       println "Reworking spock package name in $file"
       String contents = file.text
