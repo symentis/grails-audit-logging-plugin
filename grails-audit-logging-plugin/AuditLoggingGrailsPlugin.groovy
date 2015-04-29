@@ -76,7 +76,7 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  *
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.4"
+    def version = "1.0.5-SNAPSHOT"
     def grailsVersion = '2.0 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
