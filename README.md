@@ -6,7 +6,10 @@ The Audit Logging plugin can add generic event based Audit Logging to a Grails p
 For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ##**Issue Management**##
-See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA")
+
+See [GitHub Issues](https://github.com/robertoschwald/grails-audit-logging-plugin/issues "Issues")
+
+(old) See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA") (Will be migrated to GH, soon)
 
 ##**Pull Requests**##
 Pull requests are highly appreciated and welcome!
