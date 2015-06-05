@@ -18,8 +18,6 @@
 */
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
-import org.hibernate.TypeMismatchException
-
 class AuditLogEventController {
 
   // the delete, save and update actions only accept POST requests
@@ -42,10 +40,14 @@ class AuditLogEventController {
     // We badly need GH #
     try {
       auditLogEvent = AuditLogEvent.get(params.long('id'))
-    } catch (TypeMismatchException e){
-      auditLogEvent = AuditLogEvent.get(params.id)
+    } catch (Exception e){
+      try {
+        auditLogEvent = AuditLogEvent.get(params.id)
+      } catch (Exception giveup){
+        log.error("Cannot obtain AuditLogEvent. ", giveup)
+      }
     }
-    if (!auditLogEvent) {
+    if (auditLogEvent == null) {
       flash.message = "AuditLogEvent not found with id ${params.id}"
       redirect(action: 'list')
       return
