@@ -123,9 +123,8 @@ class AuditDeleteSpec extends IntegrationSpec {
 			resolution.save(flush: true, failOnError: true)
 		when: "updateing resolution"
 			resolution.name = "One for all and all for one"
-			resolution.save(flush: true, failOnError: true)
-			
-		then:
+			resolution.save(flush: true, failOnError: true)			
+		then: "delete resolution"
 			resolution.delete(flush: true, failOnError: true)
 			def events = AuditLogEvent.findAllByClassName('test.Resolution')
 			events.size() == 1
