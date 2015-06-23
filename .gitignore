@@ -1,6 +1,8 @@
 /cobertura.ser
 *.log
 target/
+build/
+.gradle/
 /docs
 plugin.xml
 *.zip
