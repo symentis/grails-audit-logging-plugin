@@ -1,6 +1,6 @@
 package test
 
-import org.codehaus.groovy.grails.plugins.orm.auditable.Stamp
+import grails.plugins.orm.auditable.Stamp
 
 @Stamp
 class Train {
