@@ -6,16 +6,15 @@ The Grails Audit Logging plugin adds generic event based Audit Logging to a Grai
 For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ##**Supported Grails versions**##
-Grails 3.x (master branch)
-Grails 2.x (1.x_maintenance branch)
+ * Grails 3.x (master branch)
+ * Grails 2.x (1.x_maintenance branch)
 
 ##**Issue Management**##
 
 See [GitHub Issues](https://github.com/robertoschwald/grails-audit-logging-plugin/issues "Issues")
 
 JIRA issues have been migrated to GitHub issues recently (Thanks to Graeme).
-Please do not add issues / comments to Jira anymore
-Old Jira issues, see [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA")
+Please do not add issues / comments to Jira anymore. Old Jira issues, see [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA")
 
 ##**Pull Requests**##
 Pull requests are highly appreciated and welcome!
