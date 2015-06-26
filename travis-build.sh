@@ -33,10 +33,13 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
   git clone https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git -b gh-pages gh-pages --single-branch > /dev/null
   cd gh-pages
 
+  echo "Path: `pwd`"
+  ls ..
+
   # If this is the master branch then update the snapshot
   if [[ $TRAVIS_BRANCH == 'master' ]]; then
     mkdir -p snapshot
-    cp -r ../audit-logging/build/docs/manual/. ./snapshot/
+    cp -r ../build/docs/manual/. ./snapshot/
 
     git add snapshot/*
   fi
