@@ -1,20 +1,7 @@
----
 grails:
     profile: web-plugin
     codegen:
         defaultPackage: audit.logging
-info:
-    app:
-        name: '@info.app.name@'
-        version: '@info.app.version@'
-        grailsVersion: '@info.app.grailsVersion@'
-spring:
-    groovy:
-        template:
-            check-template-location: false
-
----
-grails:
     mime:
         disable:
             accept:
@@ -30,7 +17,7 @@ grails:
             css: text/css
             csv: text/csv
             form: application/x-www-form-urlencoded
-            html: 
+            html:
               - text/html
               - application/xhtml+xml
             js: text/javascript
@@ -40,7 +27,7 @@ grails:
             multipartForm: multipart/form-data
             rss: application/rss+xml
             text: text/plain
-            hal: 
+            hal:
               - application/hal+json
               - application/hal+xml
             xml:
@@ -64,10 +51,24 @@ grails:
                 scriptlets: html
                 taglib: none
                 staticparts: none
+
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+
+spring:
+    groovy:
+        template:
+            check-template-location: false
+
+
 hibernate:
     cache:
         queries: false
----
+
+
 dataSource:
     pooled: true
     jmxExport: true
