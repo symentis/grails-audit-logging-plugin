@@ -1,0 +1,64 @@
+
+You can use the grails-audit-logging plugin in several ways.
+
+h3. 1. Auditing of domain class
+
+{code}
+static auditable = true
+{code}
+
+Enables audit logging using the introduced domain class AuditLogEvent which will record insert, update, and delete events. Update events will be logged in detail with the property name and the old and new values.
+
+
+h3. 2. Auditing plus domain event handlers
+
+You may use the optional event handlers in your Domain classes.
+
+Example:
+
+{code}
+class Person {
+ static auditable = true
+ Long id
+ Long version
+ String firstName
+ String middleName
+ String lastName
+
+ String email
+
+ static constraints = {
+	 firstName(nullable:true,size:0..60)
+	 middleName(nullable:true,size:0..60)
+	 lastName(nullable:false,size:1..60)
+	 email(email:true)
+ }
+
+ def onSave = {
+	 println "new person inserted"
+	 // may optionally refer to newState map
+ }
+ def onDelete = {
+	 println "person was deleted"
+     // may optionally refer to oldState map
+ }
+ def onChange = { oldMap,newMap ->
+ 	println "Person was changed ..."
+ 	oldMap.each({ key, oldVal ->
+ 		if(oldVal != newMap[key]) {
+   		 println " * $key changed from $oldVal to " + newMap[key]
+		}
+	})
+ }//*/
+}
+{code}
+
+h3. 3. Use event handlers only (no auditing)
+
+You may choose to disable the audit logging and only use the event handlers. You would do this by specifying in your domain class:
+
+{code}
+static auditable = [handlersOnly:true]
+{code}
+
+With "handlersOnly:true" specified, no AuditLogEvents will be persisted to the database and only the event handlers will be called.

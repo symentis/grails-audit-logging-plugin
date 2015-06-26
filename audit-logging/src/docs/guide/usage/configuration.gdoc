@@ -1,0 +1,316 @@
+h4. Configuration
+
+The plugin configuration can be specified in the @Config.groovy@ file. It supports @environments@ blocks for environment-specific configuration.
+
+There are a few configuration options for the plugin; these are specified in @Config.groovy@.
+
+
+
+h3. Auditing Current User Information
+
+With version >= 0.5, additional configuration can be specified in the Config.groovy file of the project to help log the authenticated user for various security systems. For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor name (the person performing the action which triggered the event, e.g. the username) add these lines to Config.groovy:
+{code}
+auditLog {
+  actorClosure = { request, session ->
+      session.user?.username
+  }
+}
+{code}
+
+h2. Spring Security Core Plugin 1.1.2 or higher
+
+If you save data from an unprotected URL (configAttribute:IS_AUTHENTICATED_ANONYMOUSLY), the principal is a String-object not a Principal-object. To cope with this behaviour you should use the following Closure definition in Config.groovy:
+Import statement:
+
+{code}
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+…
+auditLog {
+ actorClosure = { request, session ->
+   if (request.applicationContext.springSecurityService.principal instanceof java.lang.String){
+    return request.applicationContext.springSecurityService.principal
+   }
+   def username = request.applicationContext.springSecurityService.principal?.username
+   if (SpringSecurityUtils.isSwitched()){
+    username = SpringSecurityUtils.switchedUserOriginalUsername+" AS "+username
+   }
+   return username
+ }
+}
+{code}
+
+h3. Spring Security Core 1.0.1 Plugin
+
+Based off of Jorge Aguilera's example, the Spring Security Plugin uses the SpringSecurityService.
+{code}
+auditLog {
+  actorClosure = { request, session ->
+   request.applicationContext.springSecurityService.principal?.username
+  }
+}
+{code}
+
+h3. Acegi Plugin
+
+Thanks to Jorge Aguilera for his example on how to integrate with the Acegi plugin:
+
+{code}
+auditLog {
+ actorClosure = { request, session ->
+   return request.applicationContext.authenticateService.principal()?.username
+ }
+}
+{code}
+
+h3. CAS Authentication
+
+For example if you are using a system such as CAS you can specify the CAS user attribute using a special configuration property to get the CAS user name. In Config.groovy just add the following lines to the top of the file:
+import edu.yale.its.tp.cas.client.filter.CASFilter
+
+{code}
+auditLog {
+ actorClosure = { request, session ->
+   session?.getAttribute(CASFilter.CAS_FILTER_USER)
+ }
+}
+{code}
+
+… and the audit_log table will have a record of which user and what controller triggered the event.
+
+h3. Shiro Plugin
+
+With Shiro, add the following lines to use the currently logged in user's username:
+
+{code}
+auditLog {
+ actorClosure = { request, session ->
+   org.apache.shiro.SecurityUtils.getSubject()?.getPrincipal()
+ }
+}
+{code}
+
+h3. Other security systems
+
+If you are using a custom authentication system in your controller that puts the user data into the session you can set up the actorClosure to work with your security system instead.
+
+h4. Property Ignore List
+
+It's possible to configure which properties get ignored by auditing. The default ignore field list is:
+{code}
+['version','lastUpdated'].
+{code}
+
+If you want to provide your own ignore list specify the ignore list like this:
+
+{code}
+static auditable = [ignore:['version','lastUpdated','myField']]
+{code}
+
+If instead you want to trigger on version and lastUpdated changes you may specify an empty ignore list:
+
+{code}
+static auditable = [ignore:[]]
+{code}
+
+h3. Verbose mode
+
+You can enable verbose mode. If enabled, column by column change logging in insert and delete events is enabled. Old- and new values are stored in detailed to the audit logging table. Enable verbose logging with:
+
+{code}
+auditLog {
+  verbose = true
+}
+{code}
+
+This setting is disabled by default.
+
+{warning}
+When enabling verbose audit logging, you may get errors if you explicitly flush the session. In this case, do not enable verbose logging. Starting with version 1.0.1 of the plugin, additional closures are available to disable logging or verbose mode in a code block.
+{warning}
+
+h3. Logging of associated objectIds (since 0.5.5)
+
+You can log the object-ids of associated objects. Logging will be performed in the format: "[id:<objId>]objDetails". You can enable id-logging with
+
+{code}
+auditLog {
+  logIds = true
+}
+{code}
+
+This setting is disabled by default.
+
+h3. Large value column mode (since 0.5.5)
+
+You can enable large value columns to log more details. If large value columns are enabled, the column limit is 65534 for oldValue and newValue. This setting is especially designed to work with "verbose" mode. If you enabled the large value column mode, you can set TRUNCATE_LENGTH to a value larger 255 and smaller 65535. Enable large value columns in Config.groovy with:
+
+{code}
+auditLog {
+  largeValueColumnTypes = true // use large column db types for oldValue/newValue.
+}
+{code}
+
+Whenever you change the largeValueColumnTypes flag, you need to update your database schema(s).
+
+h3. Property value masking (since 0.5.5)
+
+You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are not stored into the audit log table if verbose mode is enabled. Instead, a mask of "**********" will be logged. By default, "password" properties are masked. You can mask property fields in domain classes like this:
+
+{code}
+static auditable = [mask:'password','otherField']
+{code}
+
+
+h3. Verbose log truncation length
+
+If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue columns (Default is 255). Configure the TRUNCATE_LENGTH in Config.groovy:
+
+{code}
+auditLog {
+  TRUNCATE_LENGTH = 400 // don't forget to enable largeValueColumnTypes if > 255!
+  largeValueColumnTypes = true // use large column db types for oldValue/newValue.
+}
+{code}
+
+{warning}
+When you set TRUNCATE_LENGTH to a value > 255 you must enable largeValueColumnTypes (see above). When you forgot to enable large value column mode while setting TRUNCATE_LENGTH > 255, a warning is logged during startup and the setting will be ignored (255 will be used instead).
+{warning}
+
+h3. Renaming the Audit-Log table name (since 0.5.5)
+
+You can specify the audit log table name. Default is "audit_log". Change the table name in Config.groovy with:
+
+{code}
+auditLog {
+  tablename = "other_audit_log_name"
+}
+{code}
+
+If you change the tablename, you need to update your database schema(s).
+
+h3. Disable Hibernate caching of AuditLogEvent
+
+You can disable the caching of the AuditLogEvents by specifying:
+
+{code}
+auditLog {
+  cacheDisabled = true
+}
+{code}
+
+h3. Transactional AuditLog events
+
+In Config.groovy you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin and commit transactions around audit log save events. If set to false then the AuditLog will be persisted without a transaction wrapping its call to save. This setting should not be changed from defaults lightly as it can cause problems in integration testing.
+
+{code}
+auditLog {
+  transactional = true
+}
+{code}
+
+You are only likely to want to change the defaults if you are working with a transactional database in test and production.
+
+
+h3. Disable auditing by config (since 0.5.5.3)
+
+You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable auditing to not slow down the bootstrap process or if you want to audit log by Enviroment. With version >= 1.0.0 of the plugin, you can disable auditing on a per-datasource base as well Currently, disabling the plugin on a per-datasource base does not work. See GPAUDITLOGGING-68
+
+{code}
+auditLog {
+  disabled = true
+}
+{code}
+
+Disabling in DataSource.groovy is currently not possible.
+
+This setting is "false" by default (auditing is enabled).
+
+h3. nonVerboseDelete logging (since 1.0.1)
+
+If verbose logging is enabled (see above), you can log deletes in a non-verbose manner. This means, only the delete event is logged, but not the properties the deleted object hold prior the deletion.
+
+{code}
+auditLog {
+  nonVerboseDelete = true
+}
+{code}
+
+This setting is "false" by default (verbosity of deletes depend on the verbose setting).
+
+h3. log full domain class name (since 1.0.3)
+
+By default, only the entity class name is logged. If you want to log the entity full name (including the package name), you can enable full logging. Thanks to tcrossland for this feature.
+
+{code}
+logFullClassName = true
+{code}
+
+This setting is "false" by default (entity name is logged).
+
+h3. getAuditLogUri closure (since 1.0.4)
+
+By default, the "uri" field is filled with the request uri which caused the action. You can define a closure "getAuditLogUri" on a per-domain object base to define what should be written to the AuditLog "uri" field.
+
+{code}
+class User {
+  static auditable = true
+  static belongsTo = [Client]
+
+  def getAuditLogUri = {
+    clientId as String
+  }
+}
+{code}
+
+You need to take special care how you obtain the "uri" data in the getAuditLogUri closure. It is recommended to not perform costly calls.
+
+h3. Domain class stamping support (since 1.0.4)
+
+Since version 1.0.4, it is possible to enable domain class stamping support. With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get the fields dateCreated, lastUpdated, createdBy, lastUpdatedBy using an AST transformation. You can create your own StampASTTransformation implementation for your specific needs. The createdBy and lastUpdatedBy fieldnames can be declared in Config.groovy. These fields will be filled with the result of the actor closure on the event PreInsert, PreUpdate and PreDelete. Thanks to tkvw for this feature.
+
+{code}
+stampEnabled = true // enable stamping support
+stampAlways = false // always stamp domain classes, regardless of @Stamp or static stampable = true existence
+stampCreatedBy = 'createdBy' // fieldname
+stampLastUpdatedBy = 'lastUpdatedBy' // fieldname
+{code}
+
+h3. Use specific datasource (since 1.0.4)
+
+Since version 1.0.4 it is possible to set the datasource name to use for the audit logging table.
+
+{code}
+useDatasource = 'second' // use "second" datasource defined in DataSource.groovy
+{code}
+
+h3. Example configuration
+
+Example Config.groovy configuration with various settings as described above:
+
+{code}
+// AuditLog Plugin config
+auditLog {
+ verbose = true // verbosely log all changed values to db
+ logIds = true  // log db-ids of associated objects.
+ // Note: if you change next 2 properties, you must update your database schema!
+ tablename = 'my_audit' // table name for audit logs.
+ largeValueColumnTypes = true // use large column db types for oldValue/newValue.
+ TRUNCATE_LENGTH = 1000
+ cacheDisabled = true
+ logFullClassName = true
+ replacementPatterns = ["local.example.xyz.":""] // replace with empty string.
+ actorClosure = { request, session ->
+    // SpringSecurity Core 1.1.2
+    if (request.applicationContext.springSecurityService.principal instanceof java.lang.String){
+       return request.applicationContext.springSecurityService.principal
+    }
+    def username = request.applicationContext.springSecurityService.principal?.username
+    if (SpringSecurityUtils.isSwitched()){
+       username = SpringSecurityUtils.switchedUserOriginalUsername+" AS "+username
+    }
+    return username
+ }
+ stampEnabled = true
+ stampAlways = true
+}
+{code}

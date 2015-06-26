@@ -1,0 +1,30 @@
+h3. Description
+
+The Audit Logging plugin adds Grails GORM Events (Hibernate Events when using plugin version < 1.0.0) based Audit Logging
+capabilities to a Grails project and it also adds support to domain models for hooking into the Grails GORM events system.
+
+Support for the following closures are added: onSave, onDelete, and onChange. The onChange closure can be used in two ways.
+First, it can be used with no parameters or it can be used with two parameters, oldMap and newMap.
+The first parameter is a LinkedHashMap representing the old state of the object before the change was applied,
+the second parameter is a LinkedHashMap representing the state of the object after changes are applied.
+
+NOTE: GORM Events hook into the ''beforeInsert'' and the ''beforeUpdate'' events which work great for preventing updates
+but do not work well for ''Audit Logging'' where we would need critical information about the entity that is only
+available after these actions complete. We've chosen to prefix the handler names with "on" so that they do not conflict
+with other handler names in other existing plugins.
+
+h3. Compatibility issues
+
+* For Grails <= 1.2.0 use version 0.5.3 of this plugin.
+* For Grails >= 1.3.0 use version 0.5.5.3 of this plugin.
+* For Grails >= 2.3.0 use version 1.0.0 or above.
+* For Grails >= 3.0.0 use version 2.0.0 or above.
+
+
+h3. ORM implementation dependency
+
+Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use it with the ORM mapper of your choice
+(Hibernate3, Hibernate4, MongoDB, etc.).
+
+Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
+please file a GitHub issue.
