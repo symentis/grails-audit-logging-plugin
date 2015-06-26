@@ -3,7 +3,7 @@ set -e
 rm -rf *.zip
 ./gradlew clean check assemble
 
-filename=$(find build/libs -name "*.jar" | head -1)
+filename=$(find audit-logging/build/libs -name "*.jar" | head -1)
 filename=$(basename "$filename")
 
 EXIT_STATUS=0
@@ -34,7 +34,7 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
   git clone https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git -b gh-pages gh-pages --single-branch > /dev/null
   cd gh-pages
 
-  echo "Path: `pwd` . Parent audit-logging dir:"
+  echo "Path: `pwd` . Parent ../audit-logging dir:"
   ls ../audit-logging/
 
   # If this is the master branch then update the snapshot
