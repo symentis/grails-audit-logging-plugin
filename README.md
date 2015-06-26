@@ -32,6 +32,7 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	Dhiraj Mahapatro
 	Fernando Cambarieri
 	Graeme Rocher
+	Jorge Aguilera
 	Matthew A Stewart
 	Shawn Hartsock
 	Tom Crossland
