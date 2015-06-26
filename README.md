@@ -21,9 +21,6 @@ Pull requests are highly appreciated and welcome!
 
 Please add integration tests for new features to the audit-test application.
 
-##**Continuous Integration Server**##
-[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
-
 ##**Contributors**##
 Special thanks to all the contributors to the project (in alphabetical order):
 
@@ -40,6 +37,10 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	Tom Crossland
 	
 	Project lead: Robert Oschwald
+	
+##**Continuous Integration Server**##
+[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
+
 
 
 
