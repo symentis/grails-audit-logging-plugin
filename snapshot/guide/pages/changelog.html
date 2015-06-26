@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>1.1 Changelog 2.0.0-SNAPSHOT</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/introduction.html"><strong>1</strong><span>Introduction To The Cache Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/usage.html"><strong>2</strong><span>Usage</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/implementation.html"><strong>3</strong><span>Implementation Details</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p></p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/usage.html"><strong>2</strong><span>Usage</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>1.1 Changelog - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> </p>
+
+                    <p><strong>Version:</strong> 2.0.0-SNAPSHOT</p>
+
+                    
+                </div>
+
+                
+
+                
+<a name="1.1 Change log"><!-- Legacy link --></a>
+<h2 id="changelog">1.1 Changelog</h2>
+<p class="paragraph"/><h3>2.0.0-SNAPSHOT</h3><p class="paragraph"/>Grails 3 support.
+Current branch: master.
+For 1.0.x version, see 1.x_maintenance branch<p class="paragraph"/><h3>1.0.4</h3><p class="paragraph"/>GPAUDITLOGGING-69 allow to set uri per domain object
+GPAUDITLOGGING-62 Add identifier in handler map
+GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
+GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent
+GPAUDITLOGGING-74 Impossible to log values of zero or false
+GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities<p class="paragraph"/><h3>1.0.3</h3><p class="paragraph"/>GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource
+GPAUDITLOGGING-63 logFullClassName property<p class="paragraph"/><h3>1.0.2</h3><p class="paragraph"/>GPAUDITLOGGING-66<p class="paragraph"/>
+<h3>1.0.1</h3><p class="paragraph"/>closures,
+nonVerboseDelete property
+provide domain identifier to onSave() handler<p class="paragraph"/><h3>1.0.0</h3><p class="paragraph"/>Grails &#62;= 2.0
+ORM agnostic implementation
+major cleanup and new features<p class="paragraph"/>
+<h3>0.5.5.3</h3><p class="paragraph"/>Added ability to disable audit logging by config.<p class="paragraph"/>
+<h3>0.5.5.2</h3><p class="paragraph"/>Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.<p class="paragraph"/><h3>0.5.5.1</h3><p class="paragraph"/>Fixed the title. No changes in the plugin code.<p class="paragraph"/><h3> 0.5.5</h3><p class="paragraph"/>collections logging
+log ids
+replacement patterns
+property value masking
+large fields support
+fixes and enhancements<p class="paragraph"/><h3> 0.5.4</h3><p class="paragraph"/>compatibility issues with Grails 1.3.x<p class="paragraph"/>
+<h3> 0.5.3</h3><p class="paragraph"/>GRAILSPLUGINS-2135
+GRAILSPLUGINS-2060
+an issue with extra JAR files that are somehow getting released as part of the plugin<p class="paragraph"/>
+<h3>0.5.2</h3><p class="paragraph"/>GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354<p class="paragraph"/><h3>0.5.1</h3><p class="paragraph"/>fixes regression in field logging<p class="paragraph"/><h3>0.5</h3><p class="paragraph"/>GRAILSPLUGINS-391
+GRAILSPLUGINS-1496
+GRAILSPLUGINS-1181
+GRAILSPLUGINS-1515
+GRAILSPLUGINS-1811
+changes to AuditLogEvent domain object uses composite id to simplify logging
+changes to AuditLogListener uses new domain model with separate transaction
+for logging action to avoid invalidating the main hibernate session.<p class="paragraph"/><h3>0.4.1</h3><p class="paragraph"/>repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181<p class="paragraph"/><h3>0.4</h3><p class="paragraph"/>custom serializable implementation for AuditLogEvent so events can happen inside a webflow context.
+tweak application.properties for loading in other grails versions
+update to views to show URI in an event
+fix missing oldState bug in change event<p class="paragraph"/><h3>0.3</h3><p class="paragraph"/>actorKey and username features allow for the logging of user or userPrincipal for most security systems.
+Fix #31 disable hotkeys for layout.
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/usage.html"><strong>2</strong><span>Usage</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>

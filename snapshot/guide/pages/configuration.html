@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>2.1 Configuration 2.0.0-SNAPSHOT</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/introduction.html"><strong>1</strong><span>Introduction To The Cache Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/usage.html"><strong>2</strong><span>Usage</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/implementation.html"><strong>3</strong><span>Implementation Details</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p></p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/introduction.html">&lt;&lt; <strong>1</strong><span>Introduction To The Cache Plugin</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/implementation.html"><strong>3</strong><span>Implementation Details</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>2.1 Configuration - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> </p>
+
+                    <p><strong>Version:</strong> 2.0.0-SNAPSHOT</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h2 id="configuration">2.1 Configuration</h2>
+<h4>Configuration</h4><p class="paragraph"/>The plugin configuration can be specified in the <code>Config.groovy</code> file. It supports <code>environments</code> blocks for environment-specific configuration.<p class="paragraph"/>There are a few configuration options for the plugin; these are specified in <code>Config.groovy</code>.<p class="paragraph"/><p class="paragraph"/><h3>Auditing Current User Information</h3><p class="paragraph"/>With version &#62;= 0.5, additional configuration can be specified in the Config.groovy file of the project to help log the authenticated user for various security systems. For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor name (the person performing the action which triggered the event, e.g. the username) add these lines to Config.groovy:
+<div class="code"><pre>auditLog &#123;
+  actorClosure = &#123; request, session &#45;&#62;
+      session.user?.username
+  &#125;
+&#125;</pre></div><p class="paragraph"/><h2>Spring Security Core Plugin 1.1.2 or higher</h2><p class="paragraph"/>If you save data from an unprotected URL (configAttribute:IS_AUTHENTICATED_ANONYMOUSLY), the principal is a String-object not a Principal-object. To cope with this behaviour you should use the following Closure definition in Config.groovy:
+Import statement:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+…
+auditLog &#123;
+ actorClosure = &#123; request, session &#45;&#62;
+   <span class="java&#45;keyword">if</span> (request.applicationContext.springSecurityService.principal <span class="java&#45;keyword">instanceof</span> java.lang.<span class="java&#45;object">String</span>)&#123;
+    <span class="java&#45;keyword">return</span> request.applicationContext.springSecurityService.principal
+   &#125;
+   def username = request.applicationContext.springSecurityService.principal?.username
+   <span class="java&#45;keyword">if</span> (SpringSecurityUtils.isSwitched())&#123;
+    username = SpringSecurityUtils.switchedUserOriginalUsername+<span class="java&#45;quote">" AS "</span>+username
+   &#125;
+   <span class="java&#45;keyword">return</span> username
+ &#125;
+&#125;</pre></div><p class="paragraph"/><h3>Spring Security Core 1.0.1 Plugin</h3><p class="paragraph"/>Based off of Jorge Aguilera's example, the Spring Security Plugin uses the SpringSecurityService.
+<div class="code"><pre>auditLog &#123;
+  actorClosure = &#123; request, session &#45;&#62;
+   request.applicationContext.springSecurityService.principal?.username
+  &#125;
+&#125;</pre></div><p class="paragraph"/><h3>Acegi Plugin</h3><p class="paragraph"/>Thanks to Jorge Aguilera for his example on how to integrate with the Acegi plugin:<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+ actorClosure = &#123; request, session &#45;&#62;
+   <span class="java&#45;keyword">return</span> request.applicationContext.authenticateService.principal()?.username
+ &#125;
+&#125;</pre></div><p class="paragraph"/><h3>CAS Authentication</h3><p class="paragraph"/>For example if you are using a system such as CAS you can specify the CAS user attribute using a special configuration property to get the CAS user name. In Config.groovy just add the following lines to the top of the file:
+import edu.yale.its.tp.cas.client.filter.CASFilter<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+ actorClosure = &#123; request, session &#45;&#62;
+   session?.getAttribute(CASFilter.CAS_FILTER_USER)
+ &#125;
+&#125;</pre></div><p class="paragraph"/>… and the audit_log table will have a record of which user and what controller triggered the event.<p class="paragraph"/><h3>Shiro Plugin</h3><p class="paragraph"/>With Shiro, add the following lines to use the currently logged in user's username:<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+ actorClosure = &#123; request, session &#45;&#62;
+   org.apache.shiro.SecurityUtils.getSubject()?.getPrincipal()
+ &#125;
+&#125;</pre></div><p class="paragraph"/><h3>Other security systems</h3><p class="paragraph"/>If you are using a custom authentication system in your controller that puts the user data into the session you can set up the actorClosure to work with your security system instead.<p class="paragraph"/><h4>Property Ignore List</h4><p class="paragraph"/>It's possible to configure which properties get ignored by auditing. The default ignore field list is:
+<div class="code"><pre>&#91;'version','lastUpdated'&#93;.</pre></div><p class="paragraph"/>If you want to provide your own ignore list specify the ignore list like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> auditable = &#91;ignore:&#91;'version','lastUpdated','myField'&#93;&#93;</pre></div><p class="paragraph"/>If instead you want to trigger on version and lastUpdated changes you may specify an empty ignore list:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> auditable = &#91;ignore:&#91;&#93;&#93;</pre></div><p class="paragraph"/><h3>Verbose mode</h3><p class="paragraph"/>You can enable verbose mode. If enabled, column by column change logging in insert and delete events is enabled. Old- and new values are stored in detailed to the audit logging table. Enable verbose logging with:<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  verbose = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>This setting is disabled by default.<p class="paragraph"/><blockquote class="warning">
+When enabling verbose audit logging, you may get errors if you explicitly flush the session. In this case, do not enable verbose logging. Starting with version 1.0.1 of the plugin, additional closures are available to disable logging or verbose mode in a code block.
+</blockquote><p class="paragraph"/><h3>Logging of associated objectIds (since 0.5.5)</h3><p class="paragraph"/>You can log the object-ids of associated objects. Logging will be performed in the format: "id:<objId>objDetails". You can enable id-logging with<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  logIds = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>This setting is disabled by default.<p class="paragraph"/><h3>Large value column mode (since 0.5.5)</h3><p class="paragraph"/>You can enable large value columns to log more details. If large value columns are enabled, the column limit is 65534 for oldValue and newValue. This setting is especially designed to work with "verbose" mode. If you enabled the large value column mode, you can set TRUNCATE_LENGTH to a value larger 255 and smaller 65535. Enable large value columns in Config.groovy with:<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  largeValueColumnTypes = <span class="java&#45;keyword">true</span> // use large column db types <span class="java&#45;keyword">for</span> oldValue/newValue.
+&#125;</pre></div><p class="paragraph"/>Whenever you change the largeValueColumnTypes flag, you need to update your database schema(s).<p class="paragraph"/><h3>Property value masking (since 0.5.5)</h3><p class="paragraph"/>You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are not stored into the audit log table if verbose mode is enabled. Instead, a mask of "<strong class="bold"></strong><strong class="bold"></strong><strong class="bold"></strong><strong class="bold"></strong><strong class="bold"></strong>" will be logged. By default, "password" properties are masked. You can mask property fields in domain classes like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> auditable = &#91;mask:'password','otherField'&#93;</pre></div><p class="paragraph"/>
+<h3>Verbose log truncation length</h3><p class="paragraph"/>If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue columns (Default is 255). Configure the TRUNCATE_LENGTH in Config.groovy:<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  TRUNCATE_LENGTH = 400 // don't forget to enable largeValueColumnTypes <span class="java&#45;keyword">if</span> &#62; 255!
+  largeValueColumnTypes = <span class="java&#45;keyword">true</span> // use large column db types <span class="java&#45;keyword">for</span> oldValue/newValue.
+&#125;</pre></div><p class="paragraph"/><blockquote class="warning">
+When you set TRUNCATE_LENGTH to a value &#62; 255 you must enable largeValueColumnTypes (see above). When you forgot to enable large value column mode while setting TRUNCATE_LENGTH &#62; 255, a warning is logged during startup and the setting will be ignored (255 will be used instead).
+</blockquote><p class="paragraph"/><h3>Renaming the Audit-Log table name (since 0.5.5)</h3><p class="paragraph"/>You can specify the audit log table name. Default is "audit_log". Change the table name in Config.groovy with:<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  tablename = <span class="java&#45;quote">"other_audit_log_name"</span>
+&#125;</pre></div><p class="paragraph"/>If you change the tablename, you need to update your database schema(s).<p class="paragraph"/><h3>Disable Hibernate caching of AuditLogEvent</h3><p class="paragraph"/>You can disable the caching of the AuditLogEvents by specifying:<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  cacheDisabled = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/><h3>Transactional AuditLog events</h3><p class="paragraph"/>In Config.groovy you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin and commit transactions around audit log save events. If set to false then the AuditLog will be persisted without a transaction wrapping its call to save. This setting should not be changed from defaults lightly as it can cause problems in integration testing.<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  transactional = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>You are only likely to want to change the defaults if you are working with a transactional database in test and production.<p class="paragraph"/>
+<h3>Disable auditing by config (since 0.5.5.3)</h3><p class="paragraph"/>You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable auditing to not slow down the bootstrap process or if you want to audit log by Enviroment. With version &#62;= 1.0.0 of the plugin, you can disable auditing on a per-datasource base as well Currently, disabling the plugin on a per-datasource base does not work. See GPAUDITLOGGING-68<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  disabled = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>Disabling in DataSource.groovy is currently not possible.<p class="paragraph"/>This setting is "false" by default (auditing is enabled).<p class="paragraph"/><h3>nonVerboseDelete logging (since 1.0.1)</h3><p class="paragraph"/>If verbose logging is enabled (see above), you can log deletes in a non-verbose manner. This means, only the delete event is logged, but not the properties the deleted object hold prior the deletion.<p class="paragraph"/><div class="code"><pre>auditLog &#123;
+  nonVerboseDelete = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>This setting is "false" by default (verbosity of deletes depend on the verbose setting).<p class="paragraph"/><h3>log full domain class name (since 1.0.3)</h3><p class="paragraph"/>By default, only the entity class name is logged. If you want to log the entity full name (including the package name), you can enable full logging. Thanks to tcrossland for this feature.<p class="paragraph"/><div class="code"><pre>logFullClassName = <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>This setting is "false" by default (entity name is logged).<p class="paragraph"/><h3>getAuditLogUri closure (since 1.0.4)</h3><p class="paragraph"/>By default, the "uri" field is filled with the request uri which caused the action. You can define a closure "getAuditLogUri" on a per-domain object base to define what should be written to the AuditLog "uri" field.<p class="paragraph"/><div class="code"><pre>class User &#123;
+  <span class="java&#45;keyword">static</span> auditable = <span class="java&#45;keyword">true</span>
+  <span class="java&#45;keyword">static</span> belongsTo = &#91;Client&#93;<p class="paragraph"/>  def getAuditLogUri = &#123;
+    clientId as <span class="java&#45;object">String</span>
+  &#125;
+&#125;</pre></div><p class="paragraph"/>You need to take special care how you obtain the "uri" data in the getAuditLogUri closure. It is recommended to not perform costly calls.<p class="paragraph"/><h3>Domain class stamping support (since 1.0.4)</h3><p class="paragraph"/>Since version 1.0.4, it is possible to enable domain class stamping support. With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get the fields dateCreated, lastUpdated, createdBy, lastUpdatedBy using an AST transformation. You can create your own StampASTTransformation implementation for your specific needs. The createdBy and lastUpdatedBy fieldnames can be declared in Config.groovy. These fields will be filled with the result of the actor closure on the event PreInsert, PreUpdate and PreDelete. Thanks to tkvw for this feature.<p class="paragraph"/><div class="code"><pre>stampEnabled = <span class="java&#45;keyword">true</span> // enable stamping support
+stampAlways = <span class="java&#45;keyword">false</span> // always stamp domain classes, regardless of @Stamp or <span class="java&#45;keyword">static</span> stampable = <span class="java&#45;keyword">true</span> existence
+stampCreatedBy = 'createdBy' // fieldname
+stampLastUpdatedBy = 'lastUpdatedBy' // fieldname</pre></div><p class="paragraph"/><h3>Use specific datasource (since 1.0.4)</h3><p class="paragraph"/>Since version 1.0.4 it is possible to set the datasource name to use for the audit logging table.<p class="paragraph"/><div class="code"><pre>useDatasource = 'second' // use <span class="java&#45;quote">"second"</span> datasource defined in DataSource.groovy</pre></div><p class="paragraph"/><h3>Example configuration</h3><p class="paragraph"/>Example Config.groovy configuration with various settings as described above:<p class="paragraph"/><div class="code"><pre>// AuditLog Plugin config
+auditLog &#123;
+ verbose = <span class="java&#45;keyword">true</span> // verbosely log all changed values to db
+ logIds = <span class="java&#45;keyword">true</span>  // log db&#45;ids of associated objects.
+ // Note: <span class="java&#45;keyword">if</span> you change next 2 properties, you must update your database schema!
+ tablename = 'my_audit' // table name <span class="java&#45;keyword">for</span> audit logs.
+ largeValueColumnTypes = <span class="java&#45;keyword">true</span> // use large column db types <span class="java&#45;keyword">for</span> oldValue/newValue.
+ TRUNCATE_LENGTH = 1000
+ cacheDisabled = <span class="java&#45;keyword">true</span>
+ logFullClassName = <span class="java&#45;keyword">true</span>
+ replacementPatterns = &#91;<span class="java&#45;quote">"local.example.xyz."</span>:<span class="java&#45;quote">""</span>&#93; // replace with empty string.
+ actorClosure = &#123; request, session &#45;&#62;
+    // SpringSecurity Core 1.1.2
+    <span class="java&#45;keyword">if</span> (request.applicationContext.springSecurityService.principal <span class="java&#45;keyword">instanceof</span> java.lang.<span class="java&#45;object">String</span>)&#123;
+       <span class="java&#45;keyword">return</span> request.applicationContext.springSecurityService.principal
+    &#125;
+    def username = request.applicationContext.springSecurityService.principal?.username
+    <span class="java&#45;keyword">if</span> (SpringSecurityUtils.isSwitched())&#123;
+       username = SpringSecurityUtils.switchedUserOriginalUsername+<span class="java&#45;quote">" AS "</span>+username
+    &#125;
+    <span class="java&#45;keyword">return</span> username
+ &#125;
+ stampEnabled = <span class="java&#45;keyword">true</span>
+ stampAlways = <span class="java&#45;keyword">true</span>
+&#125;</pre></div>
+
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/introduction.html">&lt;&lt; <strong>1</strong><span>Introduction To The Cache Plugin</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/implementation.html"><strong>3</strong><span>Implementation Details</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
