@@ -116,6 +116,22 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.handlerCalled == "onDelete"
     }
 
+	void "Test only delete event is logged" () {
+		given: "create resolution"
+			def resolution = new Resolution()
+			resolution.name = "One for all"
+			resolution.save(flush: true, failOnError: true)
+		when: "updateing resolution"
+			resolution.name = "One for all and all for one"
+			resolution.save(flush: true, failOnError: true)			
+		then: "delete resolution"
+			resolution.delete(flush: true, failOnError: true)
+			def events = AuditLogEvent.findAllByClassName('test.Resolution')
+			events.size() == 1
+		and:
+			events.get(0).eventName == "DELETE"
+		
+	}
 
 }
 

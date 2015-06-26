@@ -3,6 +3,7 @@ String grailsHomeRoot = '/eclipse-common/grails'
 String projectDirCommon = "target"
 String dotGrailsCommon = "${System.properties.getProperty('user.home')}/.grails"
 
+
 v20 {
 	grailsVersion = '2.0.4'
 	pluginVersion = version
@@ -42,6 +43,7 @@ v23 {
 	projectDir = projectDirCommon
 	grailsHome = grailsHomeRoot + '/grails-' + grailsVersion
 }
+
 
 v24 {
 	grailsVersion = '2.4.2'

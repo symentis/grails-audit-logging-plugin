@@ -76,6 +76,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
   List<String> defaultIgnoreList
   List<String> defaultMaskList
   Map<String, String> replacementPatterns
+  
 
   AuditLogListener(Datastore datastore) {
     super(datastore)
@@ -184,6 +185,21 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
     return false
   }
+  
+  /**
+   * We allow users to specify static auditable = [ignoreEvents: ["onSave","onDelete","onChange"]]
+   * First check global variable auditLog.events
+   * @param domain
+   * @param event
+   */
+  boolean ignoreEvent(domain, event) {
+	List<String> ignoreEvents = Collections.EMPTY_LIST
+	Map auditableMap = getAuditableMap(domain)
+	if (auditableMap?.containsKey('ignoreEvents')) {
+		ignoreEvents =  auditableMap['ignoreEvents'] 
+	}
+	return ignoreEvents.contains(event)
+  }
 
   /**
    * The default ignore field list is: ['version','lastUpdated'] if you want
@@ -268,6 +284,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     try {
       def entity = getDomainClass(domain)
 	  
+	  if(ignoreEvent(domain, "onDelete")) {
+		  return
+	  }
+	  
 	  def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
         if (nonVerboseDelete) {
@@ -302,6 +322,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     def domain = event.entityObject
     try {
       def entity = getDomainClass(domain)
+	  
+	  if(ignoreEvent(domain, "onSave")) {
+		  return
+	  }
 	  
 	  def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
@@ -341,6 +365,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     def domain = event.entityObject
     try {
       def entity = getDomainClass(domain)
+	  
+	  if(ignoreEvent(domain, "onChange")) {
+		  return
+	  }
 	  
       // Get all the dirty properties
       Set<String> dirtyProperties = getDirtyPropertyNames(domain, entity)
