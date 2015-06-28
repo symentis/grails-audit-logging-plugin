@@ -9,6 +9,7 @@ env:
 branches:
   only:
     - master
+    - 1.x_maintenance
 
 before_install:
 - rm -rf ~/.gvm
