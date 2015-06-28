@@ -73,10 +73,12 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  *               GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent
  *               GPAUDITLOGGING-74 Impossible to log values of zero or false
  *               GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities
+ *               static auditable = [ignoreEvents:["onChange","onSave"]]
+ * Release 1.0.5 Support for ignoring certain Events (#92)
  *
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.5-SNAPSHOT"
+    def version = "1.0.5"
     def grailsVersion = '2.0 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
