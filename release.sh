@@ -5,7 +5,7 @@ rm -rf grails-audit-logging-plugin/target/release
 mkdir -p grails-audit-logging-plugin/target/release
 cd grails-audit-logging-plugin/target/release
 git clone https://github.com/robertoschwald/grails-audit-logging-plugin.git
-cd grails-audit-logging-plugin/grails-audit-logging-plugin
+cd grails-audit-logging-plugin
 
 # switch BRANCH
 if [ "$1" != "" ]; then
@@ -18,7 +18,10 @@ if [ "$1" != "" ]; then
 else 
     echo "Building 1.x_maintenance release"
     git checkout 1.x_maintenance
+    cd grails-audit-logging-plugin
 fi
+
+pwd
 
 # BUILD
 grails clean
