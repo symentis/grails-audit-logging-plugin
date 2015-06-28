@@ -10,6 +10,9 @@ if [ "$1" != "" ]; then
         echo "Switching to branch $1 failed. Aborting"
         exit 1
     fi
+else 
+    echo "Building 1.x_maintenance release"
+    git checkout 1.x_maintenance
 fi
 cd grails-audit-logging-plugin/grails-audit-logging-plugin
 grails clean
