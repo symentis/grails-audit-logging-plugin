@@ -1,10 +1,6 @@
 h4. Configuration
 
-The plugin configuration can be specified in the @Config.groovy@ file. It supports @environments@ blocks for environment-specific configuration.
-
-There are a few configuration options for the plugin; these are specified in @Config.groovy@.
-
-
+The plugin configuration can be specified in the @application.groovy@ (Grails 3.x) / @Config.groovy@ (Grails 2.x) file. It supports @environments@ blocks for environment-specific configuration.
 
 h3. Auditing Current User Information
 
@@ -282,6 +278,11 @@ Since version 1.0.4 it is possible to set the datasource name to use for the aud
 {code}
 useDatasource = 'second' // use "second" datasource defined in DataSource.groovy
 {code}
+
+h3. Ignoring certain events (since 1.0.5 / 2.0.0-SNAPSHOT)
+
+Since version 1.0.5, it is possible to ignore certain events on a per-domain base.
+static auditable = [ignoreEvents:["onChange","onSave"]]
 
 h3. Example configuration
 

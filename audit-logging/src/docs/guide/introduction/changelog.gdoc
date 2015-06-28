@@ -6,6 +6,11 @@ Grails 3 support.
 Current branch: master.
 For 1.0.x version, see 1.x_maintenance branch
 
+h3. 1.0.5
+Migration of JIRA to GitHub Issues
+Fix #92 (Support for ignoring certain Events)
+Starting with this release, the main branch for the 1.0.x series is 1.x_maintenance. Master branch is for Grails 3.0 support, now. Both branches will be tested by Travis-CI.
+
 h3. 1.0.4
 
 GPAUDITLOGGING-69 allow to set uri per domain object
