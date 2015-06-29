@@ -59,7 +59,7 @@ dependencies {
     compile "org.grails:grails-web-boot"
 
     compile "org.grails.plugins:hibernate"
-    compile "org.grails.plugins:cache"
+    // compile "org.grails.plugins:cache"
     compile "org.hibernate:hibernate-ehcache"
 
     runtime "org.grails.plugins:asset-pipeline"
