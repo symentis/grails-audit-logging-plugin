@@ -89,10 +89,10 @@ but do not work well for ''Audit Logging'' where we would need critical informat
 available after these actions complete. We've chosen to prefix the handler names with "on" so that they do not conflict
 with other handler names in other existing plugins.<p class="paragraph"/><h3>Compatibility issues</h3>
 <ul class="star">
-<li>For Grails &#60;= 1.2.0 use version 0.5.3 of this plugin.</li>
-<li>For Grails &#62;= 1.3.0 use version 0.5.5.3 of this plugin.</li>
-<li>For Grails &#62;= 2.3.0 use version 1.0.0 or above.</li>
-<li>For Grails &#62;= 3.0.0 use version 2.0.0 or above.</li>
+<li>For Grails 3.x use version 2.0.0 or above.</li>
+<li>For Grails 2.x use version 1.0.0 or above.</li>
+<li>For Grails 1.3.x use version 0.5.5.3.</li>
+<li>For Grails &#60;= 1.2.0 use version 0.5.3.</li>
 </ul><p class="paragraph"/><h3>ORM implementation dependency</h3><p class="paragraph"/>Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use it with the ORM mapper of your choice
 (Hibernate3, Hibernate4, MongoDB, etc.).<p class="paragraph"/>Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
 please file a GitHub issue.
@@ -101,7 +101,10 @@ please file a GitHub issue.
 <h2 id="changelog">1.1 Changelog</h2>
 <p class="paragraph"/><h3>2.0.0-SNAPSHOT</h3><p class="paragraph"/>Grails 3 support.
 Current branch: master.
-For 1.0.x version, see 1.x_maintenance branch<p class="paragraph"/><h3>1.0.4</h3><p class="paragraph"/>GPAUDITLOGGING-69 allow to set uri per domain object
+For 1.0.x version, see 1.x_maintenance branch<p class="paragraph"/><h3>1.0.5</h3>
+Migration of JIRA to GitHub Issues
+Fix #92 (Support for ignoring certain Events)
+Starting with this release, the main branch for the 1.0.x series is 1.x_maintenance. Master branch is for Grails 3.0 support, now. Both branches will be tested by Travis-CI.<p class="paragraph"/><h3>1.0.4</h3><p class="paragraph"/>GPAUDITLOGGING-69 allow to set uri per domain object
 GPAUDITLOGGING-62 Add identifier in handler map
 GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
 GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent
@@ -172,7 +175,7 @@ You can use the grails-audit-logging plugin in several ways.<p class="paragraph"
 
 
 <h2 id="configuration">2.1 Configuration</h2>
-<h4>Configuration</h4><p class="paragraph"/>The plugin configuration can be specified in the <code>Config.groovy</code> file. It supports <code>environments</code> blocks for environment-specific configuration.<p class="paragraph"/>There are a few configuration options for the plugin; these are specified in <code>Config.groovy</code>.<p class="paragraph"/><p class="paragraph"/><h3>Auditing Current User Information</h3><p class="paragraph"/>With version &#62;= 0.5, additional configuration can be specified in the Config.groovy file of the project to help log the authenticated user for various security systems. For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor name (the person performing the action which triggered the event, e.g. the username) add these lines to Config.groovy:
+<h4>Configuration</h4><p class="paragraph"/>The plugin configuration can be specified in the <code>application.groovy</code> (Grails 3.x) / <code>Config.groovy</code> (Grails 2.x) file. It supports <code>environments</code> blocks for environment-specific configuration.<p class="paragraph"/><h3>Auditing Current User Information</h3><p class="paragraph"/>With version &#62;= 0.5, additional configuration can be specified in the Config.groovy file of the project to help log the authenticated user for various security systems. For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor name (the person performing the action which triggered the event, e.g. the username) add these lines to Config.groovy:
 <div class="code"><pre>auditLog &#123;
   actorClosure = &#123; request, session &#45;&#62;
       session.user?.username
@@ -243,7 +246,8 @@ When you set TRUNCATE_LENGTH to a value &#62; 255 you must enable largeValueColu
 &#125;</pre></div><p class="paragraph"/>You need to take special care how you obtain the "uri" data in the getAuditLogUri closure. It is recommended to not perform costly calls.<p class="paragraph"/><h3>Domain class stamping support (since 1.0.4)</h3><p class="paragraph"/>Since version 1.0.4, it is possible to enable domain class stamping support. With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get the fields dateCreated, lastUpdated, createdBy, lastUpdatedBy using an AST transformation. You can create your own StampASTTransformation implementation for your specific needs. The createdBy and lastUpdatedBy fieldnames can be declared in Config.groovy. These fields will be filled with the result of the actor closure on the event PreInsert, PreUpdate and PreDelete. Thanks to tkvw for this feature.<p class="paragraph"/><div class="code"><pre>stampEnabled = <span class="java&#45;keyword">true</span> // enable stamping support
 stampAlways = <span class="java&#45;keyword">false</span> // always stamp domain classes, regardless of @Stamp or <span class="java&#45;keyword">static</span> stampable = <span class="java&#45;keyword">true</span> existence
 stampCreatedBy = 'createdBy' // fieldname
-stampLastUpdatedBy = 'lastUpdatedBy' // fieldname</pre></div><p class="paragraph"/><h3>Use specific datasource (since 1.0.4)</h3><p class="paragraph"/>Since version 1.0.4 it is possible to set the datasource name to use for the audit logging table.<p class="paragraph"/><div class="code"><pre>useDatasource = 'second' // use <span class="java&#45;quote">"second"</span> datasource defined in DataSource.groovy</pre></div><p class="paragraph"/><h3>Example configuration</h3><p class="paragraph"/>Example Config.groovy configuration with various settings as described above:<p class="paragraph"/><div class="code"><pre>// AuditLog Plugin config
+stampLastUpdatedBy = 'lastUpdatedBy' // fieldname</pre></div><p class="paragraph"/><h3>Use specific datasource (since 1.0.4)</h3><p class="paragraph"/>Since version 1.0.4 it is possible to set the datasource name to use for the audit logging table.<p class="paragraph"/><div class="code"><pre>useDatasource = 'second' // use <span class="java&#45;quote">"second"</span> datasource defined in DataSource.groovy</pre></div><p class="paragraph"/><h3>Ignoring certain events (since 1.0.5 / 2.0.0-SNAPSHOT)</h3><p class="paragraph"/>Since version 1.0.5, it is possible to ignore certain events on a per-domain base.
+static auditable = ignoreEvents:["onChange","onSave"]<p class="paragraph"/><h3>Example configuration</h3><p class="paragraph"/>Example Config.groovy configuration with various settings as described above:<p class="paragraph"/><div class="code"><pre>// AuditLog Plugin config
 auditLog &#123;
  verbose = <span class="java&#45;keyword">true</span> // verbosely log all changed values to db
  logIds = <span class="java&#45;keyword">true</span>  // log db&#45;ids of associated objects.
