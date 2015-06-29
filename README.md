@@ -3,7 +3,8 @@
 The Grails Audit Logging plugin adds generic event based Audit Logging to a Grails project and also adds support to domain models for hooking into the GORM events system.
 
 ##**Documentation**##
-For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
+ * For Grails 3.x documentation, see [Grails 3.0.0-SNAPSHOT Documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/snapshot/)
+ * For Grails 2.x documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ##**Supported Grails versions**##
  * Grails 3.x (master branch)
