@@ -21,3 +21,4 @@ grails-audit-logging-plugin/web-app
 
 /atlassian-ide-plugin.xml
 audit-logging/classes
+classes
