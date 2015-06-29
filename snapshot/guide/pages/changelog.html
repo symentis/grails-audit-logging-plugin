@@ -79,45 +79,96 @@ function addJsClass() {
                 
 <a name="1.1 Change log"><!-- Legacy link --></a>
 <h2 id="changelog">1.1 Changelog</h2>
-<p class="paragraph"/><h3>2.0.0-SNAPSHOT</h3><p class="paragraph"/>Grails 3 support.
-Current branch: master.
-For 1.0.x version, see 1.x_maintenance branch<p class="paragraph"/><h3>1.0.5</h3>
-Migration of JIRA to GitHub Issues
-Fix #92 (Support for ignoring certain Events)
-Starting with this release, the main branch for the 1.0.x series is 1.x_maintenance. Master branch is for Grails 3.0 support, now. Both branches will be tested by Travis-CI.<p class="paragraph"/><h3>1.0.4</h3><p class="paragraph"/>GPAUDITLOGGING-69 allow to set uri per domain object
-GPAUDITLOGGING-62 Add identifier in handler map
-GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
-GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent
-GPAUDITLOGGING-74 Impossible to log values of zero or false
-GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities<p class="paragraph"/><h3>1.0.3</h3><p class="paragraph"/>GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource
-GPAUDITLOGGING-63 logFullClassName property<p class="paragraph"/><h3>1.0.2</h3><p class="paragraph"/>GPAUDITLOGGING-66<p class="paragraph"/>
-<h3>1.0.1</h3><p class="paragraph"/>closures,
-nonVerboseDelete property
-provide domain identifier to onSave() handler<p class="paragraph"/><h3>1.0.0</h3><p class="paragraph"/>Grails &#62;= 2.0
-ORM agnostic implementation
-major cleanup and new features<p class="paragraph"/>
-<h3>0.5.5.3</h3><p class="paragraph"/>Added ability to disable audit logging by config.<p class="paragraph"/>
-<h3>0.5.5.2</h3><p class="paragraph"/>Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.<p class="paragraph"/><h3>0.5.5.1</h3><p class="paragraph"/>Fixed the title. No changes in the plugin code.<p class="paragraph"/><h3> 0.5.5</h3><p class="paragraph"/>collections logging
-log ids
-replacement patterns
-property value masking
-large fields support
-fixes and enhancements<p class="paragraph"/><h3> 0.5.4</h3><p class="paragraph"/>compatibility issues with Grails 1.3.x<p class="paragraph"/>
-<h3> 0.5.3</h3><p class="paragraph"/>GRAILSPLUGINS-2135
-GRAILSPLUGINS-2060
-an issue with extra JAR files that are somehow getting released as part of the plugin<p class="paragraph"/>
-<h3>0.5.2</h3><p class="paragraph"/>GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354<p class="paragraph"/><h3>0.5.1</h3><p class="paragraph"/>fixes regression in field logging<p class="paragraph"/><h3>0.5</h3><p class="paragraph"/>GRAILSPLUGINS-391
-GRAILSPLUGINS-1496
-GRAILSPLUGINS-1181
-GRAILSPLUGINS-1515
-GRAILSPLUGINS-1811
-changes to AuditLogEvent domain object uses composite id to simplify logging
-changes to AuditLogListener uses new domain model with separate transaction
-for logging action to avoid invalidating the main hibernate session.<p class="paragraph"/><h3>0.4.1</h3><p class="paragraph"/>repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181<p class="paragraph"/><h3>0.4</h3><p class="paragraph"/>custom serializable implementation for AuditLogEvent so events can happen inside a webflow context.
-tweak application.properties for loading in other grails versions
-update to views to show URI in an event
-fix missing oldState bug in change event<p class="paragraph"/><h3>0.3</h3><p class="paragraph"/>actorKey and username features allow for the logging of user or userPrincipal for most security systems.
-Fix #31 disable hotkeys for layout.
+<p class="paragraph"/><h3>2.0.0-SNAPSHOT</h3>
+<ul class="star">
+<li>Grails 3 support.</li>
+<li>Current branch: master.</li>
+<li>For 1.0.x version, see 1.x_maintenance branch</li>
+</ul><p class="paragraph"/><h3>1.0.5</h3>
+<ul class="star">
+<li>Migration of JIRA to GitHub Issues</li>
+<li>Fix #92 (Support for ignoring certain Events)</li>
+<li>Starting with this release, the main branch for the 1.0.x series is 1.x_maintenance. Master branch is for Grails 3.0 support, now. Both branches will be tested by Travis-CI.</li>
+</ul><p class="paragraph"/><h3>1.0.4</h3>
+<ul class="star">
+<li>GPAUDITLOGGING-69 allow to set uri per domain object</li>
+<li>GPAUDITLOGGING-62 Add identifier in handler map</li>
+<li>GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent</li>
+<li>GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent</li>
+<li>GPAUDITLOGGING-74 Impossible to log values of zero or false</li>
+<li>GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities</li>
+</ul><p class="paragraph"/><h3>1.0.3</h3>
+<ul class="star">
+<li>GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource</li>
+<li>GPAUDITLOGGING-63 logFullClassName property</li>
+</ul><p class="paragraph"/><h3>1.0.2</h3>
+<ul class="star">
+<li>GPAUDITLOGGING-66</li>
+</ul><p class="paragraph"/><h3>1.0.1</h3>
+<ul class="star">
+<li>closures</li>
+<li>nonVerboseDelete property</li>
+<li>provide domain identifier to onSave() handler</li>
+</ul><p class="paragraph"/><h3>1.0.0</h3>
+<ul class="star">
+<li>Grails &#62;= 2.0</li>
+<li>ORM agnostic implementation</li>
+<li>major cleanup and new features</li>
+</ul><p class="paragraph"/><h3>0.5.5.3</h3>
+<ul class="star">
+<li>Added ability to disable audit logging by config.</li>
+</ul><p class="paragraph"/><h3>0.5.5.2</h3>
+<ul class="star">
+<li>Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.</li>
+</ul><p class="paragraph"/><h3>0.5.5.1</h3>
+<ul class="star">
+<li>Fixed the title. No changes in the plugin code.</li>
+</ul><p class="paragraph"/><h3> 0.5.5</h3>
+<ul class="star">
+<li>collections logging</li>
+<li>log ids</li>
+<li>replacement patterns</li>
+<li>property value masking</li>
+<li>large fields support</li>
+<li>fixes and enhancements</li>
+</ul><p class="paragraph"/><h3> 0.5.4</h3>
+<ul class="star">
+<li>compatibility issues with Grails 1.3.x</li>
+</ul><p class="paragraph"/><h3> 0.5.3</h3>
+<ul class="star">
+<li>GRAILSPLUGINS-2135</li>
+<li>GRAILSPLUGINS-2060</li>
+<li>an issue with extra JAR files that are somehow getting released as part of the plugin</li>
+</ul><p class="paragraph"/><h3>0.5.2</h3>
+<ul class="star">
+<li>GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354</li>
+</ul><p class="paragraph"/><h3>0.5.1</h3>
+<ul class="star">
+<li>fixes regression in field logging</li>
+</ul><p class="paragraph"/><h3>0.5</h3>
+<ul class="star">
+<li>GRAILSPLUGINS-391</li>
+<li>GRAILSPLUGINS-1496</li>
+<li>GRAILSPLUGINS-1181</li>
+<li>GRAILSPLUGINS-1515</li>
+<li>GRAILSPLUGINS-1811</li>
+<li>changes to AuditLogEvent domain object uses composite id to simplify logging</li>
+<li>changes to AuditLogListener uses new domain model with separate transaction</li>
+<li>for logging action to avoid invalidating the main hibernate session.</li>
+</ul><p class="paragraph"/><h3>0.4.1</h3>
+<ul class="star">
+<li>repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181</li>
+</ul><p class="paragraph"/><h3>0.4</h3>
+<ul class="star">
+<li>custom serializable implementation for AuditLogEvent so events can happen inside a webflow context.</li>
+<li>tweak application.properties for loading in other grails versions</li>
+<li>update to views to show URI in an event</li>
+<li>fix missing oldState bug in change event</li>
+</ul><p class="paragraph"/><h3>0.3</h3>
+<ul class="star">
+<li>actorKey and username features allow for the logging of user or userPrincipal for most security systems.</li>
+<li>Fix #31 disable hotkeys for layout.</li>
+</ul><p class="paragraph"/>
 
 
                 <div style="clear:both;margin-top:15px;"></div>
