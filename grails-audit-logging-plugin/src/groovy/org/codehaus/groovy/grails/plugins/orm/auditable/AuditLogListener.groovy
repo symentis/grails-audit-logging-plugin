@@ -388,6 +388,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         // Allow user to override whether you do auditing for them
         if (!callHandlersOnly(domain)) {
           logChanges(domain, newMap, oldMap, getEntityId(domain), getEventName(event), getClassName(entity))
+        } else {
+          def identifier = entity.identifier.name
+          if (!(oldMap.containsKey(identifier) || newMap.containsKey(identifier)) && domain."$identifier") {
+            [oldMap, newMap]*.leftShift([(identifier): domain."$identifier"])
+          }
         }
 
         executeHandler(domain, 'onChange', oldMap, newMap)
