@@ -20,6 +20,7 @@
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
+import org.grails.datastore.mapping.core.Datastore
 
 /**
  * @author Robert Oschwald
@@ -75,11 +76,15 @@ import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
  *               GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities
  *               static auditable = [ignoreEvents:["onChange","onSave"]]
  * Release 1.0.5 Support for ignoring certain Events (#92)
- *
+ * Release 1.0.6 Compile fails with mongoDB plugin (#91)
+ *               Use MongoDB as datasource in a multiple-datasource configuration (#93)
+ *               Removed grails-hibernate EventTriggeringInterceptor dependency from Plugin descriptor to be ORM agnostic.
+ *               Minimum Grails version raised to 2.1 due to Datastore limitations in applicationContext
+ *               Make identifiers available in the maps during onChange event (PR #96)
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.5"
-    def grailsVersion = '2.0 > *'
+    def version = "1.0.6-SNAPSHOT"
+    def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
     def description = """ Automatically log change events for domain objects.
@@ -103,9 +108,13 @@ When called, the event handlers have access to oldObj and newObj definitions tha
 
     // Register generic GORM listener
     def doWithApplicationContext = { applicationContext ->
-        application.mainContext.eventTriggeringInterceptor.datastores.each { key, datastore ->
+        // due to next line, Grails 2.0 is not supported anymore.
+        // We need to obtain all datastores in ORM agnostic way, but in Grails 2.0.x, the DataStore is not obtainable from ctx.
+        applicationContext.getBeansOfType(Datastore).values().each { Datastore datastore ->
             // Don't register the listener if we are disabled
+            log.debug("Registering AuditLogListeners to datastores")
             if (!application.config.auditLog.disabled && !datastore.config.auditLog.disabled) {
+                log.debug("Registering AuditLogListeners to datastore $datastore")
                 def listener = new AuditLogListener(datastore)
                 listener.with {
                     grailsApplication = application
