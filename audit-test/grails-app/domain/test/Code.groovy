@@ -13,8 +13,8 @@ class Code implements Serializable {
         id composite: ['tag', 'code']
     }
 
-    Map handlersMap = [:]
-    static transients = ['handlersMap']
+    Map handlersMap = [:], handlersOldMap = [:]
+    static transients = ['handlersMap', 'handlersOldMap']
 
     static auditable = [handlersOnly : true]
 
@@ -23,5 +23,13 @@ class Code implements Serializable {
         assert !newMap.containsKey(id)
 
         this.handlersMap = newMap
+    }
+
+    def onChange = { Map oldMap, Map newMap ->
+        assert oldMap && newMap
+        assert !oldMap.id && !newMap.id
+
+        this.handlersMap = newMap
+        this.handlersOldMap = oldMap
     }
 }
