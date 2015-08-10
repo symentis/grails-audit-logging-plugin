@@ -84,7 +84,7 @@ class AuditLogEvent implements Serializable {
           def map = Holders.config.auditLog.idMapping
           id generator:map.generator, type:map.type, length:map.length
         } else {
-          id generator:'increment', type:'long' // default
+          id generator:'native', type:'long' // default
         }
 
         autoImport false

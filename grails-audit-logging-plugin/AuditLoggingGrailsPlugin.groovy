@@ -81,6 +81,7 @@ import org.grails.datastore.mapping.core.Datastore
  *               Removed grails-hibernate EventTriggeringInterceptor dependency from Plugin descriptor to be ORM agnostic.
  *               Minimum Grails version raised to 2.1 due to Datastore limitations in applicationContext
  *               Make identifiers available in the maps during onChange event (PR #96)
+ *               Id generation default for AuditLogEvent should align with GORM default (#100)
  */
 class AuditLoggingGrailsPlugin {
     def version = "1.0.6-SNAPSHOT"
