@@ -77,11 +77,13 @@ import org.grails.datastore.mapping.core.Datastore
  *               static auditable = [ignoreEvents:["onChange","onSave"]]
  * Release 1.0.5 Support for ignoring certain Events (#92)
  * Release 1.0.6 Compile fails with mongoDB plugin (#91)
- *               Use MongoDB as datasource in a multiple-datasource configuration (#93)
  *               Removed grails-hibernate EventTriggeringInterceptor dependency from Plugin descriptor to be ORM agnostic.
  *               Minimum Grails version raised to 2.1 due to Datastore limitations in applicationContext
- *               Make identifiers available in the maps during onChange event (PR #96)
- *               Id generation default for AuditLogEvent should align with GORM default (#100)
+ *               fix #93 Use MongoDB as datasource in a multiple-datasource configuration
+ *               merge PR #96 Make identifiers available in the maps during onChange event
+ *               fix #99 Plugin not working with MongoDB as Only Database
+ *               fix #100 Id generation default for AuditLogEvent should align with GORM default
+ *               Changed issue management url to GH.
  */
 class AuditLoggingGrailsPlugin {
     def version = "1.0.6-SNAPSHOT"
@@ -102,7 +104,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         [ name: 'Elmar Kretzer', email: 'elkr@symentis.com' ],
         [ name: 'Aaron Long', email: 'longwa@gmail.com' ]
     ]
-    def issueManagement = [system: 'JIRA', url: 'http://jira.grails.org/browse/GPAUDITLOGGING']
+    def issueManagement = [system: 'GitHub', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
     def dependsOn = [:]
     def loadAfter = ['core', 'dataSource']
