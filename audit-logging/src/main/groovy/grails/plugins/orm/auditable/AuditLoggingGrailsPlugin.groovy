@@ -95,8 +95,10 @@ When called, the event handlers have access to oldObj and newObj definitions tha
 
 
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
+            // Note: Some datastores do not hold config property (e.g. mongodb)
+            boolean dataStoreDisabled = datastore.hasProperty("config") ? datastore.config.auditLog.disabled : false
             // Don't register the listener if we are disabled
-            if (!disabled && !datastore.config.auditLog.disabled) {
+            if (!disabled && !dataStoreDisabled) {
                 def listener = new AuditLogListener(datastore)
                 listener.grailsApplication = application
                 listener.stampEnabled = stampEnabled
