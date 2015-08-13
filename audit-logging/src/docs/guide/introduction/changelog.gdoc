@@ -41,6 +41,9 @@ h3. 1.0.0
 * Grails >= 2.0
 * ORM agnostic implementation
 * major cleanup and new features
+* fix #99 Plugin not working with MongoDB as Only Database
+* Changed issue management url to GH.
+* #13 Externalize AuditTrailEvent domain to user
 
 
 h3. 0.5.5.3
