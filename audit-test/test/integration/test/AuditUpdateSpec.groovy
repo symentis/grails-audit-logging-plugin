@@ -18,8 +18,9 @@
 */
 package test
 
+import static org.codehaus.groovy.grails.plugins.orm.auditable.ReflectionUtils.getAuditClass
+
 import grails.test.spock.IntegrationSpec
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 
 class AuditUpdateSpec extends IntegrationSpec {
     void setup() {
@@ -37,8 +38,8 @@ class AuditUpdateSpec extends IntegrationSpec {
         heliport.save(flush: true, failOnError: true)
 
         // Remove all logging of the inserts, we are focused on updates here
-        AuditLogEvent.where { id != null }.deleteAll()
-        assert AuditLogEvent.count() == 0
+        auditClass.where { id != null }.deleteAll()
+        assert auditClass.count() == 0
 
         author.handlerCalled = ""
     }
@@ -52,7 +53,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -68,7 +69,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'famous' }
@@ -86,7 +87,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         heliport.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Heliport')
+        def events = auditClass.findAllByClassName('test.Heliport')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'name' }
@@ -102,7 +103,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -120,7 +121,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'publisher' }
@@ -140,7 +141,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -159,7 +160,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         publisher.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Publisher')
+        def events = auditClass.findAllByClassName('test.Publisher')
         events.size() == 0
     }
 
@@ -173,7 +174,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         publisher.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditLogEvent.findAllByClassName('test.Publisher')
+        def events = auditClass.findAllByClassName('test.Publisher')
         events.size() == 1
 
         def first = events.first()
@@ -193,7 +194,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 0
     }
 
@@ -206,7 +207,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then: "verbose audit logging is created"
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 1
 
         and:
@@ -223,7 +224,7 @@ class AuditUpdateSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+        def events = auditClass.findAllByClassName('test.Author')
         events.size() == 0
 
         and:
