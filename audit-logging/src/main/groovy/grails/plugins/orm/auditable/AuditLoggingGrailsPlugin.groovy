@@ -66,7 +66,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         [ name: 'Elmar Kretzer', email: 'elkr@symentis.com' ],
         [ name: 'Aaron Long', email: 'longwa@gmail.com' ]
     ]
-    def issueManagement = [system: 'github', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
+    def issueManagement = [system: 'GitHub', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
 
     def dependsOn = [:]
