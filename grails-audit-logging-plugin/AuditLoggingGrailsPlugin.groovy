@@ -114,7 +114,9 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         applicationContext.getBeansOfType(Datastore).values().each { Datastore datastore ->
             // Don't register the listener if we are disabled
             log.debug("Registering AuditLogListeners to datastores")
-            if (!application.config.auditLog.disabled && !datastore.config.auditLog.disabled) {
+            // Note: Some datastores do not hold config property (e.g. mongodb)
+            boolean dataStoreDisabled = datastore.hasProperty("config") ? datastore.config.auditLog.disabled : false
+            if (!application.config.auditLog.disabled && !dataStoreDisabled) {
                 log.debug("Registering AuditLogListeners to datastore $datastore")
                 def listener = new AuditLogListener(datastore)
                 listener.with {
