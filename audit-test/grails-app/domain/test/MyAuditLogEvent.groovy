@@ -28,6 +28,7 @@ class MyAuditLogEvent implements Serializable {
 
     static auditable = false
 
+    String id // globally use UUID. See Config.groovy
     Date dateCreated
     Date lastUpdated
 
@@ -61,7 +62,7 @@ class MyAuditLogEvent implements Serializable {
     static mapping = {
         table 'audit_log'
         cache usage: 'read-only', include: 'non-lazy'
-
+        id generator:"uuid2", type:"string", length:36
         // no HQL package name import
         autoImport false
         version false

@@ -18,8 +18,6 @@
 */
 package test
 
-import static org.codehaus.groovy.grails.plugins.orm.auditable.ReflectionUtils.getAuditClass
-
 import grails.test.spock.IntegrationSpec
 
 class AuditUpdateCollectionSpec extends IntegrationSpec {
@@ -33,8 +31,8 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         // Remove all logging of the inserts, we are focused on updates here
-        auditClass.where { id != null }.deleteAll()
-        assert auditClass.count() == 0
+        MyAuditLogEvent.where { id != null }.deleteAll()
+        assert MyAuditLogEvent.count() == 0
 
         author.handlerCalled = ""
     }
@@ -49,11 +47,11 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then: "the author didn't change"
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == 0
 
         and: "the book did"
-        def bookEvents = auditClass.findAllByClassName('test.Book')
+        def bookEvents = MyAuditLogEvent.findAllByClassName('test.Book')
         bookEvents.size() == 1
     }
 
@@ -68,7 +66,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         then:
         author.books.size() == 2
 
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         and: "the new value lists the values using the entityId override to show title"
@@ -94,7 +92,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         then: "another book"
         author.books.size() == 4
 
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         and: "the new value lists the values using the entityId override to show title"
@@ -108,7 +106,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         e.newValue.contains('[id:Something]')
 
         and: "the book inserted is logged too"
-        def bookEvents = auditClass.findAllByClassName('test.Book')
+        def bookEvents = MyAuditLogEvent.findAllByClassName('test.Book')
         bookEvents.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
         bookEvents.first().eventName == 'INSERT'
     }
@@ -124,7 +122,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         then:
         author.books.size() == 0
 
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         def e = events.first()
@@ -134,7 +132,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         e.newValue == null
 
         and: "no delete orphan so books are NOT changed"
-        def bookEvents = auditClass.findAllByClassName('test.Book')
+        def bookEvents = MyAuditLogEvent.findAllByClassName('test.Book')
         bookEvents.size() == 0
     }
 
@@ -147,7 +145,7 @@ class AuditUpdateCollectionSpec extends IntegrationSpec {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == 1
 
         def e = events.first()

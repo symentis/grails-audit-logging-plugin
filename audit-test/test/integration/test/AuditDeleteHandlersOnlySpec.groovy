@@ -18,8 +18,6 @@
 */
 package test
 
-import static org.codehaus.groovy.grails.plugins.orm.auditable.ReflectionUtils.getAuditClass
-
 import grails.test.spock.IntegrationSpec
 
 /**
@@ -41,8 +39,8 @@ class AuditDeleteHandlersOnlySpec extends IntegrationSpec {
         codes*.save(flush: true)
 
         // Remove all logging of the inserts, we are focused on deletes here
-        auditClass.where { id != null }.deleteAll()
-        assert auditClass.count() == 0
+        MyAuditLogEvent.where { id != null }.deleteAll()
+        assert MyAuditLogEvent.count() == 0
 
     }
 

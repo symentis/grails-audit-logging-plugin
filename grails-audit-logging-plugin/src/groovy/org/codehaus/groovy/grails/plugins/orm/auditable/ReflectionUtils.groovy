@@ -16,8 +16,6 @@ package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
  * Helper methods in Groovy.
@@ -26,7 +24,8 @@ import org.slf4j.LoggerFactory
  */
 class ReflectionUtils {
 
-	private static final Logger log = LoggerFactory.getLogger(this)
+	// Configured Entity class
+	private static Class<?> AuditLogEventClazz
 
 	// set at startup
 	static GrailsApplication application
@@ -71,11 +70,17 @@ class ReflectionUtils {
 
 	static void setAuditConfig(ConfigObject c) { getApplication().config.auditLog = c }
 
-	static String getGrailsServerURL() {
-        getApplication().config.grails.serverURL ? application.config?.grails?.serverURL?.toString() : null
-	}
-
 	static Class<?> getAuditClass() {
-		Class.forName((String)auditConfig."${AuditLoggingUtils.AUDIT_CONFIG_DOMAIN_CLASS_NAME}")
+		String domainClassName = (String)getAuditConfig()."${AuditLoggingUtils.AUDIT_CONFIG_DOMAIN_CLASS_NAME}"
+		if (domainClassName == null) {
+			throw new IllegalArgumentException("You must configure auditLog.${AuditLoggingUtils.AUDIT_CONFIG_DOMAIN_CLASS_NAME}. Have you performed grails audit-quickstart?")
+		}
+		if (domainClassName && !AuditLogEventClazz) {
+			AuditLogEventClazz = Holders.grailsApplication.getDomainClass(domainClassName)?.clazz
+		}
+		if (!AuditLogEventClazz) {
+			throw new IllegalStateException("Can't find configured AuditLog domain: $domainClassName")
+		}
+		AuditLogEventClazz
 	}
 }

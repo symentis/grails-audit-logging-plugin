@@ -18,8 +18,6 @@
 */
 package test
 
-import static org.codehaus.groovy.grails.plugins.orm.auditable.ReflectionUtils.getAuditClass
-
 import grails.test.spock.IntegrationSpec
 
 class AuditDeleteSpec extends IntegrationSpec {
@@ -35,8 +33,8 @@ class AuditDeleteSpec extends IntegrationSpec {
         publisher.save(flush: true, failOnError: true)
 
         // Remove all logging of the inserts, we are focused on deletes here
-        auditClass.where { id != null }.deleteAll()
-        assert auditClass.count() == 0
+        MyAuditLogEvent.where { id != null }.deleteAll()
+        assert MyAuditLogEvent.count() == 0
 
         author.handlerCalled = ""
     }
@@ -50,7 +48,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.delete(flush: true, failOnError: true)
 
         then: "audit logging is created"
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         def first = events.find { it.propertyName == 'age' }
@@ -59,10 +57,10 @@ class AuditDeleteSpec extends IntegrationSpec {
         first.eventName == 'DELETE'
 
         and: 'all books are deleted'
-        def b1Events = auditClass.findAllByClassNameAndPersistedObjectId('test.Book', 'Hunger Games')
+        def b1Events = MyAuditLogEvent.findAllByClassNameAndPersistedObjectId('test.Book', 'Hunger Games')
         b1Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
 
-        def b2Events = auditClass.findAllByClassNameAndPersistedObjectId('test.Book', 'Catching Fire')
+        def b2Events = MyAuditLogEvent.findAllByClassNameAndPersistedObjectId('test.Book', 'Catching Fire')
         b2Events.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
     }
 
@@ -78,7 +76,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         !Publisher.get(publisher.id)
 
         and:
-        def events = auditClass.findAllByClassName('test.Publisher')
+        def events = MyAuditLogEvent.findAllByClassName('test.Publisher')
         events.size() == resultCount
 
         where: "publisher active flag determines logging"
@@ -94,7 +92,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.delete(flush: true, failOnError: true)
 
         then: "verbose audit logging is created"
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
 
         and:
@@ -110,7 +108,7 @@ class AuditDeleteSpec extends IntegrationSpec {
         author.delete(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = auditClass.findAllByClassName('test.Author')
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
         events.size() == 0
 
         and:
@@ -127,7 +125,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 			resolution.save(flush: true, failOnError: true)			
 		then: "delete resolution"
 			resolution.delete(flush: true, failOnError: true)
-			def events = auditClass.findAllByClassName('test.Resolution')
+			def events = MyAuditLogEvent.findAllByClassName('test.Resolution')
 			events.size() == 1
 		and:
 			events.get(0).eventName == "DELETE"
