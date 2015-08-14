@@ -28,7 +28,7 @@ class MyAuditLogEvent implements Serializable {
 
     static auditable = false
 
-    String id // globally use UUID. See Config.groovy
+    String id // UUID. See mapping
     Date dateCreated
     Date lastUpdated
 
