@@ -79,12 +79,13 @@ class AuditLogEvent implements Serializable {
           datasource "$Holders.config.auditLog.useDatasource"
         }
 
-        // GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
+        // GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent 
+        // enhanced with #101
         if (Holders.config.auditLog.idMapping) {
-          def map = Holders.config.auditLog.idMapping
-          id generator:map.generator, type:map.type, length:map.length
+            def idMappingMapCopy = [:] << Holders.config.auditLog.idMapping
+            id (idMappingMapCopy)
         } else {
-          id generator:'native', type:'long' // default
+            id generator: 'native', type: 'long' // default
         }
 
         autoImport false
