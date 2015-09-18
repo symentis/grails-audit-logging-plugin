@@ -163,7 +163,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         if (!dc) {
             throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")
         }
-        Class AuditLogEventClazz = dc.clazz
-        AuditLogEventClazz.constraints.oldValue?.maxSize ?: 255
+        Class AuditLogEvent = dc.clazz
+        AuditLogEvent.constraints.oldValue?.maxSize ?: 255
     }
 }
