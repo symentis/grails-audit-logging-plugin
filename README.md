@@ -19,5 +19,5 @@ Before placing a pull request, please create an issue in Jira and state the issu
 
 
 ##**Continuous Integration Server**##
-[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
+[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg?branch=1.x_maintenance)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin?branch=1.x_maintenance)
 
