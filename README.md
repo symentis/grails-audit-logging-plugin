@@ -9,7 +9,7 @@ For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-loggi
 
 See [GitHub Issues](https://github.com/robertoschwald/grails-audit-logging-plugin/issues "Issues")
 
-(old) See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA") (Will be migrated to GH, soon)
+(old) See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA") (All tickets migrated to GH)
 
 ##**Pull Requests**##
 Pull requests are highly appreciated and welcome!
