@@ -86,7 +86,7 @@ import org.grails.datastore.mapping.core.Datastore
  *               Changed issue management url to GH.
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.6-SNAPSHOT"
+    def version = "1.0.6"
     def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
