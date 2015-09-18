@@ -149,6 +149,7 @@ private void configureApp() {
     defaultActor = 'SYS'
     useDatasource = 'second' // store in "second" datasource
     idMapping = [generator:"uuid2", type:"string", length:36] // UUID id-type for AuditLogEvent
+    auditDomainClassName = 'test.MyAuditLogEvent\'
   }
   '''
   if (grailsMajorVersion < 2.3f) {
@@ -223,8 +224,8 @@ private void callGrails(String grailsHome, String dir, String env, String action
   String resultproperty = 'exitCode' + System.currentTimeMillis()
   String outputproperty = 'execOutput' + System.currentTimeMillis()
 
-  println "Running 'grails $env $action ${extraArgs?.join(' ') ?: ''}'"
-  println "Dir: $dir"
+  println "Running in $dir \n    '${grailsHome}/bin/grails $env $action ${extraArgs?.join(' ') ?: ''} --stacktrace --verbose -plain-output'"
+
   ant.exec(executable: "${grailsHome}/bin/grails", dir: dir, failonerror: false,
       resultproperty: resultproperty, outputproperty: outputproperty) {
     ant.env key: 'GRAILS_HOME', value: grailsHome
@@ -233,6 +234,7 @@ private void callGrails(String grailsHome, String dir, String env, String action
     extraArgs.each { ant.arg value: it }
     ant.arg value: '--stacktrace'
     ant.arg value: '-verbose'
+    ant.arg value: '-plain-output'
   }
 
   println ant.project.getProperty(outputproperty)

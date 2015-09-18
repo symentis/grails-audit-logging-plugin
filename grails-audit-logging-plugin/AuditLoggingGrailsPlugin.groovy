@@ -158,6 +158,10 @@ When called, the event handlers have access to oldObj and newObj definitions tha
      * The default truncate length is 255 unless we are using the largeValueColumnTypes, then we allow up to the column size
      */
     private Integer determineDefaultTruncateLength(ctx) {
+        String confAuditDomainClassName = AuditLoggingUtils.auditConfig.auditDomainClassName
+        if (confAuditDomainClassName == null){
+            throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
+        }
         String auditClassName = AuditLoggingUtils.auditConfig.auditDomainClassName
         def dc = ctx.grailsApplication.getDomainClass(auditClassName)
         if (!dc) {
