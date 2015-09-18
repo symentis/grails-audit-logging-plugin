@@ -84,9 +84,16 @@ import org.grails.datastore.mapping.core.Datastore
  *               fix #99 Plugin not working with MongoDB as Only Database
  *               fix #100 Id generation default for AuditLogEvent should align with GORM default
  *               Changed issue management url to GH.
+ * Release 1.1.0 #13 Externalize AuditTrailEvent domain to user
+ *               #39 Refactor Plugin to generate AuditLogEvent Artifact
+ *               #93 Use MongoDB as datasource in a multiple-datasource configuration
+ *               #94 automatic type conversion does not work
+ *               #90 / GPAUDITLOGGING-80 Add support for enabling/disabling auto import of AuditLogEvent domain class in HQL queries
+ *               #89 / GPAUDITLOGGING-78 custom naming of id sequence generator
+ *
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.6"
+    def version = "1.1.0-SNAPSHOT"
     def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
@@ -105,7 +112,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         [ name: 'Aaron Long', email: 'longwa@gmail.com' ]
     ]
     def issueManagement = [system: 'GitHub', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
-    def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
+    def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance']
     def dependsOn = [:]
     def loadAfter = ['core', 'dataSource']
 
