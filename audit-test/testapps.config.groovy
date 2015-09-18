@@ -35,3 +35,11 @@ v24 {
 	grailsHome = grailsHomeRoot + '/grails-' + grailsVersion
 }
 
+v25 {
+	grailsVersion = '2.5.1'
+	pluginVersion = version
+	dotGrails = dotGrailsCommon
+	projectDir = projectDirCommon
+	grailsHome = grailsHomeRoot + '/grails-' + grailsVersion
+}
+
