@@ -17,9 +17,9 @@
  * under the License.
 */
 
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListener
 import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLoggingUtils
 import org.grails.datastore.mapping.core.Datastore
 
 /**
@@ -133,7 +133,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                     transactional = application.config.auditLog.transactional ?: false
                     sessionAttribute = application.config.auditLog.sessionAttribute ?: ""
                     actorKey = application.config.auditLog.actorKey ?: ""
-                    truncateLength = application.config.auditLog.truncateLength ?: determineDefaultTruncateLength()
+                    truncateLength = application.config.auditLog.truncateLength ?: determineDefaultTruncateLength(applicationContext)
                     actorKey = application.config.auditLog.actorKey ?: ""
                     actorClosure = application.config.auditLog.actorClosure ?: AuditLogListenerUtil.actorDefaultGetter
                     defaultIgnoreList = application.config.auditLog.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
@@ -150,7 +150,13 @@ When called, the event handlers have access to oldObj and newObj definitions tha
     /**
      * The default truncate length is 255 unless we are using the largeValueColumnTypes, then we allow up to the column size
      */
-    private Integer determineDefaultTruncateLength() {
+    private Integer determineDefaultTruncateLength(ctx) {
+        String auditClassName = AuditLoggingUtils.auditConfig.auditDomainClassName
+        def dc = ctx.grailsApplication.getDomainClass(auditClassName)
+        if (!dc) {
+            throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")
+        }
+        Class AuditLogEvent = dc.clazz
         AuditLogEvent.constraints.oldValue?.maxSize ?: 255
     }
 }

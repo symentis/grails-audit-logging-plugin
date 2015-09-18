@@ -16,22 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-package org.codehaus.groovy.grails.plugins.orm.auditable
-
-import grails.util.Holders
+package test
 
 /**
  * AuditLogEvents are reported to the AuditLog table.
  * This requires you to set up a table or allow
  * Grails to create a table for you.
  */
-class AuditLogEvent implements Serializable {
+class MyAuditLogEvent implements Serializable {
     private static final long serialVersionUID = 1L
-
-    Object id // id can be configured type since 1.0.4 (depending on mapping config)
 
     static auditable = false
 
+    String id // UUID. See mapping
     Date dateCreated
     Date lastUpdated
 
@@ -54,45 +51,25 @@ class AuditLogEvent implements Serializable {
         persistedObjectVersion(nullable: true)
         eventName(nullable: true)
         propertyName(nullable: true)
+        oldValue(nullable: true)
+        newValue(nullable: true)
 
-        if(Holders.config.auditLog.largeValueColumnTypes) {
-            oldValue(nullable: true, maxSize: 65534)
-            newValue(nullable: true, maxSize: 65534)
-        }
-        else {
-            oldValue(nullable: true)
-            newValue(nullable: true)
-        }
+        // for large column support as in < 1.6 plugin versions, use
+        // oldValue(nullable: true, maxSize: 65534)
+        // newValue(nullable: true, maxSize: 65534)
     }
 
     static mapping = {
-        // GPAUDITLOGGING-30
-        table Holders.config.auditLog.tablename ?: 'audit_log'
-
-        // Disable caching by setting auditLog.cacheDisabled = true in your app's Config.groovy
-        if (!Holders.config.auditLog.cacheDisabled) {
-            cache usage: 'read-only', include: 'non-lazy'
-        }
-
-        // GPAUDITLOGGING-70 configurable Datasource name to use for AuditLogEvent
-        if (Holders.config.auditLog.useDatasource){
-          datasource "$Holders.config.auditLog.useDatasource"
-        }
-
-        // GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
-        if (Holders.config.auditLog.idMapping) {
-          def map = Holders.config.auditLog.idMapping
-          id generator:map.generator, type:map.type, length:map.length
-        } else {
-          id generator:'native', type:'long' // default
-        }
-
+        table 'audit_log'
+        cache usage: 'read-only', include: 'non-lazy'
+        id generator:"uuid2", type:"string", length:36
+        // no HQL package name import
         autoImport false
         version false
     }
 
     /**
-     * A very Groovy de-serializer that maps a stored map onto the object
+     * Deserializer that maps a stored map onto the object
      * assuming that the keys match attribute properties.
      */
     private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {

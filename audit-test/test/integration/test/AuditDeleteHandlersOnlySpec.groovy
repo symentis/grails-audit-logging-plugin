@@ -39,8 +39,8 @@ class AuditDeleteHandlersOnlySpec extends IntegrationSpec {
         codes*.save(flush: true)
 
         // Remove all logging of the inserts, we are focused on deletes here
-        org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent.where { id != null }.deleteAll()
-        assert org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent.count() == 0
+        MyAuditLogEvent.where { id != null }.deleteAll()
+        assert MyAuditLogEvent.count() == 0
 
     }
 

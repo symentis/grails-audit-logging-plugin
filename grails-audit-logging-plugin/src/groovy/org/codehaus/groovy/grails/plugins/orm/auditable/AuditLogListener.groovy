@@ -19,6 +19,7 @@
 package org.codehaus.groovy.grails.plugins.orm.auditable
 
 import static org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogListenerUtil.*
+import static org.codehaus.groovy.grails.plugins.orm.auditable.ReflectionUtils.auditClass
 import groovy.util.logging.Commons
 
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -196,7 +197,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 	List<String> ignoreEvents = Collections.EMPTY_LIST
 	Map auditableMap = getAuditableMap(domain)
 	if (auditableMap?.containsKey('ignoreEvents')) {
-		ignoreEvents =  auditableMap['ignoreEvents'] 
+		ignoreEvents =  auditableMap['ignoreEvents']
 	}
 	return ignoreEvents.contains(event)
   }
@@ -510,7 +511,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       log.trace "There are new and old values to log"
       newMap.each { String key, val ->
         if (val != oldMap[key]) {
-          def audit = new AuditLogEvent(
+          def audit = auditClass.newInstance(
             actor:getActor(),
             uri:getUri(domain),
             className:className,
@@ -528,7 +529,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     if (newMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
       log.trace "there are new values and logging is verbose ... "
       newMap.each { String key, val ->
-        def audit = new AuditLogEvent(
+        def audit = auditClass.newInstance(
           actor:getActor(),
           uri:getUri(domain),
           className:className,
@@ -545,7 +546,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     if (oldMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
       log.trace "there is only an old map of values available and logging is set to verbose... "
       oldMap.each { String key, val ->
-        def audit = new AuditLogEvent(
+        def audit = auditClass.newInstance(
           actor:getActor(),
           uri:getUri(domain),
           className:className,
@@ -561,7 +562,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
     // default
     log.trace "creating a basic audit logging event object."
-    def audit = new AuditLogEvent(
+    def audit = auditClass.newInstance(
       actor:getActor(),
       uri:getUri(domain),
       className:className,
@@ -701,15 +702,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    *
    * SEE: GRAILSPLUGINS-391
    */
-  def saveAuditLog = { AuditLogEvent audit ->
+  def saveAuditLog = { audit ->
     audit.with {
       dateCreated = lastUpdated = new Date()
     }
     log.info audit
     try {
-      AuditLogEvent.withNewSession {
+      auditClass.withNewSession {
         if (transactional) {
-          AuditLogEvent.withTransaction {
+          auditClass.withTransaction {
             audit.merge(flush:true, failOnError:true)
           }
         } else {
@@ -718,13 +719,13 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       }
     }
     catch (e) {
-      log.error "Failed to create AuditLogEvent for ${audit}: ${e.message}"
+      log.error "Failed to create ${auditClass.name} for ${audit}: ${e.message}"
     }
   }
 
   /*
   Execute given Closure without verbose logging.
-  You MUST wrap your CRUD by this closure if you explicitely set flush:true and
+  You MUST wrap your CRUD by this closure if you explicitly set flush:true and
   use verbose=true (the default), otherwise you might receive Hibernate exceptions.
   */
   static withoutVerboseAuditLog = { Closure c ->
@@ -747,4 +748,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
       AuditLogListenerThreadLocal.clearAuditLogDisabled()
     }
   }
+
+  protected ConfigObject getAuditConfig() { AuditLoggingUtils.auditConfig }
+
+
+
 }

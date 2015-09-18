@@ -122,6 +122,7 @@ log4j = {
 }
 
 auditLog {
+    auditDomainClassName = 'test.MyAuditLogEvent'
     verbose = true
     defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
     logFullClassName = true
@@ -132,3 +133,4 @@ auditLog {
     useDatasource = 'second' // store in "second" datasource
     idMapping = [generator:"uuid2", type:"string", length:36] // UUID id-type for AuditLogEvent
 }
+
