@@ -9,7 +9,7 @@ For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-loggi
 
 ##**audit-quickstart (version >=1.1.0)**##
 Currently, we are impementing audit-quickstart to generate a domain artifact in the developers Grails project. 
-Therefore, you need to perform "grails audit-quickstart <package.DomainClass> after installing this plugin's version 1.1.0 and later. 
+Therefore, you need to perform "grails audit-quickstart \<package.DomainClass\>" after installing this plugin's version 1.1.0 and later. 
 
 With this, you get a AuditLog domain class in your project which is fully under your control. See issue #13.
 
