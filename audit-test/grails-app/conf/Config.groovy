@@ -121,6 +121,7 @@ log4j = {
 		// trace 'org.codehaus.groovy.grails.plugins.orm.auditable'
 }
 
+// NOTE: To test with different Grails versions, configure in PerformAuditLogTestApps.groovy
 auditLog {
     auditDomainClassName = 'test.MyAuditLogEvent'
     verbose = true

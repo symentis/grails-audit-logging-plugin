@@ -42,6 +42,7 @@ target(performAuditLogTestApps: 'Creates Audit Log Plugin test apps and runs the
     configureApp()
     installPlugins()
     createProjectFiles()
+    fixDataSource()
     performTests()
   }
   println "\n *** ALL TESTS PASSED ***"
@@ -122,6 +123,17 @@ private void installPlugins() {
   println "Calling $grailsHome dev compile"
   callGrails grailsHome, testprojectRoot, 'dev', 'compile', null, true // can fail when installing the functional-test plugin
   callGrails grailsHome, testprojectRoot, 'dev', 'compile'
+}
+
+private void fixDataSource(){
+  File dataSource = new File(testprojectRoot, 'grails-app/conf/DataSource.groovy')
+  String contents = dataSource.text
+
+  if (grailsMajorVersion > 2.4f){
+    println "**** Grails ${grailsMajorVersion}: using org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory"
+    contents = contents.replaceAll(~/.*cache.region.factory_class.*/, '   cache.region.factory_class = "org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory" //by PerformAuditLogTestApps')
+    dataSource.withWriter { it.writeLine contents }
+  }
 }
 
 private void configureApp() {
