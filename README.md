@@ -1,9 +1,32 @@
-#*Grails Audit Logging Plugin*#
+#*Grails Audit Logging Plugin 1.x*#
 
-The Audit Logging plugin can add generic event based Audit Logging to a Grails project and it can also add support to domain models for hooking into the events system.
+This is the branch for the 1.x series of this plugin, compatible with Grails < 3.x.
+
+The Grails Audit Logging plugin can add generic event based Audit Logging to a Grails project and it can also add support to domain models for hooking into the events system.
 
 ##**Documentation**##
 For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
+
+##**audit-quickstart (version >=1.1.0**##
+Use version 1.1.0-SNAPSHOT to test this new feature in your project.  Any feedback is highly appreciated.
+
+Currently, we are impementing audit-quickstart to generate a domain artifact in the developers Grails project. 
+Therefore, you need to perform "grails audit-quickstart <package.DomainClass> after installing this plugin's version 1.1.0 and later. 
+
+With this, you get a AuditLog domain class in your project which is fully under your control. See issue #13.
+
+This feature will be the default in the upcoming Grails 3.x plugin version as well.
+
+Example:
+
+```
+grails audit-quickstart org.example.myproject.AuditLogEvent
+
+```
+ 
+####**Migration from plugin versions < 1.1.0**####
+If you already use a plugin version < 1.1.0, you must change the created AuditLogEvent domain class to fit your previous settings. The generated domain class contains hint-comments what to change.
+
 
 ##**Issue Management**##
 
