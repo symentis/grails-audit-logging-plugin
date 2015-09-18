@@ -19,12 +19,15 @@
 package ${packageName}
 
 /**
- * AuditLogEvents are reported to the AuditLog table.
+ * ${auditClassName}s are reported to the AuditLog table.
  * This requires you to set up a table or allow
- * Grails to create a table for you.
+ * Grails to create a table for you. (e.g. DDL or db-migration plugin)
  */
 class ${auditClassName} implements Serializable {
     private static final long serialVersionUID = 1L
+
+    // Enable when you configured UUID(2) kind of ids in "auditLog.idMapping" in < 1.1.0 plugin version
+    // String id
 
     static auditable = false
 
@@ -50,20 +53,32 @@ class ${auditClassName} implements Serializable {
         persistedObjectVersion(nullable: true)
         eventName(nullable: true)
         propertyName(nullable: true)
+
         oldValue(nullable: true)
         newValue(nullable: true)
 
-        // for large column support as in < 1.6 plugin versions, use
+        // for large column support (as in < 1.0.6 plugin versions), use
         // oldValue(nullable: true, maxSize: 65534)
         // newValue(nullable: true, maxSize: 65534)
     }
 
     static mapping = {
+
+        // Set similiar when you used "auditLog.tablename" in < 1.1.0 plugin version.
         table 'audit_log'
+
+        // Remove when you used "auditLog.cacheDisabled = true" in < 1.1.0 plugin version.
         cache usage: 'read-only', include: 'non-lazy'
 
-        // no HQL package name import
+        // Set similiar when you used "auditLog.useDatasource" in < 1.1.0 plugin version.
+        // datasource "yourdatasource"
+
+        // Set similiar when you used "auditLog.idMapping" in < 1.1.0 plugin version. Example:
+        // id generator:"uuid2", type:"string", "length:36"
+
+        // no HQL queries package name import (was default in < 1.0.x versions as well)
         autoImport false
+
         version false
     }
 
