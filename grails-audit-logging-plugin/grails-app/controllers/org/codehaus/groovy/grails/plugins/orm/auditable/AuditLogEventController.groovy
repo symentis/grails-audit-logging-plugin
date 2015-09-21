@@ -22,6 +22,7 @@ class AuditLogEventController {
 
   // the delete, save and update actions only accept POST requests
   static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+  Class AuditLogEvent = ReflectionUtils.getAuditClass()
 
   def index() {
     redirect(action: 'list', params: params)
