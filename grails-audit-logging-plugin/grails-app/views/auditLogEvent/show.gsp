@@ -20,91 +20,84 @@
                 <table>
                     <tbody>
 
-                    
                         <tr class="prop">
-                            <td valign="top" class="name">Id:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.dateCreated.label', default: 'Date Created:')}</td>
+
+                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'dateCreated')}</td>
+
+                        </tr>
+
+
+                        <tr class="prop">
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.id.label', default: 'Id:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'id')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Actor:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.actor.label', default: 'Actor:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'actor')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Uri:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.uri.label', default: 'Uri:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'uri')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Class Name:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.className.label', default: 'Class Name:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'className')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Persisted Object Id:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.persistedObjectId.label', default: 'Persisted Object Id:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'persistedObjectId')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Persisted Object Version:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.persistedObjectVersion.label', default: 'Persisted Object Version:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'persistedObjectVersion')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Event Name:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.eventName.label', default: 'Event Name:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'eventName')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Property Name:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.propertyName.label', default: 'Property Name:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'propertyName')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Old Value:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.oldValue.label', default: 'Old Value:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'oldValue')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">New Value:</td>
+                            <td valign="top" class="name">${message(code: 'auditLogEvent.newValue.label', default: 'New Value:')}</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'newValue')}</td>
                             
                         </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Date Created:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'dateCreated')}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
-                            <td valign="top" class="name">Last Updated:</td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean:auditLogEventInstance, field:'lastUpdated')}</td>
-                            
-                        </tr>
-                    
+
                     </tbody>
                 </table>
             </div>

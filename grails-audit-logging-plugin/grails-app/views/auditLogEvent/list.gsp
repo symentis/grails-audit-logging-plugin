@@ -19,33 +19,31 @@
                 <table>
                     <thead>
                         <tr>
+                            <g:sortableColumn property="dateCreated" title="${message(code: 'auditLogEvent.dateCreated.label', default: 'Created')}" />
                         
-                   	        <g:sortableColumn property="id" title="Id" />
+                   	        <g:sortableColumn property="actor" title="${message(code: 'auditLogEvent.actor.label', default: 'Actor')}" />
+
+                   	        <g:sortableColumn property="className" title="${message(code: 'auditLogEvent.className.label', default: 'Class')}" />
+
+                            <g:sortableColumn property="uri" title="${message(code: 'auditLogEvent.eventName.label', default: 'eventName')}" />
+
+                            <g:sortableColumn property="persistedObjectId" title="${message(code: 'auditLogEvent.persistedObjextId.label', default: 'Persisted Object Id')}" />
                         
-                   	        <g:sortableColumn property="actor" title="Actor" />
-                        
-                   	        <g:sortableColumn property="uri" title="Uri" />
-                        
-                   	        <g:sortableColumn property="className" title="Class Name" />
-                        
-                   	        <g:sortableColumn property="persistedObjectId" title="Persisted Object Id" />
-                        
-                   	        <g:sortableColumn property="persistedObjectVersion" title="Persisted Object Version" />
+                   	        <g:sortableColumn property="persistedObjectVersion" title="${message(code: 'auditLogEvent.persistedObjextVersion.label', default: 'Persisted Object Version')}" />
                         
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${auditLogEventInstanceList}" status="i" var="auditLogEventInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-                            <td><g:link action="show" id="${auditLogEventInstance.id}">${fieldValue(bean:auditLogEventInstance, field:'id')}</g:link></td>
-                        
+                            <td><g:link action="show" id="${auditLogEventInstance.id}">${fieldValue(bean: auditLogEventInstance, field: "dateCreated")}</g:link></td>
+
                             <td>${fieldValue(bean:auditLogEventInstance, field:'actor')}</td>
-                        
-                            <td>${fieldValue(bean:auditLogEventInstance, field:'uri')}</td>
-                        
+
                             <td>${fieldValue(bean:auditLogEventInstance, field:'className')}</td>
-                        
+
+                            <td>${fieldValue(bean:auditLogEventInstance, field:'eventName')}</td>
+
                             <td>${fieldValue(bean:auditLogEventInstance, field:'persistedObjectId')}</td>
                         
                             <td>${fieldValue(bean:auditLogEventInstance, field:'persistedObjectVersion')}</td>
