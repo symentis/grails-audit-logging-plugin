@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 import grails.util.GrailsNameUtils
-import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLoggingUtils
+
 
 includeTargets << new File(auditLoggingPluginDir, 'scripts/_AuditCommon.groovy')
 
@@ -87,7 +87,7 @@ private void updateConfig() {
 		writer.newLine()
 		writer.newLine()
 		writer.writeLine '// Added by the Audit-Logging plugin:'
-		writer.writeLine "${AuditLoggingUtils.AUDIT_CONFIG_DOMAIN_CLASS_NAME} = '${packageName}.$auditClassName'"
+		writer.writeLine "auditLog.auditDomainClassName = '${packageName}.$auditClassName'"
 		writer.newLine()
 	}
 }
