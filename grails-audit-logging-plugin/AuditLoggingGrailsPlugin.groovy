@@ -84,9 +84,11 @@ import org.grails.datastore.mapping.core.Datastore
  *               fix #99 Plugin not working with MongoDB as Only Database
  *               fix #100 Id generation default for AuditLogEvent should align with GORM default
  *               Changed issue management url to GH.
+ * Release 1.0.7 fix #106 Enforce text type usage in largeColumValues mode
+ * 
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.0.6"
+    def version = "1.0.7"
     def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
