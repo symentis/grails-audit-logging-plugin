@@ -87,6 +87,12 @@ class AuditLogEvent implements Serializable {
           id generator:'native', type:'long' // default
         }
 
+        // GH-106, Create strange dataType when using with database migration
+        if (Holders.config.auditLog.largeValueColumnTypes) {
+          oldValue type: "text"
+          newValue type: "text"
+        }
+
         autoImport false
         version false
     }
