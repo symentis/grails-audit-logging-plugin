@@ -89,7 +89,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         boolean logIds = config.getProperty("auditLog.logIds", Boolean, false)
         String sessionAttribute = config.getProperty("auditLog.sessionAttribute", String, "")
         String actorKey = config.getProperty("auditLog.actorKey", String, "")
-        Integer truncateLength = config.getProperty("auditLog.truncateLength", Integer, determineDefaultTruncateLength() )
+        Integer truncateLength = config.getProperty("auditLog.truncateLength", Integer, determineDefaultTruncateLength(applicationContext) )
         Closure actorClosure = config.getProperty("auditLog.actorClosure", Closure, AuditLogListenerUtil.actorDefaultGetter)
         String propertyMask = config.getProperty("auditLog.propertyMask", String, "**********")
 
@@ -126,7 +126,17 @@ When called, the event handlers have access to oldObj and newObj definitions tha
     /**
      * The default truncate length is 255 unless we are using the largeValueColumnTypes, then we allow up to the column size
      */
-    private Integer determineDefaultTruncateLength() {
-        AuditLogEvent.constrainedProperties.oldValue?.maxSize ?: 255
+    private Integer determineDefaultTruncateLength(ctx) {
+        String confAuditDomainClassName = AuditLoggingUtils.auditConfig.auditDomainClassName
+        if (confAuditDomainClassName == null){
+            throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
+        }
+        String auditClassName = AuditLoggingUtils.auditConfig.auditDomainClassName
+        def dc = ctx.grailsApplication.getDomainClass(auditClassName)
+        if (!dc) {
+            throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")
+        }
+        Class AuditLogEventClazz = dc.clazz
+        AuditLogEventClazz.constraints.oldValue?.maxSize ?: 255
     }
 }

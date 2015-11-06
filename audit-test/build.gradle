@@ -16,7 +16,7 @@ plugins {
     id "io.spring.dependency-management" version "0.5.1.RELEASE"
 }
 
-version "0.1"
+version "2.0.0"
 group "audit.test"
 
 apply plugin: "spring-boot"
@@ -50,7 +50,8 @@ dependencyManagement {
 }
 
 dependencies {
-    compile project(":audit-logging")
+    compile project(":audit-logging") // "INLINE" Plugin using gradle multi-project feature.
+
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile "org.springframework.boot:spring-boot-autoconfigure"

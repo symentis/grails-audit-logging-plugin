@@ -279,7 +279,7 @@ Since version 1.0.4 it is possible to set the datasource name to use for the aud
 useDatasource = 'second' // use "second" datasource defined in DataSource.groovy
 {code}
 
-h3. Ignoring certain events (since 1.0.5 / 2.0.0-SNAPSHOT)
+h3. Ignoring certain events (since 1.0.5 / 2.0.0)
 
 Since version 1.0.5, it is possible to ignore certain events on a per-domain base.
 static auditable = [ignoreEvents:["onChange","onSave"]]
