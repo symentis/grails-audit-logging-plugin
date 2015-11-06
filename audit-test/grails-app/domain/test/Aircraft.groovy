@@ -4,8 +4,8 @@ class Aircraft {
     String type
     String description
 
-    Map handlersMap = [:]
-    static transients = ['handlersMap']
+    Map handlersMap = [:], handlersOldMap = [:]
+    static transients = ['handlersMap', 'handlersOldMap']
 
     static auditable = [handlersOnly : true]
 
@@ -28,5 +28,13 @@ class Aircraft {
         assert oldMap
 
         this.handlersMap = oldMap
+    }
+
+    def onChange = { oldMap, newMap ->
+        assert oldMap && newMap
+        assert !newMap.id && !oldMap.id
+
+        this.handlersOldMap = oldMap
+        this.handlersMap = newMap
     }
 }
