@@ -18,8 +18,6 @@ import grails.core.GrailsApplication
 import grails.util.Holders
 import groovy.util.logging.Slf4j
 import org.grails.config.PropertySourcesConfig
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.core.env.MapPropertySource
 import org.springframework.core.env.PropertySource
 
@@ -36,14 +34,14 @@ class ReflectionUtils {
 		// static only
 	}
 
-	static Object getConfigProperty(String name, config = AuditLoggingUtils.auditConfig) {
+	static Object getConfigProperty(String name, config = AuditLoggingConfigUtils.auditConfig) {
 		def value = config
 		name.split('\\.').each { String part -> value = value."$part" }
 		value
 	}
 
 	static void setConfigProperty(String name, value) {
-		def config = AuditLoggingUtils.auditConfig
+		def config = AuditLoggingConfigUtils.auditConfig
 
 		List parts = name.split('\\.')
 		name = parts.remove(parts.size() - 1)

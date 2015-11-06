@@ -18,12 +18,7 @@ package grails.plugins.orm.auditable
  * specific language governing permissions and limitations
  * under the License.
 */
-
-import grails.plugins.orm.auditable.AuditLogEvent
-import grails.plugins.orm.auditable.AuditLogListener
-import grails.plugins.orm.auditable.AuditLogListenerUtil
 import grails.plugins.*
-import groovy.transform.*
 import org.grails.datastore.mapping.core.*
 
 /**
@@ -127,11 +122,11 @@ When called, the event handlers have access to oldObj and newObj definitions tha
      * The default truncate length is 255 unless we are using the largeValueColumnTypes, then we allow up to the column size
      */
     private Integer determineDefaultTruncateLength(ctx) {
-        String confAuditDomainClassName = AuditLoggingUtils.auditConfig.auditDomainClassName
+        String confAuditDomainClassName = AuditLoggingConfigUtils.auditConfig.auditDomainClassName
         if (confAuditDomainClassName == null){
             throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
         }
-        String auditClassName = AuditLoggingUtils.auditConfig.auditDomainClassName
+        String auditClassName = AuditLoggingConfigUtils.auditConfig.auditDomainClassName
         def dc = ctx.grailsApplication.getDomainClass(auditClassName)
         if (!dc) {
             throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")

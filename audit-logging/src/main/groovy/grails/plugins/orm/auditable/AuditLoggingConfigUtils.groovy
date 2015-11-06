@@ -20,20 +20,20 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 /**
- * Plugin Helper methods.
+ * Plugin config Helper methods.
  *
  * @author <a href='mailto:roos@symentis.com'>Robert Oschwald</a>
  */
 
 @CompileStatic
 @Slf4j
-class AuditLoggingUtils {
+class AuditLoggingConfigUtils {
 
   private static ConfigObject _auditConfig
   private static GrailsApplication application
 
   // Constructor. Static methods only
-  private AuditLoggingUtils() {}
+  private AuditLoggingConfigUtils() {}
 
   /**
    * Set at startup by plugin.
@@ -44,12 +44,12 @@ class AuditLoggingUtils {
   }
 
   /**
-   * Parse and load the security configuration.
+   * Parse and load the auditLog configuration.
    * @return the configuration
    */
   static synchronized ConfigObject getAuditConfig() {
     if (_auditConfig == null) {
-      log.trace 'Building security config since there is no cached config'
+      log.trace 'Building auditLog config since there is no cached config'
       reloadAuditConfig()
     }
 
@@ -67,13 +67,13 @@ class AuditLoggingUtils {
   /** Reset the config for testing or after a dev mode Config.groovy change. */
   static synchronized void resetAuditConfig() {
     _auditConfig = null
-    log.trace 'reset security config'
+    log.trace 'reset auditLog config'
   }
 
-  /** Force a reload of the security configuration. */
+  /** Force a reload of the auditLog configuration. */
   static void reloadAuditConfig() {
-    mergeConfig ReflectionUtils.auditConfig, 'DefaultSecurityConfig'
-    log.trace 'reloaded security config'
+    mergeConfig ReflectionUtils.auditConfig, 'DefaultAuditLogConfig'
+    log.trace 'reloaded auditLog config'
   }
 
   /**
@@ -94,7 +94,7 @@ class AuditLoggingUtils {
   private static void mergeConfig(ConfigObject currentConfig, String className) {
     ConfigObject secondary = new ConfigSlurper(Environment.current.name).parse(
       new GroovyClassLoader(this.classLoader).loadClass(className))
-    secondary = secondary.security as ConfigObject
+    secondary = secondary.auditLog as ConfigObject
 
     Collection<String> keysToDefaultEmpty = []
     findKeysToDefaultEmpty secondary, '', keysToDefaultEmpty
@@ -137,9 +137,9 @@ class AuditLoggingUtils {
   /**
    * Given an unmodified config map with defaults, loop through the keys looking for values that are initially
    * empty maps. This will be used after merging to remove map values that cause problems by being included both as
-   * the result from the ConfigSlurper (which is correct) and as a "flattened" maps which confuse Spring Security.
+   * the result from the ConfigSlurper (which is correct) and as a "flattened" maps which confuse Audit Logging.
    * @param m the config map
-   * @param fullPath the path to this config map, e.g. 'grails.plugin.security
+   * @param fullPath the path to this config map, e.g. 'grails.plugin.auditLog
    * @param keysToDefaultEmpty a collection of key names to add to
    */
   private static void findKeysToDefaultEmpty(Map m, String fullPath, Collection keysToDefaultEmpty) {
