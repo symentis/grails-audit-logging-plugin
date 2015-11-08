@@ -49,15 +49,15 @@ message += " in package '" + packageName + "'"
 addStatus message
 
 templateAttributes = [packageName       :auditModel.packageName,
-                      auditClassName    :auditClassName,
+                      auditClassName    :auditModel.simpleName,
                       auditClassProperty:auditModel.modelName]
 
 
 createDomain(auditModel)
 
-updateConfig(auditModel?.simpleName)
+updateConfig(auditModel?.simpleName, auditModel?.packageName)
 
-printMessage '''
+addStatus '''
 *******************************************************
 * Created auditLogEvent domain class.                 *
 * Your grails-app/conf/Config.groovy has been updated *
@@ -67,24 +67,19 @@ printMessage '''
 '''
 
 
-private parseArgs() {
-  def args = argsMap.params
+private String[] parseArgs() {
   if (2 == args.size()) {
-    printMessage "Creating AuditLogging class ${args[1]} in package ${args[0]}"
     return args
   }
-  errorMessage USAGE
+  usage usageMessage
   null
 }
 
 private void createDomain(Model auditModel) {
   generateFile 'AuditLogEvent', auditModel.packagePath, auditModel.simpleName
-//  String dir = packageToDir(packageName)
-//  String domainDir = "$appDir/domain/$dir"
-//  generateFile "$templateDir/AuditLogEvent.groovy.template", "$domainDir${auditClassName}.groovy"
 }
 
-private void updateConfig(String auditClassName) {
+private void updateConfig(String auditClassName, String packageName) {
   file("grails-app/conf/application.groovy").withWriterAppend { BufferedWriter writer ->
     writer.newLine()
     writer.newLine()

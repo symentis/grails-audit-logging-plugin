@@ -53,15 +53,27 @@ class ${auditClassName} implements Serializable {
 
         oldValue(nullable: true)
         newValue(nullable: true)
+
+        // for large column support (as in < 1.0.6 plugin versions), use
+        // oldValue(nullable: true, maxSize: 65534)
+        // newValue(nullable: true, maxSize: 65534)
     }
 
     static mapping = {
 
+        // Set similiar when you used "auditLog.tablename" in < 1.1.0 plugin version.
         table 'audit_log'
 
+        // Remove when you used "auditLog.cacheDisabled = true" in < 1.1.0 plugin version.
         cache usage: 'read-only', include: 'non-lazy'
 
-        // no HQL queries package name import (was default in < 1.0.x versions)
+        // Set similiar when you used "auditLog.useDatasource" in < 1.1.0 plugin version.
+        // datasource "yourdatasource"
+
+        // Set similiar when you used "auditLog.idMapping" in < 1.1.0 plugin version. Example:
+        // id generator:"uuid2", type:"string", "length:36"
+
+        // no HQL queries package name import (was default in 1.x version)
         //autoImport false
 
         version false
