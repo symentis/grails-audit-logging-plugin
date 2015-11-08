@@ -84,7 +84,6 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         boolean logIds = config.getProperty("auditLog.logIds", Boolean, false)
         String sessionAttribute = config.getProperty("auditLog.sessionAttribute", String, "")
         String actorKey = config.getProperty("auditLog.actorKey", String, "")
-        Integer truncateLength = config.getProperty("auditLog.truncateLength", Integer, determineDefaultTruncateLength(applicationContext) )
         Closure actorClosure = config.getProperty("auditLog.actorClosure", Closure, AuditLogListenerUtil.actorDefaultGetter)
         String propertyMask = config.getProperty("auditLog.propertyMask", String, "**********")
 
@@ -106,7 +105,6 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 listener.transactional = transactional
                 listener.sessionAttribute = sessionAttribute
                 listener.actorKey = actorKey
-                listener.truncateLength = truncateLength
                 listener.actorClosure = actorClosure
                 listener.defaultIgnoreList = application.config.auditLog.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
                 listener.defaultMaskList = application.config.auditLog.defaultMask?.asImmutable() ?: ['password'].asImmutable()
@@ -116,22 +114,5 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 applicationContext.addApplicationListener(listener)
             }
         }
-    }
-
-    /**
-     * The default truncate length is 255 unless we are using the largeValueColumnTypes, then we allow up to the column size
-     */
-    private Integer determineDefaultTruncateLength(ctx) {
-        String confAuditDomainClassName = AuditLoggingConfigUtils.auditConfig.auditDomainClassName
-        if (confAuditDomainClassName == null){
-            throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
-        }
-        String auditClassName = AuditLoggingConfigUtils.auditConfig.auditDomainClassName
-        def dc = ctx.grailsApplication.getDomainClass(auditClassName)
-        if (!dc) {
-            throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")
-        }
-        Class AuditLogEventClazz = dc.clazz
-        AuditLogEventClazz.constraints.oldValue?.maxSize ?: 255
     }
 }

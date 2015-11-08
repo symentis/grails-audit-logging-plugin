@@ -60,7 +60,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     Boolean logIds = false
     Boolean transactional = false
     Boolean logFullClassName = false
-    Integer truncateLength
     String sessionAttribute
     String actorKey
     String propertyMask
@@ -517,8 +516,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                         persistedObjectId: persistedObjectId?.toString(),
                         persistedObjectVersion: persistedObjectVersion,
                         propertyName: key,
-                        oldValue: conditionallyMaskAndTruncate(domain, key, oldMap[key]),
-                        newValue: conditionallyMaskAndTruncate(domain, key, newMap[key]))
+                        oldValue: conditionallyMask(domain, key, oldMap[key]),
+                        newValue: conditionallyMask(domain, key, newMap[key]))
                     saveAuditLog(audit)
                 }
             }
@@ -536,7 +535,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     persistedObjectVersion: persistedObjectVersion,
                     propertyName: key,
                     oldValue: null,
-                    newValue: conditionallyMaskAndTruncate(domain, key, val))
+                    newValue: conditionallyMask(domain, key, val))
                 saveAuditLog(audit)
             }
             return
@@ -552,7 +551,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     persistedObjectId: persistedObjectId?.toString(),
                     persistedObjectVersion: persistedObjectVersion,
                     propertyName: key,
-                    oldValue: conditionallyMaskAndTruncate(domain, key, val),
+                    oldValue: conditionallyMask(domain, key, val),
                     newValue: null)
                 saveAuditLog(audit)
             }
@@ -585,7 +584,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * @param value the value of the property
      * @return
      */
-    String conditionallyMaskAndTruncate(domain, String key, value) {
+    String conditionallyMask(domain, String key, value) {
         try {
             if (value == null) {
                 return null
@@ -598,20 +597,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (maskList(domain)?.contains(key)) {
             log.trace("Masking property ${key} with ${propertyMask}")
             propertyMask
-        } else if (truncateLength) {
-            truncate(value, truncateLength)
         } else {
-            truncate(value, Integer.MAX_VALUE)
+            logIds(value)
         }
     }
 
-    String truncate(value, int max) {
+    String logIds(value) {
         if (value == null) {
             return null
         }
-
-        log.trace "trimming object's string representation based on ${max} characters."
-
         // GPAUDITLOGGING-43
         def str = null
         if (logIds) {
@@ -625,9 +619,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         } else {
             str = "$value".trim() // GPAUDITLOGGING-40
         }
-
         str = replaceByReplacementPatterns(str)
-        (str?.length() > max) ? str?.substring(0, max) : str
     }
 
     private String appendWithId(obj, str) {
