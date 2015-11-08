@@ -1,4 +1,7 @@
 
+h3. 2.0.0-SNAPSHOT2
+
+* audit-quickstart command to create the AuditLog domain artifact
 
 h3. 2.0.0-SNAPSHOT
 

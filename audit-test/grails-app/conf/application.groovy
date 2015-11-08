@@ -10,6 +10,9 @@ auditLog {
     idMapping = [generator:"uuid2", type:"string", length:36] // UUID id-type for AuditLogEvent
 }
 
+// Added by the Audit-Logging plugin:
+auditLog.auditDomainClassName = 'test.AuditTrail'
+
 
 dataSource {
     pooled = true
@@ -83,3 +86,5 @@ environments {
       }
     }
 }
+
+
