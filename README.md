@@ -39,7 +39,20 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	Tom Crossland
 	
 	Project lead: Robert Oschwald
-	
+
+##**audit-quickstart (version >=1.1.0)**##
+2.0.0-SNAPSHOT2 is the first version with audit-quickstart command.
+Therefore, you need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version and later. See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
+  
+With this, you get a AuditLog domain class in your project which is fully under your control. The domain name is registered in your application.groovy with key "auditLog.auditDomainClassName".
+  
+Example:
+  
+```
+grails audit-quickstart org.example.myproject.AuditLogEvent
+  
+```
+
 ##**Continuous Integration Server**##
 [![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
 
