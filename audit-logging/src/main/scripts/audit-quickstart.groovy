@@ -84,7 +84,7 @@ private void updateConfig(String auditClassName, String packageName) {
     writer.newLine()
     writer.newLine()
     writer.writeLine '// Added by the Audit-Logging plugin:'
-    writer.writeLine "auditLog.auditDomainClassName = '${packageName}.$auditClassName'"
+    writer.writeLine "grails.plugin.auditLog.auditDomainClassName = '${packageName}.$auditClassName'"
     writer.newLine()
   }
 }

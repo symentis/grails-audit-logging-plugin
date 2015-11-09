@@ -70,22 +70,22 @@ When called, the event handlers have access to oldObj and newObj definitions tha
     // Register generic GORM listener
     void doWithApplicationContext() {
         def application = grailsApplication
-        def config = application.config
-        boolean disabled = config.getProperty("auditLog.disabled", Boolean, false)
-        boolean stampEnabled = config.getProperty("auditLog.stampEnabled", Boolean, true)
-        boolean stampAlways = config.getProperty("auditLog.stampAlways", Boolean, false)
+        def config = AuditLoggingConfigUtils.auditConfig
+        boolean disabled = config.getProperty("disabled", Boolean, false)
+        boolean stampEnabled = config.getProperty("stampEnabled", Boolean, true)
+        boolean stampAlways = config.getProperty("stampAlways", Boolean, false)
 
-        String stampCreatedBy = config.getProperty("auditLog.stampCreatedBy", String, "createdBy")
-        String stampLastUpdatedBy = config.getProperty("auditLog.stampLastUpdatedBy", String, "lastUpdatedBy")
-        boolean verbose = config.getProperty("auditLog.verbose", Boolean, false)
-        boolean nonVerboseDelete = config.getProperty("auditLog.nonVerboseDelete", Boolean, false)
-        boolean logFullClassName = config.getProperty("auditLog.logFullClassName", Boolean, false)
-        boolean transactional = config.getProperty("auditLog.transactional", Boolean, false)
-        boolean logIds = config.getProperty("auditLog.logIds", Boolean, false)
-        String sessionAttribute = config.getProperty("auditLog.sessionAttribute", String, "")
-        String actorKey = config.getProperty("auditLog.actorKey", String, "")
-        Closure actorClosure = config.getProperty("auditLog.actorClosure", Closure, AuditLogListenerUtil.actorDefaultGetter)
-        String propertyMask = config.getProperty("auditLog.propertyMask", String, "**********")
+        String stampCreatedBy = config.getProperty("stampCreatedBy", String, "createdBy")
+        String stampLastUpdatedBy = config.getProperty("stampLastUpdatedBy", String, "lastUpdatedBy")
+        boolean verbose = config.getProperty("verbose", Boolean, false)
+        boolean nonVerboseDelete = config.getProperty("nonVerboseDelete", Boolean, false)
+        boolean logFullClassName = config.getProperty("logFullClassName", Boolean, false)
+        boolean transactional = config.getProperty("transactional", Boolean, false)
+        boolean logIds = config.getProperty("logIds", Boolean, false)
+        String sessionAttribute = config.getProperty("sessionAttribute", String, "")
+        String actorKey = config.getProperty("actorKey", String, "")
+        Closure actorClosure = config.getProperty("actorClosure", Closure, AuditLogListenerUtil.actorDefaultGetter)
+        String propertyMask = config.getProperty("propertyMask", String, "**********")
 
 
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
@@ -106,10 +106,10 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 listener.sessionAttribute = sessionAttribute
                 listener.actorKey = actorKey
                 listener.actorClosure = actorClosure
-                listener.defaultIgnoreList = application.config.auditLog.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
-                listener.defaultMaskList = application.config.auditLog.defaultMask?.asImmutable() ?: ['password'].asImmutable()
+                listener.defaultIgnoreList = AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
+                listener.defaultMaskList = AuditLoggingConfigUtils.auditConfig.defaultMask?.asImmutable() ?: ['password'].asImmutable()
                 listener.propertyMask = propertyMask
-                listener.replacementPatterns = application.config.auditLog.replacementPatterns
+                listener.replacementPatterns = AuditLoggingConfigUtils.auditConfig.replacementPatterns
                 listener.logIds = logIds
                 applicationContext.addApplicationListener(listener)
             }
