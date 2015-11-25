@@ -87,6 +87,15 @@ class AuditLogEvent implements Serializable {
           id generator:'increment', type:'long' // default
         }
 
+        // Issue #109: support custom indices
+        if (Holders.config.auditLog.columnMappings) {
+          Holders.config.auditLog.columnMappings.each { c ->
+            if (c.name != 'id') {
+              "$c.name"(index: c.index)
+            }
+          }
+        }
+
         autoImport false
         version false
     }
