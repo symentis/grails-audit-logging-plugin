@@ -184,6 +184,24 @@ auditLog {
 
 If you change the tablename, you need to update your database schema(s).
 
+h3. Custom Indices
+
+You can specify a list of column property maps to declare custom indices for the audit log table.  Each map requires a 'name' attribute to identify the column and an 'index' attribute to specify the index names that column is a part of.  These values get baked directly into the domain object and are therefore compatible with the database migration plugin.  Desired values are specified in Config.groovy:
+
+{code}
+auditLog {
+    columnProperties = [
+            [name: 'persistedObjectId', index: 'al_idx_001,al_idx_002'],
+            [name: 'id', index: 'al_idx_001'],
+            [name: 'oldValue', index: 'al_idx_002']
+    ]
+}
+{code}
+
+{warning}
+No spaces are allowed in the 'index' value, a restriction of the GORM mapping 'index' attribute.
+{warning}
+
 h3. Disable Hibernate caching of AuditLogEvent
 
 You can disable the caching of the AuditLogEvents by specifying:
