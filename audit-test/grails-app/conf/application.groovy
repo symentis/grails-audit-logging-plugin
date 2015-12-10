@@ -11,7 +11,7 @@ auditLog {
 }
 
 // Added by the Audit-Logging plugin:
-auditLog.auditDomainClassName = 'test.AuditTrail'
+grails.plugin.auditLog.auditDomainClassName = 'test.AuditTrail'
 
 
 dataSource {

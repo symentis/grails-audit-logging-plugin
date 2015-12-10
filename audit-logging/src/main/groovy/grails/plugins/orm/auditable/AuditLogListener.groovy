@@ -149,7 +149,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
             // If we couldn't find an actor, use the configured default or just 'system'
             if (!actor) {
-                actor = grailsApplication.config.auditLog.defaultActor ?: 'system'
+                actor = AuditLoggingConfigUtils.auditConfig.defaultActor ?: 'system'
             }
         }
         return actor?.toString()
@@ -173,7 +173,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      */
     boolean callHandlersOnly(domain) {
         // Allow global configuration of handlers only
-        if (grailsApplication.config.auditLog.handlersOnly) {
+        if (AuditLoggingConfigUtils.auditConfig.handlersOnly) {
             return true
         }
 
