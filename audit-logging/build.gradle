@@ -87,7 +87,7 @@ bintray {
         publicDownloadNumbers = true
         version {
             name = project.version
-            desc = 'Grails Audit-Logging Plugin for Grails 3.x'
+            desc = 'Grails Audit-Logging Plugin for Grails 3.x '
             attributes = ['grails-plugin': "$project.group:$project.name"]
         }
     }
