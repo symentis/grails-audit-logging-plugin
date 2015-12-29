@@ -13,7 +13,7 @@ buildscript {
 
 plugins {
     id "io.spring.dependency-management" version "0.5.1.RELEASE"
-    id "com.jfrog.bintray" version "1.1"
+    id "com.jfrog.bintray" version "1.4"
 }
 
 version "2.0.0-SNAPSHOT2"
@@ -28,7 +28,7 @@ apply plugin: "org.grails.grails-gsp"
 apply plugin: "org.grails.grails-doc"
 // Used for publishing to central repository, remove if not needed
 apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
-apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
+//apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
 
 ext {
     grailsVersion = project.grailsVersion
@@ -72,13 +72,21 @@ task wrapper(type: Wrapper) {
 }
 
 bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['maven']
+    publish = true
     pkg {
+        repo = 'plugins'
         userOrg = '' // If you want to publish to an organization
-        name = "robertoschwald.plugins:$project.name"
+        name = "$project.name"
+        websiteUrl = "https://robertoschwald.github.io/grails-${project.name}-plugin"
         issueTrackerUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin/issues"
         vcsUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin"
+        licenses = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
+        publicDownloadNumbers = true
         version {
-            attributes = ['grails-plugin': "robertoschwald.plugins:$project.name"]
+            attributes = ['grails-plugin': "$project.group:$project.name"]
             name = project.version
         }
     }
