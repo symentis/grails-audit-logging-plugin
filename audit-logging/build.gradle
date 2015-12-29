@@ -70,3 +70,16 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
+
+bintray {
+    pkg {
+        userOrg = '' // If you want to publish to an organization
+        name = "robertoschwald.plugins:$project.name"
+        issueTrackerUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin/issues"
+        vcsUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin"
+        version {
+            attributes = ['grails-plugin': "robertoschwald.plugins:$project.name"]
+            name = project.version
+        }
+    }
+}
