@@ -3,9 +3,6 @@ jdk:
 - oraclejdk7
 before_script:
 - rm -rf target
-branches:
-  only:
-  - master
 script: ./travis-build.sh
 sudo: false
 cache:
@@ -13,6 +10,7 @@ cache:
   - $HOME/.gradle
 env:
   global:
+  - TERM=dumb
   - GIT_NAME="Robert Oschwald"
   - GIT_EMAIL="robertoschwald@gmail.com"
   - secure: QgwDKgm+TFRpt6fnAjbI4MGmBOIqfCm0ycyIom927aZPvhp4fzzI6wGIN06RTAPNao95BnV7TwSgonRExPfqIMCrMzDj4BXVYkK9uXUXTUPYw24+9cEv2ZvnyEurg/MR2ajpu3MHtam+7uGO8mh4pYq+693RpiU+IZFkB5vPWcM=
