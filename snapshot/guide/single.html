@@ -80,8 +80,8 @@ function addJsClass(el) {
                         
 <a name="1. Introduction To The Cache Plugin"><!-- Legacy link --></a>
 <h1 id="introduction">1 Introduction To The Cache Plugin</h1>
-<h3>Description</h3><p class="paragraph"/>The Audit Logging plugin adds Grails GORM Events (Hibernate Events when using plugin version &#60; 1.0.0) based Audit Logging
-capabilities to a Grails project and it also adds support to domain models for hooking into the Grails GORM events system.<p class="paragraph"/>Support for the following closures are added: onSave, onDelete, and onChange. The onChange closure can be used in two ways.
+<h3>Description</h3><p class="paragraph"/>The Audit Logging plugin adds Grails GORM Events based Audit Logging capabilities to a Grails project and it also adds
+support to domain models for hooking into the Grails GORM events system.<p class="paragraph"/>Support for the following closures are added: onSave, onDelete, and onChange. The onChange closure can be used in two ways.
 First, it can be used with no parameters or it can be used with two parameters, oldMap and newMap.
 The first parameter is a LinkedHashMap representing the old state of the object before the change was applied,
 the second parameter is a LinkedHashMap representing the state of the object after changes are applied.<p class="paragraph"/>NOTE: GORM Events hook into the ''beforeInsert'' and the ''beforeUpdate'' events which work great for preventing updates
@@ -95,17 +95,27 @@ with other handler names in other existing plugins.<p class="paragraph"/><h3>Com
 <li>For Grails &#60;= 1.2.0 use version 0.5.3.</li>
 </ul><p class="paragraph"/><h3>ORM implementation dependency</h3><p class="paragraph"/>Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use it with the ORM mapper of your choice
 (Hibernate3, Hibernate4, MongoDB, etc.).<p class="paragraph"/>Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
-please file a GitHub issue.
+please file a GitHub issue.<p class="paragraph"/>
+<h3>Installation</h3><p class="paragraph"/>Add to your build.gradle buildscript dependencies block and to the project dependencies block:<p class="paragraph"/>```
+buildscript {
+  /<strong class="bold"></strong> gradle build-time dependencies <strong class="bold"></strong>/
+  dependencies {
+    classpath 'org.grails.plugins:audit-logging:2.0.0'
+  }
+}<p class="paragraph"/>/<strong class="bold"></strong> Project dependencies <strong class="bold"></strong>/
+dependencies {
+   compile 'org.grails.plugins:audit-logging:2.0.0'
+}
+```<p class="paragraph"/><h3>Create your Domain Artifact using audit-quickstart</h3><p class="paragraph"/>After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.<p class="paragraph"/>    grails audit-quickstart &#60;your.package.name&#62; &#60;YourAuditLogEventClassName&#62;<p class="paragraph"/>example:<p class="paragraph"/>    grails audit-quickstart org.myaudit.example AuditLogEvent<p class="paragraph"/>Afterwards, set the mapping and constraint settings accordinghly in the created AuditLog Domain Artifact.<p class="paragraph"/>Advantage of this approach is that you got full control of the Audit Domain Class.<p class="paragraph"/>
+
 
 <a name="1.1 Change log"><!-- Legacy link --></a>
 <h2 id="changelog">1.1 Changelog</h2>
 
-<h3>2.0.0-SNAPSHOT2</h3>
-<ul class="star">
-<li>audit-quickstart command to create the AuditLog domain artifact</li>
-</ul><p class="paragraph"/><h3>2.0.0-SNAPSHOT</h3>
+<h3>2.0.0</h3>
 <ul class="star">
 <li>Grails 3 support.</li>
+<li>audit-quickstart command to create the AuditLog domain artifact</li>
 <li>Current branch: master.</li>
 <li>For 1.0.x version, see 1.x_maintenance branch</li>
 </ul><p class="paragraph"/><h3>1.0.5</h3>
@@ -309,9 +319,6 @@ static auditable = ignoreEvents:["onChange","onSave"]<p class="paragraph"/><h3>E
 auditLog &#123;
  verbose = <span class="java&#45;keyword">true</span> // verbosely log all changed values to db
  logIds = <span class="java&#45;keyword">true</span>  // log db&#45;ids of associated objects.
- // Note: <span class="java&#45;keyword">if</span> you change next 2 properties, you must update your database schema!
- tablename = 'my_audit' // table name <span class="java&#45;keyword">for</span> audit logs.
- largeValueColumnTypes = <span class="java&#45;keyword">true</span> // use large column db types <span class="java&#45;keyword">for</span> oldValue/newValue.
  TRUNCATE_LENGTH = 1000
  cacheDisabled = <span class="java&#45;keyword">true</span>
  logFullClassName = <span class="java&#45;keyword">true</span>
@@ -335,7 +342,7 @@ auditLog &#123;
 
 <h1 id="implementation">3 Implementation Details</h1>
 
-<h4>AuditLogEventListener</h4><p class="paragraph"/>The Audit Logging plugin registers a <code>PersistenceEventListener</code> bean, which listens to GORM events.<p class="paragraph"/>TODO
+<h4>AuditLogEventListener</h4><p class="paragraph"/>The Audit Logging plugin registers a <code>PersistenceEventListener</code> bean per datasource, which listens to GORM events.<p class="paragraph"/>
 
                     </div>
                 </td>
