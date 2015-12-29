@@ -1,7 +1,7 @@
 h3. Description
 
-The Audit Logging plugin adds Grails GORM Events (Hibernate Events when using plugin version < 1.0.0) based Audit Logging
-capabilities to a Grails project and it also adds support to domain models for hooking into the Grails GORM events system.
+The Audit Logging plugin adds Grails GORM Events based Audit Logging capabilities to a Grails project and it also adds
+support to domain models for hooking into the Grails GORM events system.
 
 Support for the following closures are added: onSave, onDelete, and onChange. The onChange closure can be used in two ways.
 First, it can be used with no parameters or it can be used with two parameters, oldMap and newMap.
@@ -28,3 +28,38 @@ Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use 
 
 Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
 please file a GitHub issue.
+
+
+h3. Installation
+
+Add to your build.gradle buildscript dependencies block and to the project dependencies block:
+
+```
+buildscript {
+  /** gradle build-time dependencies **/
+  dependencies {
+    classpath 'org.grails.plugins:audit-logging:2.0.0'
+  }
+}
+
+/** Project dependencies **/
+dependencies {
+   compile 'org.grails.plugins:audit-logging:2.0.0'
+}
+```
+
+h3. Create your Domain Artifact using audit-quickstart
+
+After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
+
+    grails audit-quickstart <your.package.name> <YourAuditLogEventClassName>
+
+example:
+
+    grails audit-quickstart org.myaudit.example AuditLogEvent
+
+Afterwards, set the mapping and constraint settings accordinghly in the created AuditLog Domain Artifact.
+
+Advantage of this approach is that you got full control of the Audit Domain Class.
+
+

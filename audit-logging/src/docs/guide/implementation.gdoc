@@ -1,6 +1,5 @@
 
 h4. AuditLogEventListener
 
-The Audit Logging plugin registers a @PersistenceEventListener@ bean, which listens to GORM events.
+The Audit Logging plugin registers a @PersistenceEventListener@ bean per datasource, which listens to GORM events.
 
-TODO

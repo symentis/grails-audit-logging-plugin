@@ -1,11 +1,7 @@
 
-h3. 2.0.0-SNAPSHOT2
-
-* audit-quickstart command to create the AuditLog domain artifact
-
-h3. 2.0.0-SNAPSHOT
-
+h3. 2.0.0
 * Grails 3 support.
+* audit-quickstart command to create the AuditLog domain artifact
 * Current branch: master.
 * For 1.0.x version, see 1.x_maintenance branch
 
