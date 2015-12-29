@@ -45,8 +45,8 @@ class AuditDeleteHandlersOnlySpec extends Specification {
         codes*.save(flush: true)
 
         // Remove all logging of the inserts, we are focused on deletes here
-        grails.plugins.orm.auditable.AuditLogEvent.where { id != null }.deleteAll()
-        assert grails.plugins.orm.auditable.AuditLogEvent.count() == 0       
+        AuditTrail.where { id != null }.deleteAll()
+        assert AuditTrail.count() == 0
     }
 
     void "test onDelete handler has an id available"() {

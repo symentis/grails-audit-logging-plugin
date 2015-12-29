@@ -65,7 +65,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     String propertyMask
     Closure actorClosure
 
-
     Boolean stampEnabled = true
     Boolean stampAlways = false
     String stampCreatedBy
@@ -75,7 +74,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     List<String> defaultIgnoreList
     List<String> defaultMaskList
     Map<String, String> replacementPatterns
-
 
     AuditLogListener(Datastore datastore) {
         super(datastore)
@@ -152,6 +150,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                 actor = AuditLoggingConfigUtils.auditConfig.defaultActor ?: 'system'
             }
         }
+        log.trace("Actor: $actor")
         return actor?.toString()
     }
 
@@ -194,7 +193,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         List<String> ignoreEvents = Collections.EMPTY_LIST
         Map auditableMap = getAuditableMap(domain)
         if (auditableMap?.containsKey('ignoreEvents')) {
-            ignoreEvents = auditableMap['ignoreEvents']
+            ignoreEvents = auditableMap['ignoreEvents'] as List<String>
         }
         return ignoreEvents.contains(event)
     }
@@ -508,7 +507,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             log.trace "There are new and old values to log"
             newMap.each { String key, val ->
                 if (val != oldMap[key]) {
-                    def audit = new AuditLogEvent(
+                    GrailsDomainClass audit = getAuditLogDomainInstance(
                         actor: getActor(),
                         uri: getUri(domain),
                         className: className,
@@ -526,7 +525,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (newMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
             log.trace "there are new values and logging is verbose ... "
             newMap.each { String key, val ->
-                def audit = new AuditLogEvent(
+                def audit = getAuditLogDomainInstance(
                     actor: getActor(),
                     uri: getUri(domain),
                     className: className,
@@ -543,7 +542,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (oldMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
             log.trace "there is only an old map of values available and logging is set to verbose... "
             oldMap.each { String key, val ->
-                def audit = new AuditLogEvent(
+                def audit = getAuditLogDomainInstance(
                     actor: getActor(),
                     uri: getUri(domain),
                     className: className,
@@ -559,7 +558,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
         // default
         log.trace "creating a basic audit logging event object."
-        def audit = new AuditLogEvent(
+        def audit = getAuditLogDomainInstance(
             actor: getActor(),
             uri: getUri(domain),
             className: className,
@@ -683,7 +682,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      *
      * It has also been written as a closure for your sake so that you may over-ride the
      * save closure with your own code (should your particular database not work with this code)
-     * you may over-ride the definition of this closure using ... TODO allow over-ride via config
+     * you may over-ride the definition of this closure using ... TODO allow override via config
      *
      * To debug in Config.groovy set:
      *    log4j.debug 'grails.plugins.orm.auditable.AuditLogListener'
@@ -692,15 +691,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      *
      * SEE: GRAILSPLUGINS-391
      */
-    def saveAuditLog = { AuditLogEvent audit ->
+    def saveAuditLog = { GrailsDomainClass audit ->
         audit.with {
             dateCreated = lastUpdated = new Date()
         }
         log.info audit
         try {
-            AuditLogEvent.withNewSession {
+            getAuditDomainClass().withNewSession {
                 if (transactional) {
-                    AuditLogEvent.withTransaction {
+                    getAuditDomainClass().withTransaction {
                         audit.merge(flush: true, failOnError: true)
                     }
                 } else {
@@ -709,7 +708,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
         }
         catch (e) {
-            log.error "Failed to create AuditLogEvent for ${audit}: ${e.message}"
+            log.error "Failed to create ${getAuditDomainClass().name} for ${audit}: ${e.message}"
         }
     }
 

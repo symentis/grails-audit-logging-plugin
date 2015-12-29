@@ -18,8 +18,7 @@
 */
 package test
 
-import grails.plugins.orm.auditable.AuditLogEvent
-
+import grails.plugins.orm.auditable.AuditLogListenerUtil
 import grails.test.mixin.integration.Integration
 import grails.transaction.*
 import spock.lang.*
@@ -27,121 +26,122 @@ import spock.lang.*
 @Integration
 @Rollback
 class AuditDeleteSpec extends Specification {
-    void setupData() {
-        Author.auditable = true
 
-        def author = new Author(name: "Aaron", age: 37, famous: true)
-        author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
-        author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
-        author.save(flush: true, failOnError: true)
+  void setupData() {
+    Author.auditable = true
 
-        def publisher = new Publisher(code: 'ABC123', name: 'Random House', active: true)
-        publisher.save(flush: true, failOnError: true)
+    def author = new Author(name:"Aaron", age:37, famous:true)
+    author.addToBooks(new Book(title:'Hunger Games', description:'Blah', pages:400))
+    author.addToBooks(new Book(title:'Catching Fire', description:'Blah', pages:500))
+    author.save(flush:true, failOnError:true)
 
-        // Remove all logging of the inserts, we are focused on deletes here
-        AuditLogEvent.where { id != null }.deleteAll()
-        assert AuditLogEvent.count() == 0
+    def publisher = new Publisher(code:'ABC123', name:'Random House', active:true)
+    publisher.save(flush:true, failOnError:true)
 
-        author.handlerCalled = ""
-    }
+    // Remove all logging of the inserts, we are focused on deletes here
+    AuditTrail.where { id != null }.deleteAll()
+    assert AuditTrail.count() == 0
 
-    void "Test delete logging"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-        assert author
+    author.handlerCalled = ""
+  }
 
-        when:
-        author.delete(flush: true, failOnError: true)
+  void "Test delete logging"() {
+    given:
+    setupData()
+    def author = Author.findByName("Aaron")
+    assert author
 
-        then: "audit logging is created"
-        def events = AuditLogEvent.findAllByClassName('test.Author')
+    when:
+    author.delete(flush:true, failOnError:true)
 
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+    then: "audit logging is created"
+    def events = AuditTrail.findAllByClassName('test.Author')
 
-        def first = events.find { it.propertyName == 'age' }
-        first.oldValue == "37"
-        first.newValue == null
-        first.eventName == 'DELETE'
+    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
 
-        and: 'all books are deleted'
-        def b1Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('test.Book', 'Hunger Games')
-        b1Events.size() == (Book.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+    def first = events.find { it.propertyName == 'age' }
+    first.oldValue == "37"
+    first.newValue == null
+    first.eventName == 'DELETE'
 
-        def b2Events = AuditLogEvent.findAllByClassNameAndPersistedObjectId('test.Book', 'Catching Fire')
-        b2Events.size() == (Book.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
-    }
+    and: 'all books are deleted'
+    def b1Events = AuditTrail.findAllByClassNameAndPersistedObjectId('test.Book', 'Hunger Games')
+    b1Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
 
-    void "Test conditional delete logging"() {
-        given:
-        setupData()
-        def publisher = Publisher.findByName("Random House")
+    def b2Events = AuditTrail.findAllByClassNameAndPersistedObjectId('test.Book', 'Catching Fire')
+    b2Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
+  }
 
-        when:
-        publisher.active = activeFlag
-        publisher.delete(flush: true, failOnError: true)
+  void "Test conditional delete logging"() {
+    given:
+    setupData()
+    def publisher = Publisher.findByName("Random House")
 
-        then:
-        !Publisher.get(publisher.id)
+    when:
+    publisher.active = activeFlag
+    publisher.delete(flush:true, failOnError:true)
 
-        and:
-        def events = AuditLogEvent.findAllByClassName('test.Publisher')
-        events.size() == resultCount
+    then:
+    !Publisher.get(publisher.id)
 
-        where: "publisher active flag determines logging"
-        activeFlag << [false, true]
-        resultCount << [0, 3]
-    }
+    and:
+    def events = AuditTrail.findAllByClassName('test.Publisher')
+    events.size() == resultCount
 
-    void "Test handler is called"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
+    where: "publisher active flag determines logging"
+    activeFlag << [false, true]
+    resultCount << [0, 3]
+  }
 
-        when:
-        author.delete(flush: true, failOnError: true)
+  void "Test handler is called"() {
+    given:
+    setupData()
+    def author = Author.findByName("Aaron")
 
-        then: "verbose audit logging is created"
-        def events = AuditLogEvent.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+    when:
+    author.delete(flush:true, failOnError:true)
 
-        and:
-        author.handlerCalled == "onDelete"
-    }
+    then: "verbose audit logging is created"
+    def events = AuditTrail.findAllByClassName('test.Author')
+    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
 
-    void "Test only handler is called"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-        Author.auditable = [handlersOnly: true]
+    and:
+    author.handlerCalled == "onDelete"
+  }
 
-        when:
-        author.delete(flush: true, failOnError: true)
+  void "Test only handler is called"() {
+    given:
+    setupData()
+    def author = Author.findByName("Aaron")
+    Author.auditable = [handlersOnly:true]
 
-        then: "nothing logged"
-        def events = AuditLogEvent.findAllByClassName('test.Author')
-        events.size() == 0
+    when:
+    author.delete(flush:true, failOnError:true)
 
-        and:
-        author.handlerCalled == "onDelete"
-    }
+    then: "nothing logged"
+    def events = AuditTrail.findAllByClassName('test.Author')
+    events.size() == 0
 
-	void "Test only delete event is logged" () {
-		given: "create resolution"
-			def resolution = new Resolution()
-			resolution.name = "One for all"
-			resolution.save(flush: true, failOnError: true)
-		when: "updateing resolution"
-			resolution.name = "One for all and all for one"
-			resolution.save(flush: true, failOnError: true)			
-		then: "delete resolution"
-			resolution.delete(flush: true, failOnError: true)
-			def events = AuditLogEvent.findAllByClassName('test.Resolution')
-			events.size() == 1
-		and:
-			events.get(0).eventName == "DELETE"
-		
-	}
+    and:
+    author.handlerCalled == "onDelete"
+  }
+
+  void "Test only delete event is logged"() {
+    given: "create resolution"
+    def resolution = new Resolution()
+    resolution.name = "One for all"
+    resolution.save(flush:true, failOnError:true)
+    when: "updateing resolution"
+    resolution.name = "One for all and all for one"
+    resolution.save(flush:true, failOnError:true)
+    then: "delete resolution"
+    resolution.delete(flush:true, failOnError:true)
+    def events = AuditTrail.findAllByClassName('test.Resolution')
+    events.size() == 1
+    and:
+    events.get(0).eventName == "DELETE"
+
+  }
 
 }
 

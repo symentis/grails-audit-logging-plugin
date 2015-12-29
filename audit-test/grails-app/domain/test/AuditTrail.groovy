@@ -28,6 +28,7 @@ class AuditTrail implements Serializable {
 
   static auditable = false
 
+  String id
   Date dateCreated
   Date lastUpdated
 
@@ -67,9 +68,13 @@ class AuditTrail implements Serializable {
 
     // Set similiar when you used "auditLog.useDatasource" in < 1.1.0 plugin version.
     // datasource "yourdatasource"
+    datasource 'second'
 
     // no HQL queries package name import (was default in 1.x version)
     //autoImport false
+
+    // Since 2.0.0, mapping is not done by config anymore. Configure your ID mapping here.
+    id generator:"uuid2", type:'string', length:36
 
     version false
   }

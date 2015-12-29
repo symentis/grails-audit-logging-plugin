@@ -52,7 +52,6 @@ class AuditLoggingConfigUtils {
       log.trace 'Building auditLog config since there is no cached config'
       reloadAuditConfig()
     }
-
     _auditConfig
   }
 
@@ -70,12 +69,6 @@ class AuditLoggingConfigUtils {
     log.trace 'reset auditLog config'
   }
 
-  /** Force a reload of the auditLog configuration. */
-  static void reloadAuditConfig() {
-    mergeConfig ReflectionUtils.auditConfig, 'DefaultAuditLogConfig'
-    log.trace 'reloaded auditLog config'
-  }
-
   /**
    * Allow a secondary plugin to add config attributes.
    * @param className the name of the config class.
@@ -85,16 +78,22 @@ class AuditLoggingConfigUtils {
     log.trace 'loaded secondary config {}', className
   }
 
+  /** Force a reload of the auditLog configuration. */
+  static void reloadAuditConfig() {
+    mergeConfig ReflectionUtils.auditConfig, 'DefaultAuditLogConfig'
+    log.trace 'reloaded auditLog config'
+  }
 
   /**
-   * Merge in a secondary config (provided by a plugin as defaults) into the main config.
+   * Merge in a secondary config (provided by plugin as defaults) into the main config.
    * @param currentConfig the current configuration
    * @param className the name of the config class to load
    */
   private static void mergeConfig(ConfigObject currentConfig, String className) {
+    log.trace("Merging currentConfig with $className")
     ConfigObject secondary = new ConfigSlurper(Environment.current.name).parse(
-      new GroovyClassLoader(this.classLoader).loadClass(className))
-    secondary = secondary.auditLog as ConfigObject
+                                    new GroovyClassLoader(this.classLoader).loadClass(className))
+    secondary = secondary.defaultAuditLog as ConfigObject
 
     Collection<String> keysToDefaultEmpty = []
     findKeysToDefaultEmpty secondary, '', keysToDefaultEmpty
@@ -126,12 +125,8 @@ class AuditLoggingConfigUtils {
    * @return the merged configs
    */
   private static ConfigObject mergeConfig(ConfigObject currentConfig, ConfigObject secondary) {
+    log.trace("Merging secondary config on top of currentConfig")
     (secondary ?: new ConfigObject()).merge(currentConfig ?: new ConfigObject()) as ConfigObject
-  }
-
-  @SuppressWarnings('unchecked')
-  private static <T> T getBean(String name, Class<T> c = null) {
-    (T)application.mainContext.getBean(name, c)
   }
 
   /**

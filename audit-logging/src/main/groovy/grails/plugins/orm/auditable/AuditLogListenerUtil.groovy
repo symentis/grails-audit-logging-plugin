@@ -128,6 +128,31 @@ class AuditLogListenerUtil {
   }
 
   /**
+   * Return Instance of the configured AuditLogEvent Grails Domain Class.
+   *
+   * @param domain the domain instance
+   */
+  static GrailsDomainClass getAuditLogDomainInstance(params) {
+    Class<?> dc = getAuditDomainClass()
+    dc.newInstance(params) as GrailsDomainClass
+  }
+
+  /**
+   * Return the configured AuditLogEvent Grails Domain Class.
+   *
+   * @param domain the domain instance
+   */
+  static Class<?> getAuditDomainClass() {
+    def conf = AuditLoggingConfigUtils.auditConfig
+    String auditLogClassName = conf.auditDomainClassName
+    def dc = Holders.grailsApplication.getDomainClass(auditLogClassName)
+    if (!dc) {
+      throw new IllegalArgumentException("The specified user domain class '$auditLogClassName' is not a domain class")
+    }
+    dc.clazz
+  }
+
+  /**
    * Return the grails domain class for the given domain object.
    *
    * @param domain the domain instance

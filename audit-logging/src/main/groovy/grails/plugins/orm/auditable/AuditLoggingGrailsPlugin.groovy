@@ -71,21 +71,21 @@ When called, the event handlers have access to oldObj and newObj definitions tha
     void doWithApplicationContext() {
         def application = grailsApplication
         def config = AuditLoggingConfigUtils.auditConfig
-        boolean disabled = config.getProperty("disabled", Boolean, false)
-        boolean stampEnabled = config.getProperty("stampEnabled", Boolean, true)
-        boolean stampAlways = config.getProperty("stampAlways", Boolean, false)
+        boolean disabled = config.disabled
+        boolean stampEnabled = config.stampEnabled
+        boolean stampAlways = config.stampAlways
 
-        String stampCreatedBy = config.getProperty("stampCreatedBy", String, "createdBy")
-        String stampLastUpdatedBy = config.getProperty("stampLastUpdatedBy", String, "lastUpdatedBy")
-        boolean verbose = config.getProperty("verbose", Boolean, false)
-        boolean nonVerboseDelete = config.getProperty("nonVerboseDelete", Boolean, false)
-        boolean logFullClassName = config.getProperty("logFullClassName", Boolean, false)
-        boolean transactional = config.getProperty("transactional", Boolean, false)
-        boolean logIds = config.getProperty("logIds", Boolean, false)
-        String sessionAttribute = config.getProperty("sessionAttribute", String, "")
-        String actorKey = config.getProperty("actorKey", String, "")
-        Closure actorClosure = config.getProperty("actorClosure", Closure, AuditLogListenerUtil.actorDefaultGetter)
-        String propertyMask = config.getProperty("propertyMask", String, "**********")
+        String stampCreatedBy = config.stampCreatedBy
+        String stampLastUpdatedBy = config.stampLastUpdatedBy
+        boolean verbose = config.verbose
+        boolean nonVerboseDelete = config.nonVerboseDelete
+        boolean logFullClassName = config.logFullClassName
+        boolean transactional = config.transactional
+        boolean logIds = config.logIds
+        String sessionAttribute = config.sessionAttribute
+        String actorKey = config.actorKey
+        Closure actorClosure = config.actorClosure
+        String propertyMask = config.propertyMask
 
 
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
@@ -114,5 +114,16 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 applicationContext.addApplicationListener(listener)
             }
         }
+    }
+
+    void onConfigChange(Map<String, Object> event) {
+        AuditLoggingConfigUtils.resetAuditConfig()
+
+        def conf = AuditLoggingConfigUtils.auditConfig
+        if (!conf || !conf.active) {
+            return
+        }
+
+        log.trace 'onConfigChange'
     }
 }

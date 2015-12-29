@@ -1,13 +1,17 @@
-auditLog {
-    verbose = true
-    defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
-    logFullClassName = true
-    transactional = false
-    defaultMask = ['ssn']
-    logIds = true
-    defaultActor = 'SYS'
-    useDatasource = 'second' // store in "second" datasource
-    idMapping = [generator:"uuid2", type:"string", length:36] // UUID id-type for AuditLogEvent
+
+grails {
+  plugin {
+    auditLog {
+      verbose = true
+      defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
+      logFullClassName = true
+      transactional = false
+      defaultMask = ['ssn']
+      logIds = true
+      defaultActor = 'SYS'
+      useDatasource = 'second' // store in "second" datasource
+    }
+  }
 }
 
 // Added by the Audit-Logging plugin:

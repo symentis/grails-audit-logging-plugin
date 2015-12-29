@@ -60,7 +60,7 @@ class ReflectionUtils {
 		if (grailsConfig.auditLog) {
 			log.error "Your auditLog configuration settings use the old prefix 'auditLog' but must now use 'grails.plugin.auditLog'"
 		}
-		grailsConfig.auditLog
+		grailsConfig.grails.plugin.auditLog
 	}
 
 	static void setAuditConfig(ConfigObject c) {
@@ -88,4 +88,5 @@ class ReflectionUtils {
 		}
 		application
 	}
+
 }
