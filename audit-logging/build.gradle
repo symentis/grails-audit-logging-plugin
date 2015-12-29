@@ -16,7 +16,7 @@ plugins {
     id "com.jfrog.bintray" version "1.4"
 }
 
-version "2.0.0.RC1"
+version "2.0.0"
 group "org.grails.plugins"
 
 apply plugin: 'maven-publish'
@@ -86,8 +86,9 @@ bintray {
         licenses = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
         publicDownloadNumbers = true
         version {
-            attributes = ['grails-plugin': "$project.group:$project.name"]
             name = project.version
+            desc = 'Grails Audit-Logging Plugin for Grails 3.x'
+            attributes = ['grails-plugin': "$project.group:$project.name"]
         }
     }
 }

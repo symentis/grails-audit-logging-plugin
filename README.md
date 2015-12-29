@@ -1,9 +1,9 @@
 #*Grails Audit Logging Plugin*#
 
-The Grails Audit Logging plugin adds generic event based Audit Logging to a Grails project and also adds support to domain models for hooking into the GORM events system.
+The Grails Audit Logging plugin for Grails 3.x adds generic event based Audit Logging to a Grails project and also adds support to domain models for hooking into the GORM events system.
 
 ##**Documentation**##
- * For Grails 3.x documentation, see [Grails 3.0.0-SNAPSHOT Documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/snapshot/)
+ * For Grails 3.x documentation, see [Plugin Documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/)
  * For Grails 2.x documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ##**Supported Grails versions**##
@@ -40,8 +40,8 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	
 	Project lead: Robert Oschwald
 
-##**audit-quickstart (version >=1.1.0)**##
-2.0.0-SNAPSHOT2 is the first version with audit-quickstart command.
+##**audit-quickstart**##
+Version 2.0.0 is the first version with audit-quickstart command support.
 Therefore, you need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version and later. See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
   
 With this, you get a AuditLog domain class in your project which is fully under your control. The domain name is registered in your application.groovy with key "auditLog.auditDomainClassName".
@@ -49,7 +49,7 @@ With this, you get a AuditLog domain class in your project which is fully under 
 Example:
   
 ```
-grails audit-quickstart org.example.myproject.AuditLogEvent
+grails audit-quickstart org.example.myproject MyAuditLogEvent
   
 ```
 
