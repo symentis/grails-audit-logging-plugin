@@ -136,18 +136,6 @@ auditLog {
 
 This setting is disabled by default.
 
-h3. Large value column mode (since 0.5.5)
-
-You can enable large value columns to log more details. If large value columns are enabled, the column limit is 65534 for oldValue and newValue. This setting is especially designed to work with "verbose" mode. If you enabled the large value column mode, you can set TRUNCATE_LENGTH to a value larger 255 and smaller 65535. Enable large value columns in Config.groovy with:
-
-{code}
-auditLog {
-  largeValueColumnTypes = true // use large column db types for oldValue/newValue.
-}
-{code}
-
-Whenever you change the largeValueColumnTypes flag, you need to update your database schema(s).
-
 h3. Property value masking (since 0.5.5)
 
 You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are not stored into the audit log table if verbose mode is enabled. Instead, a mask of "**********" will be logged. By default, "password" properties are masked. You can mask property fields in domain classes like this:
@@ -172,27 +160,6 @@ auditLog {
 When you set TRUNCATE_LENGTH to a value > 255 you must enable largeValueColumnTypes (see above). When you forgot to enable large value column mode while setting TRUNCATE_LENGTH > 255, a warning is logged during startup and the setting will be ignored (255 will be used instead).
 {warning}
 
-h3. Renaming the Audit-Log table name (since 0.5.5)
-
-You can specify the audit log table name. Default is "audit_log". Change the table name in Config.groovy with:
-
-{code}
-auditLog {
-  tablename = "other_audit_log_name"
-}
-{code}
-
-If you change the tablename, you need to update your database schema(s).
-
-h3. Disable Hibernate caching of AuditLogEvent
-
-You can disable the caching of the AuditLogEvents by specifying:
-
-{code}
-auditLog {
-  cacheDisabled = true
-}
-{code}
 
 h3. Transactional AuditLog events
 
@@ -269,14 +236,6 @@ stampEnabled = true // enable stamping support
 stampAlways = false // always stamp domain classes, regardless of @Stamp or static stampable = true existence
 stampCreatedBy = 'createdBy' // fieldname
 stampLastUpdatedBy = 'lastUpdatedBy' // fieldname
-{code}
-
-h3. Use specific datasource (since 1.0.4)
-
-Since version 1.0.4 it is possible to set the datasource name to use for the audit logging table.
-
-{code}
-useDatasource = 'second' // use "second" datasource defined in DataSource.groovy
 {code}
 
 h3. Ignoring certain events (since 1.0.5 / 2.0.0)
