@@ -157,9 +157,6 @@ static auditable = ignoreEvents:["onChange","onSave"]<p class="paragraph"/><h3>E
 auditLog &#123;
  verbose = <span class="java&#45;keyword">true</span> // verbosely log all changed values to db
  logIds = <span class="java&#45;keyword">true</span>  // log db&#45;ids of associated objects.
- // Note: <span class="java&#45;keyword">if</span> you change next 2 properties, you must update your database schema!
- tablename = 'my_audit' // table name <span class="java&#45;keyword">for</span> audit logs.
- largeValueColumnTypes = <span class="java&#45;keyword">true</span> // use large column db types <span class="java&#45;keyword">for</span> oldValue/newValue.
  TRUNCATE_LENGTH = 1000
  cacheDisabled = <span class="java&#45;keyword">true</span>
  logFullClassName = <span class="java&#45;keyword">true</span>
