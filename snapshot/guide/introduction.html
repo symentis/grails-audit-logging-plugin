@@ -103,17 +103,17 @@ with other handler names in other existing plugins.<p class="paragraph"/><h3>Com
 </ul><p class="paragraph"/><h3>ORM implementation dependency</h3><p class="paragraph"/>Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use it with the ORM mapper of your choice
 (Hibernate3, Hibernate4, MongoDB, etc.).<p class="paragraph"/>Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
 please file a GitHub issue.<p class="paragraph"/>
-<h3>Installation</h3><p class="paragraph"/>Add to your build.gradle buildscript dependencies block and to the project dependencies block:<p class="paragraph"/>```
-buildscript {
-  /<strong class="bold"></strong> gradle build-time dependencies <strong class="bold"></strong>/
-  dependencies {
-    classpath 'org.grails.plugins:audit-logging:2.0.0'
-  }
-}<p class="paragraph"/>/<strong class="bold"></strong> Project dependencies <strong class="bold"></strong>/
-dependencies {
-   compile 'org.grails.plugins:audit-logging:2.0.0'
-}
-```<p class="paragraph"/><h3>Create your Domain Artifact using audit-quickstart</h3><p class="paragraph"/>After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.<p class="paragraph"/>    grails audit-quickstart &#60;your.package.name&#62; &#60;YourAuditLogEventClassName&#62;<p class="paragraph"/>example:<p class="paragraph"/>    grails audit-quickstart org.myaudit.example AuditLogEvent<p class="paragraph"/>Afterwards, set the mapping and constraint settings accordinghly in the created AuditLog Domain Artifact.<p class="paragraph"/>Advantage of this approach is that you got full control of the Audit Domain Class.<p class="paragraph"/>
+<h3>Installation</h3><p class="paragraph"/>Add to your build.gradle buildscript dependencies block and to the project dependencies block:<p class="paragraph"/><div class="code"><pre>buildscript &#123;
+  /&#42;&#42; gradle build&#45;time dependencies &#42;&#42;/
+  dependencies &#123;
+    classpath 'org.grails.plugins:audit&#45;logging:2.0.0'
+  &#125;
+&#125;<p class="paragraph"/>/&#42;&#42; Project dependencies &#42;&#42;/
+dependencies &#123;
+   compile 'org.grails.plugins:audit&#45;logging:2.0.0'
+&#125;</pre></div><p class="paragraph"/><h3>Create your Domain Artifact using audit-quickstart</h3><p class="paragraph"/><blockquote class="note">
+After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
+</blockquote><p class="paragraph"/><div class="code"><pre>grails audit&#45;quickstart &#60;your.<span class="java&#45;keyword">package</span>.name&#62; &#60;YourAuditLogEventClassName&#62;</pre></div><p class="paragraph"/>example:<p class="paragraph"/><div class="code"><pre>grails audit&#45;quickstart org.myaudit.example AuditLogEvent</pre></div><p class="paragraph"/>Afterwards, set the mapping and constraint settings accordinghly in the created AuditLog Domain Artifact.<p class="paragraph"/>Advantage of this approach is that you got full control of the Audit Domain Class.<p class="paragraph"/>
 
 
 <a name="1.1 Change log"><!-- Legacy link --></a>
