@@ -14,10 +14,10 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
 
   if [[ -n $TRAVIS_TAG ]]; then
       echo "Publishing to Bintray.."
-      ./gradlew audit-logging:bintrayUpload || EXIT_STATUS=$?
+      ./gradlew audit-logging:bintrayUpload -S || EXIT_STATUS=$?
   else
       echo "Publishing to Grails Artifactory"
-      ./gradlew audit-logging:publish || EXIT_STATUS=$?
+      ./gradlew audit-logging:publish -S || EXIT_STATUS=$?
   fi
 
   ./gradlew docs || EXIT_STATUS=$?
