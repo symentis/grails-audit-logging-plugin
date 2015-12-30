@@ -103,13 +103,9 @@ with other handler names in other existing plugins.<p class="paragraph"/><h3>Com
 </ul><p class="paragraph"/><h3>ORM implementation dependency</h3><p class="paragraph"/>Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use it with the ORM mapper of your choice
 (Hibernate3, Hibernate4, MongoDB, etc.).<p class="paragraph"/>Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
 please file a GitHub issue.<p class="paragraph"/>
-<h3>Installation</h3><p class="paragraph"/>Add to your build.gradle buildscript dependencies block and to the project dependencies block:<p class="paragraph"/><div class="code"><pre>buildscript &#123;
-  /&#42;&#42; gradle build&#45;time dependencies &#42;&#42;/
-  dependencies &#123;
-    classpath 'org.grails.plugins:audit&#45;logging:2.0.0'
-  &#125;
-&#125;<p class="paragraph"/>/&#42;&#42; Project dependencies &#42;&#42;/
+<h3>Installation</h3><p class="paragraph"/>Add to your build.gradle project dependencies block:<p class="paragraph"/><div class="code"><pre>/&#42;&#42; Project dependencies &#42;&#42;/
 dependencies &#123;
+   &#8230;
    compile 'org.grails.plugins:audit&#45;logging:2.0.0'
 &#125;</pre></div><p class="paragraph"/><h3>Create your Domain Artifact using audit-quickstart</h3><p class="paragraph"/><blockquote class="note">
 After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
