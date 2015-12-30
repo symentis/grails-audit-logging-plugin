@@ -35,13 +35,18 @@ h3. Installation
 Add to your build.gradle project dependencies block:
 
 {code}
-
 /** Project dependencies **/
 dependencies {
    ...
    compile 'org.grails.plugins:audit-logging:2.0.0'
 }
 {code}
+
+Run
+{code}
+grails compile
+{code}
+or another script that triggers dependency resolution, and then the audit-quickstart script to generate the domain classes and add the initial configuration settings.
 
 h3. Create your Domain Artifact using audit-quickstart
 
@@ -56,10 +61,10 @@ After installing the plugin, you must perform the following command to let the p
 example:
 
 {code}
-    grails audit-quickstart org.myaudit.example AuditLogEvent
+    grails audit-quickstart org.myaudit.example AuditTrail
 {code}
 
-Afterwards, set the mapping and constraint settings accordinghly in the created AuditLog Domain Artifact.
+Afterwards, set the mapping and constraint settings accordinghly in the created Domain Artifact.
 
 Advantage of this approach is that you got full control of the Audit Domain Class.
 
