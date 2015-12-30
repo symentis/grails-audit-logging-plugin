@@ -107,9 +107,11 @@ please file a GitHub issue.<p class="paragraph"/>
 dependencies &#123;
    &#8230;
    compile 'org.grails.plugins:audit&#45;logging:2.0.0'
-&#125;</pre></div><p class="paragraph"/><h3>Create your Domain Artifact using audit-quickstart</h3><p class="paragraph"/><blockquote class="note">
+&#125;</pre></div><p class="paragraph"/>Run
+<div class="code"><pre>grails compile</pre></div>
+or another script that triggers dependency resolution, and then the audit-quickstart script to generate the domain classes and add the initial configuration settings.<p class="paragraph"/><h3>Create your Domain Artifact using audit-quickstart</h3><p class="paragraph"/><blockquote class="note">
 After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
-</blockquote><p class="paragraph"/><div class="code"><pre>grails audit&#45;quickstart &#60;your.<span class="java&#45;keyword">package</span>.name&#62; &#60;YourAuditLogEventClassName&#62;</pre></div><p class="paragraph"/>example:<p class="paragraph"/><div class="code"><pre>grails audit&#45;quickstart org.myaudit.example AuditLogEvent</pre></div><p class="paragraph"/>Afterwards, set the mapping and constraint settings accordinghly in the created AuditLog Domain Artifact.<p class="paragraph"/>Advantage of this approach is that you got full control of the Audit Domain Class.<p class="paragraph"/>
+</blockquote><p class="paragraph"/><div class="code"><pre>grails audit&#45;quickstart &#60;your.<span class="java&#45;keyword">package</span>.name&#62; &#60;YourAuditLogEventClassName&#62;</pre></div><p class="paragraph"/>example:<p class="paragraph"/><div class="code"><pre>grails audit&#45;quickstart org.myaudit.example AuditTrail</pre></div><p class="paragraph"/>Afterwards, set the mapping and constraint settings accordinghly in the created Domain Artifact.<p class="paragraph"/>Advantage of this approach is that you got full control of the Audit Domain Class.<p class="paragraph"/>
 
 
 <a name="1.1 Change log"><!-- Legacy link --></a>
