@@ -695,7 +695,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         audit.with {
             dateCreated = lastUpdated = new Date()
         }
-        log.info audit
         try {
             getAuditDomainClass().withNewSession {
                 if (transactional) {
