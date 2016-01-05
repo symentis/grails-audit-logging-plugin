@@ -8,5 +8,5 @@ The Audit Logging plugin registers a PersistenceEventListener (AuditLogListener)
 
 The Plugin Descriptor (AuditLogListenerGrailsPlugin) configures the plugin during startup.
 
- * Configures the plugin (either by default values - see DefaultAuditLogConfig.groovy) or by user configured settings.
+ * Configures the plugin either by default values - see DefaultAuditLogConfig.groovy - or by user configured settings.
  * Registers a PersistenceEventListener bean per datasource

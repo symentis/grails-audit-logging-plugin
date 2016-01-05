@@ -13,9 +13,7 @@ Enables audit logging using the introduced domain class AuditLogEvent which will
 
 === 2. Auditing plus domain event handlers
 
-You may use the optional event handlers in your Domain classes.
-
-Example:
+You may use the optional event handlers in your Domain classes. Example:
 
 [source,groovy]
 ----

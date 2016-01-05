@@ -1,6 +1,6 @@
 == Configuration
 
-The plugin configuration can be specified in the application.groovy (Grails 3.x) / Config.groovy (Grails 2.x) file.
+The plugin configuration can be specified in the application.groovy file.
 It supports Environments blocks for environment-specific configuration.
 
 [WARNING]
@@ -11,10 +11,10 @@ If you use the old configuration key, the plugin will log a notice.
 
 === Auditing Current User Information (actorClosure)
 
-With version >= 0.5, additional configuration can be specified in the Config.groovy file of the project to help log the
+With version >= 0.5, additional configuration can be specified in the application.groovy file of the project to help log the
 authenticated user for various security systems.
 For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor
-name (the person performing the action which triggered the event, e.g. the username) add these lines to Config.groovy:
+name (the person performing the action which triggered the event, e.g. the username) add these lines to application.groovy:
 
 [source,groovy]
 ----
@@ -44,7 +44,7 @@ grails.plugin.auditLog.actorClosure = {...}
 ==== Spring Security Core Plugin 1.1.2 or higher
 
 If you save data from an unprotected URL (configAttribute:IS_AUTHENTICATED_ANONYMOUSLY), the principal is a String-object
-not a Principal-object. To cope with this behaviour you should use the following Closure definition in Config.groovy:
+not a Principal-object. To cope with this behaviour you should use the following Closure definition in application.groovy:
 
 [source,groovy]
 ----
@@ -107,8 +107,12 @@ grails {
 ==== CAS Authentication
 
 For example if you are using a system such as CAS you can specify the CAS user attribute using a special configuration
-property to get the CAS user name. In Config.groovy just add the following lines to the top of the file:
+property to get the CAS user name. In application.groovy  add the following lines:
+
+[source,groovy]
+----
 import edu.yale.its.tp.cas.client.filter.CASFilter
+----
 
 [source,groovy]
 ----
@@ -219,7 +223,7 @@ static auditable = [mask:'password','otherField']
 === Verbose log truncation length
 
 If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
-columns (Default is 255). Configure the TRUNCATE_LENGTH in Config.groovy:
+columns (Default is 255). Configure the TRUNCATE_LENGTH in application.groovy:
 
 [source,groovy]
 ----
@@ -249,9 +253,9 @@ a truncation warning may occur and only partial information is logged.
 
 === Transactional AuditLog events
 
-In Config.groovy you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
+In application.groovy, you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
 and commit transactions around audit log save events.
-If set to false then the AuditLog will be persisted without a transaction wrapping its call to save.
+If set to false (the default), the AuditLog may be persisted without a transaction wrapping its call to save.
 This setting should not be changed from defaults lightly as it can cause problems in integration testing.
 
 [source,groovy]
@@ -338,7 +342,7 @@ Since version 1.0.4, it is possible to enable domain class stamping support.
 With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get
 the fields dateCreated, lastUpdated, createdBy, lastUpdatedBy using an AST transformation.
 You can create your own StampASTTransformation implementation for your specific needs.
-The createdBy and lastUpdatedBy fieldnames can be declared in Config.groovy.
+The createdBy and lastUpdatedBy fieldnames can be declared in application.groovy.
 These fields will be filled with the result of the actor closure on the event PreInsert, PreUpdate and PreDelete.
 Thanks to tkvw for this feature.
 
@@ -361,7 +365,7 @@ static auditable = [ignoreEvents:["onChange","onSave"]]
 
 === Example configuration
 
-Example Config.groovy configuration with various settings as described above:
+Example application.groovy configuration with various settings as described above:
 
 [source,groovy]
 ----

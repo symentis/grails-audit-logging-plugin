@@ -3,8 +3,8 @@
 * 2.0.0
 ** Grails 3 support.
 ** audit-quickstart command to create the AuditLog domain artifact
-** Current branch: master.
-** For 1.0.x version, see 1.x_maintenance branch
+** branch: master.
+** For 1.0.x plugin version (Grails2), see 1.x_maintenance branch
 
 * 1.0.5
 ** Migration of JIRA to GitHub Issues

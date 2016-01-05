@@ -17,7 +17,7 @@ Run
     grails compile
 ....
 
-or another script that triggers dependency resolution, and then the audit-quickstart script to generate the domain classes and add the initial configuration settings.
+or another script that triggers dependency resolution. Afterwards, perform audit-quickstart to generate the domain classes and add the initial configuration settings.
 
 === Create your Domain Artifact using audit-quickstart
 
@@ -34,8 +34,6 @@ example:
     grails audit-quickstart org.myaudit.example AuditTrail
 ....
 
-Afterwards, set the mapping and constraint settings accordinghly in the created Domain Artifact.
-
-Advantage of this approach is that you got full control of the Audit Domain Class.
+Afterwards, set your needed mapping and constraint settings accordinghly in the created Domain Artifact.
 
 
