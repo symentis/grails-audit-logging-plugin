@@ -644,10 +644,10 @@ please file a GitHub issue.</p>
 <p>audit-quickstart command to create the AuditLog domain artifact</p>
 </li>
 <li>
-<p>Current branch: master.</p>
+<p>branch: master.</p>
 </li>
 <li>
-<p>For 1.0.x version, see 1.x_maintenance branch</p>
+<p>For 1.0.x plugin version (Grails2), see 1.x_maintenance branch</p>
 </li>
 </ul>
 </div>
@@ -959,7 +959,7 @@ dependencies {
 </div>
 </div>
 <div class="paragraph">
-<p>or another script that triggers dependency resolution, and then the audit-quickstart script to generate the domain classes and add the initial configuration settings.</p>
+<p>or another script that triggers dependency resolution. Afterwards, perform audit-quickstart to generate the domain classes and add the initial configuration settings.</p>
 </div>
 <div class="sect2">
 <h3 id="create-your-domain-artifact-using-audit-quickstart">3.1. Create your Domain Artifact using audit-quickstart</h3>
@@ -989,10 +989,7 @@ After installing the plugin, you must perform the following command to let the p
 </div>
 </div>
 <div class="paragraph">
-<p>Afterwards, set the mapping and constraint settings accordinghly in the created Domain Artifact.</p>
-</div>
-<div class="paragraph">
-<p>Advantage of this approach is that you got full control of the Audit Domain Class.</p>
+<p>Afterwards, set your needed mapping and constraint settings accordinghly in the created Domain Artifact.</p>
 </div>
 </div>
 </div>
@@ -1017,10 +1014,7 @@ After installing the plugin, you must perform the following command to let the p
 <div class="sect2">
 <h3 id="2-auditing-plus-domain-event-handlers">4.2. 2. Auditing plus domain event handlers</h3>
 <div class="paragraph">
-<p>You may use the optional event handlers in your Domain classes.</p>
-</div>
-<div class="paragraph">
-<p>Example:</p>
+<p>You may use the optional event handlers in your Domain classes. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1081,7 +1075,7 @@ After installing the plugin, you must perform the following command to let the p
 <h2 id="configuration">5. Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The plugin configuration can be specified in the application.groovy (Grails 3.x) / Config.groovy (Grails 2.x) file.
+<p>The plugin configuration can be specified in the application.groovy file.
 It supports Environments blocks for environment-specific configuration.</p>
 </div>
 <div class="admonitionblock warning">
@@ -1102,10 +1096,10 @@ If you use the old configuration key, the plugin will log a notice.</p>
 <div class="sect2">
 <h3 id="auditing-current-user-information-actorclosure">5.1. Auditing Current User Information (actorClosure)</h3>
 <div class="paragraph">
-<p>With version &gt;= 0.5, additional configuration can be specified in the Config.groovy file of the project to help log the
+<p>With version &gt;= 0.5, additional configuration can be specified in the application.groovy file of the project to help log the
 authenticated user for various security systems.
 For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor
-name (the person performing the action which triggered the event, e.g. the username) add these lines to Config.groovy:</p>
+name (the person performing the action which triggered the event, e.g. the username) add these lines to application.groovy:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1143,7 +1137,7 @@ name (the person performing the action which triggered the event, e.g. the usern
 <h4 id="spring-security-core-plugin-1-1-2-or-higher">5.1.1. Spring Security Core Plugin 1.1.2 or higher</h4>
 <div class="paragraph">
 <p>If you save data from an unprotected URL (configAttribute:IS_AUTHENTICATED_ANONYMOUSLY), the principal is a String-object
-not a Principal-object. To cope with this behaviour you should use the following Closure definition in Config.groovy:</p>
+not a Principal-object. To cope with this behaviour you should use the following Closure definition in application.groovy:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1213,8 +1207,12 @@ not a Principal-object. To cope with this behaviour you should use the following
 <h4 id="cas-authentication">5.1.4. CAS Authentication</h4>
 <div class="paragraph">
 <p>For example if you are using a system such as CAS you can specify the CAS user attribute using a special configuration
-property to get the CAS user name. In Config.groovy just add the following lines to the top of the file:
-import edu.yale.its.tp.cas.client.filter.CASFilter</p>
+property to get the CAS user name. In application.groovy  add the following lines:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">edu.yale.its.tp.cas.client.filter.CASFilter</span></code></pre>
+</div>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1350,7 +1348,7 @@ By default, "password" properties are masked. You can mask property fields in do
 <h3 id="verbose-log-truncation-length">5.6. Verbose log truncation length</h3>
 <div class="paragraph">
 <p>If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
-columns (Default is 255). Configure the TRUNCATE_LENGTH in Config.groovy:</p>
+columns (Default is 255). Configure the TRUNCATE_LENGTH in application.groovy:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1389,9 +1387,9 @@ a truncation warning may occur and only partial information is logged.</p>
 <div class="sect2">
 <h3 id="transactional-auditlog-events">5.7. Transactional AuditLog events</h3>
 <div class="paragraph">
-<p>In Config.groovy you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
+<p>In application.groovy, you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
 and commit transactions around audit log save events.
-If set to false then the AuditLog will be persisted without a transaction wrapping its call to save.
+If set to false (the default), the AuditLog may be persisted without a transaction wrapping its call to save.
 This setting should not be changed from defaults lightly as it can cause problems in integration testing.</p>
 </div>
 <div class="listingblock">
@@ -1485,7 +1483,7 @@ It is recommended to not perform costly calls.</p>
 With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get
 the fields dateCreated, lastUpdated, createdBy, lastUpdatedBy using an AST transformation.
 You can create your own StampASTTransformation implementation for your specific needs.
-The createdBy and lastUpdatedBy fieldnames can be declared in Config.groovy.
+The createdBy and lastUpdatedBy fieldnames can be declared in application.groovy.
 These fields will be filled with the result of the actor closure on the event PreInsert, PreUpdate and PreDelete.
 Thanks to tkvw for this feature.</p>
 </div>
@@ -1512,7 +1510,7 @@ stampLastUpdatedBy = <span class="string"><span class="delimiter">'</span><span 
 <div class="sect2">
 <h3 id="example-configuration">5.14. Example configuration</h3>
 <div class="paragraph">
-<p>Example Config.groovy configuration with various settings as described above:</p>
+<p>Example application.groovy configuration with various settings as described above:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1565,7 +1563,7 @@ grails {
 <div class="ulist">
 <ul>
 <li>
-<p>Configures the plugin (either by default values - see DefaultAuditLogConfig.groovy) or by user configured settings.</p>
+<p>Configures the plugin either by default values - see DefaultAuditLogConfig.groovy - or by user configured settings.</p>
 </li>
 <li>
 <p>Registers a PersistenceEventListener bean per datasource</p>
@@ -1579,7 +1577,7 @@ grails {
 <div id="footer">
 <div id="footer-text">
 Version 2.0.1-SNAPSHOT<br>
-Last updated 2016-01-05 15:52:05 UTC
+Last updated 2016-01-05 16:03:50 UTC
 </div>
 </div>
 </body>
