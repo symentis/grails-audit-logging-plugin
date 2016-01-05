@@ -16,7 +16,7 @@ plugins {
     id "io.spring.dependency-management" version "0.5.1.RELEASE"
 }
 
-version "2.0.0"
+version "2.0.1-SNAPSHOT"
 group "audit.test"
 
 apply plugin: "spring-boot"

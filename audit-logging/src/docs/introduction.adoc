@@ -1,4 +1,4 @@
-h3. Description
+== Description
 
 The Audit Logging plugin adds Grails GORM Events based Audit Logging capabilities to a Grails project and it also adds
 support to domain models for hooking into the Grails GORM events system.
@@ -13,7 +13,7 @@ but do not work well for ''Audit Logging'' where we would need critical informat
 available after these actions complete. We've chosen to prefix the handler names with "on" so that they do not conflict
 with other handler names in other existing plugins.
 
-h3. Compatibility issues
+=== Compatibility
 
 * For Grails 3.x use version 2.0.0 or above.
 * For Grails 2.x use version 1.0.0 or above.
@@ -21,51 +21,12 @@ h3. Compatibility issues
 * For Grails <= 1.2.0 use version 0.5.3.
 
 
-h3. ORM implementation dependency
+=== ORM implementation dependency
 
 Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use it with the ORM mapper of your choice
 (Hibernate3, Hibernate4, MongoDB, etc.).
 
 Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
 please file a GitHub issue.
-
-
-h3. Installation
-
-Add to your build.gradle project dependencies block:
-
-{code}
-/** Project dependencies **/
-dependencies {
-   ...
-   compile 'org.grails.plugins:audit-logging:2.0.0'
-}
-{code}
-
-Run
-{code}
-grails compile
-{code}
-or another script that triggers dependency resolution, and then the audit-quickstart script to generate the domain classes and add the initial configuration settings.
-
-h3. Create your Domain Artifact using audit-quickstart
-
-{note}
-After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
-{note}
-
-{code}
-    grails audit-quickstart <your.package.name> <YourAuditLogEventClassName>
-{code}
-
-example:
-
-{code}
-    grails audit-quickstart org.myaudit.example AuditTrail
-{code}
-
-Afterwards, set the mapping and constraint settings accordinghly in the created Domain Artifact.
-
-Advantage of this approach is that you got full control of the Audit Domain Class.
 
 

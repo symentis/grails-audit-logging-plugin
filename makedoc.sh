@@ -1,5 +1,8 @@
 #!/bin/bash
-set -e
+set -ex
+
+TRAVIS_BRANCH=`git rev-parse --abbrev-ref HEAD`
+TRAVIS_PULL_REQUEST="false"
 
 rm -rf audit-logging/build
 rm -rf audit-test/build
@@ -17,7 +20,7 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
       ./gradlew audit-logging:bintrayUpload -S || EXIT_STATUS=$?
   else
       echo "Publishing to Grails Artifactory"
-      ./gradlew audit-logging:publish -S || EXIT_STATUS=$?
+#      ./gradlew audit-logging:publish -S || EXIT_STATUS=$?
   fi
 
   ./gradlew docs --stacktrace || EXIT_STATUS=$?
@@ -29,8 +32,8 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
 
   echo " "
   echo "** Updating gh-pages branch **"
-  cd audit-logging/build
-  git clone https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git -b gh-pages gh-pages --single-branch > /dev/null
+  pushd audit-logging/build
+  git clone https://github.com/robertoschwald/grails-audit-logging-plugin.git -b gh-pages gh-pages --single-branch > /dev/null
   cd gh-pages
 
   # prepare index.html
@@ -65,9 +68,10 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
 
     fi
 
-    git commit -a -m "Updating docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+    git commit -a -m "Updating docs manually from ${TRAVIS_BRANCH} #noref"
     git push origin HEAD
     cd ..
     rm -rf gh-pages
+    popd
 fi
 exit $EXIT_STATUS

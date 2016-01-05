@@ -1,0 +1,24 @@
+= Grails Audit Logging Plugin - Reference Documentation
+Robert Oschwald
+
+:doctype: book
+:encoding: utf-8
+:lang: en
+:toc: left
+:toclevels: 2
+:numbered:
+:keywords: Grails, AuditLog, AuditTrail
+:copyright: Apache License, Version 2.0
+
+include::introduction.adoc[]
+
+include::changelog.adoc[]
+
+include::installation.adoc[]
+
+include::usage.adoc[]
+
+include::configuration.adoc[]
+
+include::implementation.adoc[]
+
