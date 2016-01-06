@@ -12,8 +12,8 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-        classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.4'
-        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.9'
+        classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
     }
 }
 
@@ -72,6 +72,13 @@ dependencies {
     testCompile "org.grails:grails-plugin-testing"
 
     console "org.grails:grails-console"
+}
+
+
+// Needed for org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6
+// See https://github.com/asciidoctor/asciidoctorj/issues/415
+asciidoctorj {
+  version = '1.5.4'
 }
 
 String buildDate() {

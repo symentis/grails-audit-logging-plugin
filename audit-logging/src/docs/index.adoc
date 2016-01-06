@@ -1,6 +1,6 @@
 = Grails Audit Logging Plugin - Reference Documentation
 Robert Oschwald
-
+2016-01-05
 :doctype: book
 :encoding: utf-8
 :lang: en
@@ -8,7 +8,13 @@ Robert Oschwald
 :toclevels: 2
 :numbered:
 :keywords: Grails, AuditLog, AuditTrail
+ifdef::backend-epub3[]
 :copyright: Apache License, Version 2.0
+:front-cover-image: image:cover.png[Front Cover,800,600]
+:producer: Asciidoctor
+:copyright: Apache License 2.0
+:imagesdir: images
+endif::[]
 
 include::introduction.adoc[]
 
