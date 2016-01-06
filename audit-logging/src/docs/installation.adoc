@@ -7,7 +7,7 @@ Add to your build.gradle project dependencies block:
 /** Project dependencies **/
 dependencies {
    ...
-   compile 'org.grails.plugins:audit-logging:2.0.0'
+   compile 'org.grails.plugins:audit-logging:{version}'
 }
 ----
 
