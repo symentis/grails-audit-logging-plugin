@@ -91,14 +91,14 @@ class AuditLoggingConfigUtils {
    */
   private static void mergeConfig(ConfigObject currentConfig, String className) {
     log.trace("Merging currentConfig with $className")
-    ConfigObject secondary = new ConfigSlurper(Environment.current.name).parse(
-                                    new GroovyClassLoader(this.classLoader).loadClass(className))
+    GroovyClassLoader classLoader = new GroovyClassLoader(Thread.currentThread().contextClassLoader)
+    ConfigObject secondary = new ConfigSlurper(Environment.current.name).parse(classLoader.loadClass(className))
     secondary = secondary.defaultAuditLog as ConfigObject
 
     Collection<String> keysToDefaultEmpty = []
     findKeysToDefaultEmpty secondary, '', keysToDefaultEmpty
 
-    def merged = mergeConfig(currentConfig, secondary)
+    ConfigObject merged = mergeConfig(currentConfig, secondary)
 
     // having discovered the keys that have map values (since they initially point to empty maps),
     // check them again and remove the damage done when Map values are 'flattened'
