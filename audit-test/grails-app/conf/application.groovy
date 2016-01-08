@@ -10,7 +10,7 @@ grails {
       logIds = true
       defaultActor = 'SYS'
       useDatasource = 'second' // store in "second" datasource
-      replacementPatterns = ["a.b.":""]
+      replacementPatterns = ["a.b":""]
     }
   }
 }

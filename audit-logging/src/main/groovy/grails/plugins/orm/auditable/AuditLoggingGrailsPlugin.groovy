@@ -106,10 +106,11 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 listener.sessionAttribute = sessionAttribute
                 listener.actorKey = actorKey
                 listener.actorClosure = actorClosure
-                listener.defaultIgnoreList = AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
-                listener.defaultMaskList = AuditLoggingConfigUtils.auditConfig.defaultMask?.asImmutable() ?: ['password'].asImmutable()
+                listener.defaultIgnoreList = config.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
+                listener.defaultMaskList = config.defaultMask?.asImmutable() ?: ['password'].asImmutable()
                 listener.propertyMask = propertyMask
-                listener.replacementPatterns = AuditLoggingConfigUtils.auditConfig.replacementPatterns
+                if (config.replacementPatterns && config.replacementPatterns instanceof Map)
+                    listener.replacementPatterns = config.replacementPatterns.toFlatConfig() // #116
                 listener.logIds = logIds
                 applicationContext.addApplicationListener(listener)
             }

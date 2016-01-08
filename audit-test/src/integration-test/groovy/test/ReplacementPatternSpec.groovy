@@ -51,7 +51,7 @@ class ReplacementPatternSpec extends Specification {
 
         def first = events.find { it.propertyName == 'name' }
         first.oldValue == null
-        first.newValue == "MySample"
+        first.newValue == ".MySample"
     }
 
     void "Test replacementPattern does not convert c.d.MySample"() {

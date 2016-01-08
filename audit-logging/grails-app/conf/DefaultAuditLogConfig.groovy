@@ -34,5 +34,4 @@ defaultAuditLog {
   actorKey = ""
   actorClosure = AuditLogListenerUtil.actorDefaultGetter
   propertyMask = "**********"
-  replacementPatterns = [:]
 }
