@@ -19,6 +19,7 @@
 package grails.plugins.orm.auditable
 
 class AuditLogEventController {
+  Class AuditLogEvent = AuditLogListenerUtil.auditDomainClass
 
   // the delete, save and update actions only accept POST requests
   static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
@@ -29,31 +30,17 @@ class AuditLogEventController {
 
   def list() {
     if (!params.max) params.max = 10
+
     [auditLogEventInstanceList: AuditLogEvent.list(params), auditLogEventInstanceTotal: AuditLogEvent.count()]
   }
 
   def show() {
-    def auditLogEvent
-    // GPAUDITLOGGING-81: As the id type is configurable in the config, the attribute type is Object in AuditLogEvent.
-    // This causes the auto conversion not to work anymore. As we haven't found a way to get the mapping type in an ORM-agnostic way,
-    // we simply cast to Long as a first try and use String as the 2nd. Other conversions currently not supported.
-    // We badly need GH #13 implemented.
-    try {
-      auditLogEvent = AuditLogEvent.get(params.long('id'))
-    } catch (Exception e){
-      try {
-        auditLogEvent = AuditLogEvent.get(params.id)
-      } catch (Exception giveup){
-        log.error("Cannot obtain AuditLogEvent. ", giveup)
-      }
-    }
+    def  auditLogEvent = AuditLogEvent.get(params.id)
     if (auditLogEvent == null) {
       flash.message = "AuditLogEvent not found with id ${params.id}"
       redirect(action: 'list')
       return
     }
-
-
     [auditLogEventInstance: auditLogEvent]
   }
 
