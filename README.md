@@ -45,7 +45,7 @@ Special thanks to all the contributors to the project (in alphabetical order):
 Version 2.0.0 is the first version with audit-quickstart command support.
 Therefore, you need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version and later. See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
   
-With this, you get a AuditLog domain class in your project which is fully under your control. The domain name is registered in your application.groovy with key "auditLog.auditDomainClassName".
+With this, you get a AuditLog domain class in your project which is fully under your control. The domain name is registered in your application.groovy with key "grails.plugins.auditLog.auditDomainClassName".
   
 Example:
   
