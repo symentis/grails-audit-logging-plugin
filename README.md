@@ -2,19 +2,20 @@
 
 This is the branch for the 1.x series of this plugin, compatible with Grails < 3.x.
 
+For Grails 3.x compatible version, see [master](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master) branch.
+
 The Grails Audit Logging plugin can add generic event based Audit Logging to a Grails project and it can also add support to domain models for hooking into the events system.
 
 ##**Documentation**##
 For documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ##**audit-quickstart (version >=1.1.0)**##
-Currently, we are impementing audit-quickstart to generate a domain artifact in the developers Grails project. 
+1.1.0 added the audit-quickstart command to generate a domain artifact in the developers Grails project. 
 Therefore, you need to perform "grails audit-quickstart \<package.DomainClass\>" after installing this plugin's version 1.1.0 and later. See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
 
 With this, you get a AuditLog domain class in your project which is fully under your control. The domain name is registered in your Config.groovy with key "auditLog.auditDomainClassName". 
 
-
-This feature will be the default in the upcoming Grails 3.x plugin version as well.
+This feature is the default in the Grails 3.x plugin version as well.
 
 Example:
 
@@ -22,11 +23,9 @@ Example:
 grails audit-quickstart org.example.myproject.AuditLogEvent
 
 ```
-
-Use version 1.1.0-SNAPSHOT to test this new feature in your project. Your feedback in [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13) is highly appreciated.
  
 ####**Migration from plugin versions < 1.1.0**####
-If you already use a plugin version < 1.1.0, you must change the created AuditLogEvent domain class to fit your previous settings. The generated domain class contains hint-comments what to change.
+If you already use a plugin version < 1.1.0, you must change the created AuditLogEvent domain class to fit your previous settings. The generated domain class artifact contains hint-comments what to change.
 
 
 ##**Issue Management**##
