@@ -1,5 +1,9 @@
 == Change Log
 
+# 2.0.1
+** Fix #117 Clean build. Version 2.0.0 had issues with Spring Security due to unclean build.
+** Fix #116 (paritially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.
+
 * 2.0.0
 ** Grails 3 support.
 ** audit-quickstart command to create the AuditLog domain artifact

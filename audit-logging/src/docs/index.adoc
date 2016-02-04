@@ -1,6 +1,6 @@
 = Grails Audit Logging Plugin - Reference Documentation
 Robert Oschwald
-2016-01-05
+2016-02-03
 :doctype: book
 :encoding: utf-8
 :lang: en
