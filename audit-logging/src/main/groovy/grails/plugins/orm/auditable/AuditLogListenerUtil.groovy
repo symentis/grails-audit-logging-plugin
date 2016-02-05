@@ -145,6 +145,9 @@ class AuditLogListenerUtil {
   static Class<?> getAuditDomainClass() {
     def conf = AuditLoggingConfigUtils.auditConfig
     String auditLogClassName = conf.auditDomainClassName
+    if (auditLogClassName == null){
+      throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
+    }
     def dc = Holders.grailsApplication.getDomainClass(auditLogClassName)
     if (!dc) {
       throw new IllegalArgumentException("The specified user domain class '$auditLogClassName' is not a domain class")
