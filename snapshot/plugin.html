@@ -529,8 +529,6 @@ table.CodeRay td.code>pre{padding:0}
 </ul>
 </li>
 <li><a href="#change-log">2. Change Log</a></li>
-<li><a href="#2-0-1">2.0.1</a>
-<ul class="sectlevel1">
 <li><a href="#installation">3. Installation</a>
 <ul class="sectlevel2">
 <li><a href="#create-your-domain-artifact-using-audit-quickstart">3.1. Create your Domain Artifact using audit-quickstart</a></li>
@@ -565,8 +563,6 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#auditlogeventlistener">6.1. AuditLogEventListener</a></li>
 <li><a href="#plugin-descriptor">6.2. Plugin Descriptor</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -636,12 +632,20 @@ please file a GitHub issue.</p>
 <div class="sect1">
 <h2 id="change-log">2. Change Log</h2>
 <div class="sectionbody">
-
+<div class="ulist">
+<ul>
+<li>
+<p>2.0.2 (Snapshot)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #118, use Grails 3.0.10 internally.</p>
+</li>
+</ul>
 </div>
-</div>
-<h1 id="2-0-1" class="sect0">2.0.1</h1>
-<div class="openblock partintro">
-<div class="content">
+</li>
+<li>
+<p>2.0.1</p>
 <div class="ulist">
 <ul>
 <li>
@@ -649,14 +653,14 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>Fix #116 (paritially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>2.0.0</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>2.0.0</p>
+<div class="ulist">
+<ul>
 <li>
 <p>Grails 3 support.</p>
 </li>
@@ -668,14 +672,14 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>For 1.0.x plugin version (Grails2), see 1.x_maintenance branch</p>
-<div class="ulist">
-<ul>
-<li>
-<p>1.0.5</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>1.0.5</p>
+<div class="ulist">
+<ul>
 <li>
 <p>Migration of JIRA to GitHub Issues</p>
 </li>
@@ -684,14 +688,14 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>Starting with this release, the main branch for the 1.0.x series is 1.x_maintenance. Master branch is for Grails 3.0 support, now. Both branches will be tested by Travis-CI.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>1.0.4</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>1.0.4</p>
+<div class="ulist">
+<ul>
 <li>
 <p>GPAUDITLOGGING-69 allow to set uri per domain object</p>
 </li>
@@ -709,37 +713,37 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities</p>
-<div class="ulist">
-<ul>
-<li>
-<p>1.0.3</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>1.0.3</p>
+<div class="ulist">
+<ul>
 <li>
 <p>GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource</p>
 </li>
 <li>
 <p>GPAUDITLOGGING-63 logFullClassName property</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>1.0.2</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>GPAUDITLOGGING-66</p>
 <div class="ulist">
 <ul>
 <li>
-<p>1.0.1</p>
+<p>GPAUDITLOGGING-66</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>1.0.1</p>
+<div class="ulist">
+<ul>
 <li>
 <p>closures</p>
 </li>
@@ -748,14 +752,14 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>provide domain identifier to onSave() handler</p>
-<div class="ulist">
-<ul>
-<li>
-<p>1.0.0</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>1.0.0</p>
+<div class="ulist">
+<ul>
 <li>
 <p>Grails &gt;= 2.0</p>
 </li>
@@ -773,44 +777,44 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>#13 Externalize AuditTrailEvent domain to user</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>0.5.5.3</p>
-</li>
-</ul>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>Added ability to disable audit logging by config.</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>0.5.5.2</p>
-</li>
-</ul>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>0.5.5.1</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Fixed the title. No changes in the plugin code.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>0.5.5</p>
+<p>Fixed the title. No changes in the plugin code.</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>0.5.5</p>
+<div class="ulist">
+<ul>
 <li>
 <p>collections logging</p>
 </li>
@@ -828,24 +832,24 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>fixes and enhancements</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>0.5.4</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>compatibility issues with Grails 1.3.x</p>
 <div class="ulist">
 <ul>
 <li>
-<p>0.5.3</p>
+<p>compatibility issues with Grails 1.3.x</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>0.5.3</p>
+<div class="ulist">
+<ul>
 <li>
 <p>GRAILSPLUGINS-2135</p>
 </li>
@@ -854,34 +858,34 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>an issue with extra JAR files that are somehow getting released as part of the plugin</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>0.5.2</p>
-</li>
-</ul>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>0.5.1</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>fixes regression in field logging</p>
 <div class="ulist">
 <ul>
 <li>
-<p>0.5</p>
+<p>fixes regression in field logging</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>0.5</p>
+<div class="ulist">
+<ul>
 <li>
 <p>GRAILSPLUGINS-391</p>
 </li>
@@ -905,24 +909,24 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>for logging action to avoid invalidating the main hibernate session.</p>
-<div class="ulist">
-<ul>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>0.4.1</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181</p>
 <div class="ulist">
 <ul>
 <li>
-<p>0.4</p>
+<p>repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181</p>
 </li>
 </ul>
 </div>
 </li>
+<li>
+<p>0.4</p>
+<div class="ulist">
+<ul>
 <li>
 <p>custom serializable implementation for AuditLogEvent so events can happen inside a webflow context.</p>
 </li>
@@ -934,19 +938,22 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>fix missing oldState bug in change event</p>
-<div class="ulist">
-<ul>
-<li>
-<p>0.3</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
+<p>0.3</p>
+<div class="ulist">
+<ul>
+<li>
 <p>actorKey and username features allow for the logging of user or userPrincipal for most security systems.</p>
 </li>
 <li>
 <p>Fix #31 disable hotkeys for layout.</p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
@@ -1594,7 +1601,7 @@ grails {
 <div id="footer">
 <div id="footer-text">
 Version 2.0.2-SNAPSHOT<br>
-Last updated 2016-02-05 15:41:39 UTC
+Last updated 2016-02-05 15:54:09 UTC
 </div>
 </div>
 </body>
