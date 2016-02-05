@@ -1,6 +1,9 @@
 == Change Log
 
-# 2.0.1
+* 2.0.2 (Snapshot)
+** Fix #118, use Grails 3.0.10 internally.
+
+* 2.0.1
 ** Fix #117 Clean build. Version 2.0.0 had issues with Spring Security due to unclean build.
 ** Fix #116 (paritially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.
 
