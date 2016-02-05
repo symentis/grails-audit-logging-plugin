@@ -20,6 +20,8 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
       ./gradlew audit-logging:publish -S || EXIT_STATUS=$?
   fi
 
+  echo "Building docs and publish to gh-pages branch.."
+  
   ./gradlew docs --stacktrace || EXIT_STATUS=$?
   
   git config --global user.name "$GIT_NAME"
