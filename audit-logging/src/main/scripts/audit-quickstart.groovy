@@ -60,8 +60,9 @@ updateConfig(auditModel?.simpleName, auditModel?.packageName)
 addStatus '''
 *******************************************************
 * Created auditLogEvent domain class.                 *
-* Your grails-app/conf/Config.groovy has been updated *
-* with the class name of the configured domain class. *
+* Your grails-app/conf/application.groovy file has    *
+* been updated with the class name of the configured  *
+* domain class.                                       *
 * Please verify that the values are correct.          *
 *******************************************************
 '''
