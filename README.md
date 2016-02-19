@@ -32,9 +32,12 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	Burt Beckwith 
 	Dennie de Lange
 	Dhiraj Mahapatro
+	Elmar Kretzer
 	Fernando Cambarieri
 	Graeme Rocher
 	Jorge Aguilera
+	Juergen Baumann
+	Madhava Jay
 	Matthew A Stewart
 	Shawn Hartsock
 	Tom Crossland
@@ -59,6 +62,16 @@ grails audit-quickstart org.example.myproject MyAuditLogEvent
 
 ## Bintray##
 <a href='https://bintray.com/robertoschwald/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
+
+***
+
+<a href="https://www.yourkit.com/java/profiler/index.jsp"><img src="https://www.yourkit.com/images/yklogo.png" alt="YourKit Java Profiler"/></a>
+
+YourKit is kindly supporting Grails open source projects with its full-featured Java Profiler.
+YourKit, LLC is the creator of innovative and intelligent tools for profiling
+Java and .NET applications. Take a look at YourKit's leading software products:
+[YourKit Java Profiler](http://www.yourkit.com/java/profiler/index.jsp) and
+[YourKit .NET Profiler](http://www.yourkit.com/.net/profiler/index.jsp).
 
 
 
