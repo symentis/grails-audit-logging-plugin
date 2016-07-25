@@ -18,6 +18,8 @@
 */
 package grails.plugins.orm.auditable
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
 import groovy.util.logging.Commons
 
@@ -63,6 +65,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     String sessionAttribute
     String actorKey
     String propertyMask
+
+    @JsonIgnore
     Closure actorClosure
 
     Boolean stampEnabled = true
