@@ -79,6 +79,29 @@ class AuditTrail implements Serializable {
     version false
   }
 
+  static namedQueries = {
+    forQuery { String q ->
+      if (!q?.trim()) return // return all
+      def queries = q.tokenize()?.collect {
+        '%' + it.replaceAll('_', '\\\\_') + '%'
+      }
+      queries.each { query ->
+        or {
+          ilike 'actor', query
+          ilike 'persistedObjectId', query
+          ilike 'propertyName', query
+          ilike 'oldValue', query
+          ilike 'newValue', query
+        }
+      }
+    }
+
+    forDateCreated { Date date ->
+      if (!date) return
+      gt 'dateCreated', date
+    }
+  }
+
   /**
    * Deserializer that maps a stored map onto the object
    * assuming that the keys match attribute properties.

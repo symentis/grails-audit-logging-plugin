@@ -1,6 +1,13 @@
-To test the plugin with different Grails versions, perform
+This is a sample test project for audit-logging.
 
-grails perform-audit-log-test-apps
+You can either run the tests by
 
-You might need to tweak the settings in the testapps.config.groovy file for your environment, especially the
-grailsHomeRoot property which points to a common directory which holds all needed Grails versions.
+    grails test-app
+
+or start the application:
+ 
+    grails run-app 
+    
+There you create Authors and list / query the AuditTrails entries.
+
+This sample application is used by Travis to perform the integration tests.
