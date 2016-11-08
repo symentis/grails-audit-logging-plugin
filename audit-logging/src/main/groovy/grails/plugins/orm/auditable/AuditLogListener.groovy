@@ -422,7 +422,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * TODO - Need a way to load the old value generically for a collection
      */
     protected getPersistentValue(domain, String property, GrailsDomainClass entity) {
-        if (entity.isOneToMany(property)) {
+        if (entity.associationMap.containsKey(property)) {
             "N/A"
         } else {
             domain.getPersistentValue(property)
@@ -439,11 +439,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         // In some cases, collections aren't listed as being dirty in the dirty property names.
         // We need to check them individually.
         entity.associationMap.each { String associationName, value ->
-            if (entity.isOneToMany(associationName)) {
-                def collection = domain."${associationName}"
-                if (collection?.respondsTo('isDirty') && collection?.isDirty()) {
-                    dirtyProperties << associationName
-                }
+            def collection = domain."${associationName}"
+            if (collection?.respondsTo('isDirty') && collection?.isDirty()) {
+                dirtyProperties << associationName
             }
         }
 
