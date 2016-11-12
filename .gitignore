@@ -1,0 +1,6 @@
+.DS_Store
+.gradle
+.idea
+audit-logging
+audit-test
+build
