@@ -422,7 +422,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    * TODO - Need a way to load the old value generically for a collection
    */
   protected getPersistentValue(domain, String property, GrailsDomainClass entity) {
-    if (entity.isOneToMany(property)) {
+    if (entity.associationMap.containsKey(property)) {
       "N/A"
     } else {
       domain.getPersistentValue(property)
@@ -436,17 +436,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
   protected Set<String> getDirtyPropertyNames(domain, GrailsDomainClass entity) {
     Set<String> dirtyProperties = domain.dirtyPropertyNames ?: []
     // At least in MongoDB Plugin 3.0.3, the domain name is also stated as dirty property
-    if (dirtyProperties.contains(domain.class.name)){
+    if (dirtyProperties.contains(domain.class.name)) {
       dirtyProperties.remove(domain.class.name)
     }
     // In some cases, collections aren't listed as being dirty in the dirty property names.
     // We need to check them individually.
     entity.associationMap.each { String associationName, value ->
-      if (entity.isOneToMany(associationName)) {
-        def collection = domain."${associationName}"
-        if (collection?.respondsTo('isDirty') && collection?.isDirty()) {
-          dirtyProperties << associationName
-        }
+      def collection = domain."${associationName}"
+      if (collection?.respondsTo('isDirty') && collection?.isDirty()) {
+        dirtyProperties << associationName
       }
     }
 

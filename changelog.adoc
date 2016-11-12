@@ -1,0 +1,129 @@
+== 1.0.x Version ChangeLog
+
+* For 2.0.x changes (Grails3), see master branch
+
+=== 1.1.1
+
+* #126 Support for Many-To-Many assications (backported from 2.x master). Thanks to Andrey Zhuchkov
+
+=== 1.1.0
+
+* #13 Externalize AuditTrailEvent domain to user
+
+* #39 Refactor Plugin to generate AuditLogEvent Artifact
+
+* #93 Use MongoDB as datasource in a multiple-datasource configuration
+
+* #94 automatic type conversion does not work
+
+* #90 / GPAUDITLOGGING-80 Add support for enabling/disabling auto import of AuditLogEvent domain class in HQL queries
+
+* #89 / GPAUDITLOGGING-78 custom naming of id sequence generator
+
+=== 1.0.6
+
+* #91 Compile fails with mongoDB plugin ()
+* #93 Use MongoDB as datasource in a multiple-datasource configuration
+* Removed grails-hibernate EventTriggeringInterceptor dependency from Plugin descriptor to be ORM agnostic.
+* Minimum Grails version raised to 2.1 due to Datastore limitations in applicationContext
+* #96 Backported PR. Make identifiers available in the maps during onChange event. Thanks to dmahapatro.
+
+=== 1.0.5
+
+* #92 Support for ignoring certain Events
+
+=== 1.0.4
+
+* GPAUDITLOGGING-69 allow to set uri per domain object
+* GPAUDITLOGGING-62 Add identifier in handler map
+* GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent
+* GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent
+* GPAUDITLOGGING-74 Impossible to log values of zero or false
+* GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities
+
+=== 1.0.3
+
+* GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource
+* GPAUDITLOGGING-63 logFullClassName property
+
+=== 1.0.2
+
+* GPAUDITLOGGING-66
+
+=== 1.0.1
+
+* closures,
+* nonVerboseDelete property
+* provide domain identifier to onSave() handler
+
+=== 1.0.0
+
+* Grails &gt;= 2.0
+* ORM agnostic implementation
+* major cleanup and new features
+
+=== 0.5.5.3
+
+* Added ability to disable audit logging by config.
+
+=== 0.5.5.2
+
+* Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.
+
+=== 0.5.5.1
+
+* Fixed the title. No changes in the plugin code.
+
+=== 0.5.5
+
+* collections logging
+* log ids
+* replacement patterns
+* property value masking
+* large fields support
+* fixes and enhancements
+
+=== 0.5.4
+
+* compatibility issues with Grails 1.3.x
+
+=== 0.5.3
+
+* GRAILSPLUGINS-2135
+* GRAILSPLUGINS-2060
+* an issue with extra JAR files that are somehow getting released as part of the plugin
+
+=== 0.5.2
+
+* GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354
+
+=== 0.5.1
+
+* fixes regression in field logging
+
+=== 0.5
+
+* GRAILSPLUGINS-391
+* GRAILSPLUGINS-1496
+* GRAILSPLUGINS-1181
+* GRAILSPLUGINS-1515
+* GRAILSPLUGINS-1811
+* changes to AuditLogEvent domain object uses composite id to simplify logging
+* changes to AuditLogListener uses new domain model with separate transaction
+* for logging action to avoid invalidating the main hibernate session.
+
+=== 0.4.1
+
+* repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181
+
+=== 0.4
+
+* custom serializable implementation for AuditLogEvent so events can happen inside a webflow context.
+* tweak application.properties for loading in other grails versions
+* update to views to show URI in an event
+* fix missing oldState bug in change event
+
+=== 0.3
+
+* actorKey and username features allow for the logging of user or userPrincipal for most security systems.
+* Fix #31 disable hotkeys for layout.
