@@ -516,8 +516,8 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Grails Audit Logging Plugin - Reference Documentation</h1>
 <div class="details">
 <span id="author" class="author">Robert Oschwald</span><br>
-<span id="revnumber">version 2.0.2-SNAPSHOT,</span>
-<span id="revdate">2016-08-25</span>
+<span id="revnumber">version 2.0.2,</span>
+<span id="revdate">2016-11-12</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -556,7 +556,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#getauditloguri-closure-since-1-0-4">5.11. getAuditLogUri closure (since 1.0.4)</a></li>
 <li><a href="#domain-class-stamping-support-since-1-0-4">5.12. Domain class stamping support (since 1.0.4)</a></li>
 <li><a href="#ignoring-certain-events-since-1-0-5-2-0-0">5.13. Ignoring certain events (since 1.0.5 / 2.0.0)</a></li>
-<li><a href="#example-configuration">5.14. Example configuration</a></li>
+<li><a href="#domain-name-replacements-since-2-0-1">5.14. Domain Name replacements (since 2.0.1)</a></li>
+<li><a href="#example-configuration">5.15. Example configuration</a></li>
 </ul>
 </li>
 <li><a href="#implementation">6. Implementation</a>
@@ -589,8 +590,8 @@ the second parameter is a LinkedHashMap representing the state of the object aft
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-GORM Events hook into the ''beforeInsert'' and the ''beforeUpdate'' events which work great for preventing updates
-but do not work well for ''Audit Logging'' where we would need critical information about the entity that is only
+GORM Events hook into the <em>'beforeInsert</em>' and the <em>'beforeUpdate</em>' events which work great for preventing updates
+but do not work well for <em>'Audit Logging</em>' where we would need critical information about the entity that is only
 available after these actions complete. We&#8217;ve chosen to prefix the handler names with "on" so that they do not conflict
 with other handler names in other existing plugins.
 </td>
@@ -635,11 +636,14 @@ please file a GitHub issue.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>2.0.2 (Snapshot)</p>
+<p>2.0.2</p>
 <div class="ulist">
 <ul>
 <li>
 <p>Fix #118, use Grails 3.0.10 internally.</p>
+</li>
+<li>
+<p>Fix #126 Support Many-To-Many logging (thanks to Andrey Zhuchkov)</p>
 </li>
 </ul>
 </div>
@@ -967,10 +971,10 @@ please file a GitHub issue.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">/** Project dependencies **/</span>
+<pre class="CodeRay highlight"><code data-lang="groovy">/** Project dependencies **/
 dependencies {
    ...
-   compile <span class="string"><span class="delimiter">'</span><span class="content">org.grails.plugins:audit-logging:{version}</span><span class="delimiter">'</span></span>
+   compile 'org.grails.plugins:audit-logging:2.0.2'
 }</code></pre>
 </div>
 </div>
@@ -983,10 +987,8 @@ dependencies {
 </div>
 </div>
 <div class="paragraph">
-<p>or another script that triggers dependency resolution. Afterwards, perform audit-quickstart to generate the domain classes and add the initial configuration settings.</p>
+<p>or another script that triggers dependency resolution.</p>
 </div>
-<div class="sect2">
-<h3 id="create-your-domain-artifact-using-audit-quickstart">3.1. Create your Domain Artifact using audit-quickstart</h3>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -999,6 +1001,8 @@ After installing the plugin, you must perform the following command to let the p
 </tr>
 </table>
 </div>
+<div class="sect2">
+<h3 id="create-your-domain-artifact-using-audit-quickstart">3.1. Create your Domain Artifact using audit-quickstart</h3>
 <div class="literalblock">
 <div class="content">
 <pre>    grails audit-quickstart &lt;your.package.name&gt; &lt;YourAuditLogEventClassName&gt;</pre>
@@ -1117,6 +1121,82 @@ If you use the old configuration key, the plugin will log a notice.</p>
 </tr>
 </table>
 </div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 30%;">
+<col style="width: 30%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><strong>Property</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Default Value</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Meaning</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.auditDomainClassName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">use "grails audit-quickstart" to create one</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mandatory Domain Class Name for the AuditTrail Domain class. Mandatory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.verbose</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, column by column change logging in insert and delete events is enabled.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.logIds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, object-ids of associated objects are logged</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.disabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, audit logging is disabled, but the eventHandlers are still triggered.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.nonVerboseDelete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Log deletes non-verbosely if verbose = true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.logFullClassName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Log the entity including the package name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.TRUNCATE_LENGTH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">255</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure the truncation length of detail information. Must me &#8656; field size of oldMap and newMap in your Auditing domain class.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampEnabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add stamping fields to all auditable domain classes using AST transformation (dateCreated, lastUpdated, createdBy, lastUpdatedBy)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampAlways</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">always stamp Domain Classes regardless of @Stamp or "static stampable = true"</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampCreatedBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">createdBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Field name for stamping support</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampLastUpdatedBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">lastUpdatedBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Field name for lastUpdateBy field.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">actorClosure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Closure to get the principal. Details see below.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="sect2">
 <h3 id="auditing-current-user-information-actorclosure">5.1. Auditing Current User Information (actorClosure)</h3>
 <div class="paragraph">
@@ -1532,7 +1612,18 @@ stampLastUpdatedBy = <span class="string"><span class="delimiter">'</span><span 
 </div>
 </div>
 <div class="sect2">
-<h3 id="example-configuration">5.14. Example configuration</h3>
+<h3 id="domain-name-replacements-since-2-0-1">5.14. Domain Name replacements (since 2.0.1)</h3>
+<div class="paragraph">
+<p>With the replacementPatterns Map, it is possible to rewrite domain names, e.g. to remove dedicated package names:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">replacementPatterns = [<span class="string"><span class="delimiter">&quot;</span><span class="content">local.example.xyz.User</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">UserDomain</span><span class="delimiter">&quot;</span></span>]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="example-configuration">5.15. Example configuration</h3>
 <div class="paragraph">
 <p>Example application.groovy configuration with various settings as described above:</p>
 </div>
@@ -1546,8 +1637,7 @@ grails {
      verbose = <span class="predefined-constant">true</span> <span class="comment">// verbosely log all changed values to db</span>
      logIds = <span class="predefined-constant">true</span>  <span class="comment">// log db-ids of associated objects.</span>
      TRUNCATE_LENGTH = <span class="integer">1000</span>
-     cacheDisabled = <span class="predefined-constant">true</span>
-     logFullClassName = <span class="predefined-constant">true</span>
+     cacheDisabled = <span class="predefined-constant">true</span>  <span class="comment">// only for 1.x. Disable caching of AuditDomainClass.</span>
      replacementPatterns = [<span class="string"><span class="delimiter">&quot;</span><span class="content">local.example.xyz.</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>] <span class="comment">// replace with empty string.</span>
      actorClosure = { request, session -&gt;
         <span class="comment">// SpringSecurity Core 1.1.2</span>
@@ -1600,8 +1690,8 @@ grails {
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 2.0.2-SNAPSHOT<br>
-Last updated 2016-08-25 16:06:47 UTC
+Version 2.0.2<br>
+Last updated 2016-11-12 17:27:21 UTC
 </div>
 </div>
 </body>
