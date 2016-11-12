@@ -16,7 +16,7 @@ plugins {
     id "io.spring.dependency-management" version "0.5.1.RELEASE"
 }
 
-version "2.0.2"
+version file("$rootDir/version.txt").text.trim()
 group "audit.test"
 
 apply plugin: "spring-boot"

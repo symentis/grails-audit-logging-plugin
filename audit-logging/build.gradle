@@ -22,7 +22,7 @@ plugins {
     id "com.jfrog.bintray" version "1.4"
 }
 
-version "2.0.2-SNAPSHOT"
+version file("$rootDir/version.txt").text.trim()
 group "org.grails.plugins"
 
 apply plugin: 'maven-publish'
