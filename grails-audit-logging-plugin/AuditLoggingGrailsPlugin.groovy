@@ -93,7 +93,7 @@ import org.grails.datastore.mapping.core.Datastore
  *
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.1.0"
+    def version = "1.1.1"
     def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
