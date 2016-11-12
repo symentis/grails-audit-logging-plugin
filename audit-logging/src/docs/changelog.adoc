@@ -9,8 +9,9 @@
 ** Fix #116 (paritially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.
 
 * 2.0.0
-** Grails 3 support.
+** First Grails3 version. Thanks to Graeme.
 ** audit-quickstart command to create the AuditLog domain artifact
+** #96 Make identifiers available in the maps during onChange event. Thanks to dmahapatro.
 ** branch: master.
 ** For 1.0.x plugin version (Grails2), see 1.x_maintenance branch
 
