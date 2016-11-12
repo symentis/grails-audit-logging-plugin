@@ -1,7 +1,8 @@
 == Change Log
 
-* 2.0.2 (Snapshot)
+* 2.0.2
 ** Fix #118, use Grails 3.0.10 internally.
+** Fix #126 Support Many-To-Many logging (thanks to Andrey Zhuchkov)
 
 * 2.0.1
 ** Fix #117 Clean build. Version 2.0.0 had issues with Spring Security due to unclean build.

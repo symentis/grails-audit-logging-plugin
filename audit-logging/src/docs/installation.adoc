@@ -3,11 +3,12 @@
 Add to your build.gradle project dependencies block:
 
 [source,groovy]
+[subs="attributes"]
 ----
 /** Project dependencies **/
 dependencies {
    ...
-   compile 'org.grails.plugins:audit-logging:{version}'
+   compile 'org.grails.plugins:audit-logging:{project-version}'
 }
 ----
 
@@ -17,12 +18,11 @@ Run
     grails compile
 ....
 
-or another script that triggers dependency resolution. Afterwards, perform audit-quickstart to generate the domain classes and add the initial configuration settings.
-
-=== Create your Domain Artifact using audit-quickstart
-
+or another script that triggers dependency resolution.
 
 NOTE: After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
+
+=== Create your Domain Artifact using audit-quickstart
 
 ....
     grails audit-quickstart <your.package.name> <YourAuditLogEventClassName>

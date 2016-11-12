@@ -9,6 +9,60 @@ Since version 2.0.0, the configuration key has changed from "auditLog" to "grail
 If you use the old configuration key, the plugin will log a notice.
 ====
 
+[cols="30,30,40"]
+|====================
+| *Property* | *Default Value* | *Meaning*
+
+|grails.plugin.auditLog.auditDomainClassName
+|use "grails audit-quickstart" to create one
+|Mandatory Domain Class Name for the AuditTrail Domain class. Mandatory.
+
+|grails.plugin.auditLog.verbose
+|`false`
+|If set to true, column by column change logging in insert and delete events is enabled.
+
+|grails.plugin.auditLog.logIds
+|`false`
+|If set to true, object-ids of associated objects are logged
+
+|grails.plugin.auditLog.disabled
+|false
+|If set to true, audit logging is disabled, but the eventHandlers are still triggered.
+
+|grails.plugin.auditLog.nonVerboseDelete
+|false
+|Log deletes non-verbosely if verbose = true
+
+|grails.plugin.auditLog.logFullClassName
+|false
+|Log the entity including the package name
+
+|grails.plugin.auditLog.TRUNCATE_LENGTH
+|255
+|Configure the truncation length of detail information. Must me <= field size of oldMap and newMap in your Auditing domain class.
+
+|grails.plugin.auditLog.stampEnabled
+|false
+|Add stamping fields to all auditable domain classes using AST transformation (dateCreated, lastUpdated, createdBy, lastUpdatedBy)
+
+|grails.plugin.auditLog.stampAlways
+|false
+|always stamp Domain Classes regardless of @Stamp or "static stampable = true"
+
+|grails.plugin.auditLog.stampCreatedBy
+|createdBy
+|Field name for stamping support
+
+|grails.plugin.auditLog.stampLastUpdatedBy
+|lastUpdatedBy
+|Field name for lastUpdateBy field.
+
+|actorClosure
+|`null`
+|Closure to get the principal. Details see below.
+
+|====================
+
 === Auditing Current User Information (actorClosure)
 
 With version >= 0.5, additional configuration can be specified in the application.groovy file of the project to help log the
@@ -363,6 +417,14 @@ Since version 1.0.5, it is possible to ignore certain events on a per-domain bas
 static auditable = [ignoreEvents:["onChange","onSave"]]
 ----
 
+=== Domain Name replacements (since 2.0.1) ===
+With the replacementPatterns Map, it is possible to rewrite domain names, e.g. to remove dedicated package names:
+
+[source,groovy]
+----
+replacementPatterns = ["local.example.xyz.User":"UserDomain"]
+----
+
 === Example configuration
 
 Example application.groovy configuration with various settings as described above:
@@ -377,8 +439,7 @@ grails {
      verbose = true // verbosely log all changed values to db
      logIds = true  // log db-ids of associated objects.
      TRUNCATE_LENGTH = 1000
-     cacheDisabled = true
-     logFullClassName = true
+     cacheDisabled = true  // only for 1.x. Disable caching of AuditDomainClass.
      replacementPatterns = ["local.example.xyz.":""] // replace with empty string.
      actorClosure = { request, session ->
         // SpringSecurity Core 1.1.2
