@@ -93,6 +93,8 @@ When called, the event handlers have access to oldObj and newObj definitions tha
             boolean dataStoreDisabled = datastore.hasProperty("config") ? datastore.config.auditLog.disabled : false
             // Don't register the listener if we are disabled
             if (!disabled && !dataStoreDisabled) {
+                boolean isHibernateDataStore = datastore.class.simpleName == 'HibernateDatastore'
+
                 def listener = new AuditLogListener(datastore)
                 listener.grailsApplication = application
                 listener.stampEnabled = stampEnabled
@@ -100,6 +102,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 listener.stampCreatedBy = stampCreatedBy
                 listener.stampLastUpdatedBy = stampLastUpdatedBy
                 listener.verbose = verbose
+                listener.usingHibernate = isHibernateDataStore
                 listener.nonVerboseDelete = nonVerboseDelete
                 listener.logFullClassName = logFullClassName
                 listener.transactional = transactional
@@ -124,7 +127,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         if (!conf || !conf.active) {
             return
         }
-
+        
         log.trace 'onConfigChange'
     }
 }

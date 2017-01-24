@@ -19,6 +19,7 @@
 package grails.plugins.orm.auditable
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.apache.commons.lang.ArrayUtils
 
 import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
 import groovy.util.logging.Commons
@@ -69,6 +70,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     @JsonIgnore
     Closure actorClosure
 
+    boolean usingHibernate = false
+    
     Boolean stampEnabled = true
     Boolean stampAlways = false
     String stampCreatedBy
@@ -92,7 +95,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             return
         }
         if (stampEnabled && (stampAlways || isStampable(event.entityObject, event.eventType))) {
-            stamp(event.entityObject, event.eventType);
+            stamp(event);
         }
         if (isAuditableEntity(event.entityObject, getEventName(event))) {
             log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
@@ -111,12 +114,15 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
     }
 
-    void stamp(entity, EventType eventType) {
-        if (EventType.PreInsert == eventType) {
-            stampCreatedBy(entity)
-            stampLastUpdatedBy(entity)
+    void stamp(AbstractPersistenceEvent event) {
+        def entity = event.entityObject
+        def actor = getActor()
+        
+        if (EventType.PreInsert == event.eventType) {
+            stampCreatedBy(entity,actor,event)
+            stampLastUpdatedBy(entity,actor,event)
         } else {
-            stampLastUpdatedBy(entity)
+            stampLastUpdatedBy(entity,actor,event)
         }
     }
 
@@ -149,12 +155,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     actorClosure = null
                 }
             }
-            // If we couldn't find an actor, use the configured default or just 'system'
-            if (!actor) {
-                actor = AuditLoggingConfigUtils.auditConfig.defaultActor ?: 'system'
-            }
         }
-        log.trace("Actor: $actor")
+        // If we couldn't find an actor, use the configured default or just 'system'
+        if (!actor) {
+            actor = AuditLoggingConfigUtils.auditConfig.defaultActor ?: 'system'
+        }
+        if(log.traceEnabled) log.trace("Actor: $actor")
         return actor?.toString()
     }
 
@@ -268,14 +274,36 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         return mask
     }
 
-    protected stampCreatedBy(entity) {
-        entity."${stampCreatedBy}" = getActor()
+    protected stampCreatedBy(entity,actor,event) {
+        entity."${stampCreatedBy}" = actor 
+
+        if(usingHibernate){
+            String[] propertyNames = event.nativeEvent.getPersister().getEntityMetamodel().getPropertyNames();
+            Object[] state = event.nativeEvent.state
+
+            syncHibernateState(state,propertyNames,stampCreatedBy,actor)
+        }
     }
 
-    protected stampLastUpdatedBy(entity) {
-        entity."${stampLastUpdatedBy}" = getActor()
+    protected stampLastUpdatedBy(entity,actor,event) {
+        entity."${stampLastUpdatedBy}" = actor
+
+        if(usingHibernate){
+            String[] propertyNames = event.nativeEvent.getPersister().getEntityMetamodel().getPropertyNames();
+            Object[] state = event.nativeEvent.state
+
+            syncHibernateState(state,propertyNames,stampCreatedBy,entity."${stampCreatedBy}")
+            syncHibernateState(state,propertyNames,stampLastUpdatedBy,actor)
+        }
     }
 
+    private void syncHibernateState(Object[] state,String[] propertyNames,String propertyName,Object value){
+        int index = ArrayUtils.indexOf(propertyNames, propertyName);
+        if(index>=0){
+            state[index] = value
+        }
+    }
+    
     /**
      * We must use the preDelete event if we want to capture
      * what the old object was like.
