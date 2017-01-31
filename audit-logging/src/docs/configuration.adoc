@@ -18,8 +18,8 @@ If you use the old configuration key, the plugin will log a notice.
 |Mandatory Domain Class Name for the AuditTrail Domain class. Mandatory.
 
 |grails.plugin.auditLog.verbose
-|`false`
-|If set to true, column by column change logging in insert and delete events is enabled.
+|`true`
+|Column by column change logging in insert and delete events is enabled by default. You can disable it if you are not interested in value changes.
 
 |grails.plugin.auditLog.logIds
 |`false`
