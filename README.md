@@ -29,9 +29,6 @@ grails audit-quickstart org.example.myproject MyAuditLogEvent
 
 See [GitHub Issues](https://github.com/robertoschwald/grails-audit-logging-plugin/issues "Issues")
 
-JIRA issues have been migrated to GitHub issues recently (Thanks to Graeme).
-Please do not add issues / comments to Jira anymore. Old Jira issues, see [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA")
-
 ##**Pull Requests**##
 Pull requests are highly appreciated and welcome!
 
