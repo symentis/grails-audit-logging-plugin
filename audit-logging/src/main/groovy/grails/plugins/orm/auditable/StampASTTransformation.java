@@ -12,17 +12,23 @@ import org.codehaus.groovy.transform.GroovyASTTransformation;
 public class StampASTTransformation extends AbstractASTTransformation{
 	@Override
 	public void transformGeneral(AnnotationNode annotationNode, ClassNode node) {
-		addStaticField(node, "stampable", Boolean.class, Boolean.TRUE);
+		addStaticFinalField(node, "_stampable", Boolean.class, Boolean.TRUE);
+		addAutoTimestamp(node,false); // Disable grails autoTimestamp entirely 
 		for(MethodNode value:annotationNode.getClassNode().getMethods()){
 			String fieldName = value.getName();
 			
-			Object stampInfo = getAnnotationValue(annotationNode, fieldName,true);
 			
+			Object stampInfo = getAnnotationValue(annotationNode, fieldName,null);
 			boolean shouldExclude = getStampInfoValue(stampInfo,"exclude",false);
 			if(!shouldExclude){
+				String stampProperty = getStampInfoValue(stampInfo,"fieldname",fieldName);
+				
+				addStaticFinalField(node, "_"+fieldName+"StampableProperty", String.class, stampProperty);
+				
 				Class<?> fieldType = getStampInfoValue(stampInfo, "type",String.class);
 				
-				FieldNode fieldNode = addFieldNode(node, fieldName, fieldType);
+				
+				FieldNode fieldNode = addFieldNode(node, stampProperty, fieldType);
 				
 				boolean nullable = getStampInfoValue(stampInfo, "nullable",true);
 				if(nullable){
@@ -32,8 +38,14 @@ public class StampASTTransformation extends AbstractASTTransformation{
 		}
 	}
 	
+	
 	private <T> T getStampInfoValue(Object stampInfo,String field,T defaultValue){
-		T result = (T) InvokerHelper.invokeMethod(stampInfo, field, new Object[]{});
-		return result!=null ? result:defaultValue;
+		if(stampInfo instanceof AnnotationNode){
+			return getAnnotationValue((AnnotationNode) stampInfo,field,defaultValue);
+		}
+		else{
+			T result = (T) InvokerHelper.invokeMethod(stampInfo, field, new Object[]{});
+			return result!=null ? result:defaultValue;
+		}		
 	}
 }

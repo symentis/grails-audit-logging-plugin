@@ -164,7 +164,26 @@ public abstract class AbstractASTTransformation implements ASTTransformation {
     	}
     	return false;
 	}
+	protected void addAutoTimestamp(ClassNode classNode, boolean value) {
+		FieldNode closure = classNode.getDeclaredField("mapping");
+		if(closure==null){
+			ClosureExpression constraintsExpression = new ClosureExpression(new Parameter[]{}, new BlockStatement());
+			constraintsExpression.setVariableScope(new VariableScope());
 
+			closure = new FieldNode("mapping",Modifier.STATIC,new ClassNode(Closure.class),classNode,constraintsExpression);
+			classNode.addField(closure);
+		}
+		ClosureExpression exp = (ClosureExpression) closure.getInitialExpression();
+		BlockStatement block = (BlockStatement) exp.getCode();
+		if (!hasFieldInClosure(closure, "autoTimestamp")) {
+			MethodCallExpression constExpr = new MethodCallExpression(
+					VariableExpression.THIS_EXPRESSION,
+					new ConstantExpression("autoTimestamp"),
+					new ConstantExpression(value));
+			block.addStatement(new ExpressionStatement(constExpr));			
+		}
+	}
+	
 	protected FieldNode addSqlTypeMapping(ClassNode classNode, FieldNode fieldNode,String sqlType) {
         FieldNode closure = classNode.getDeclaredField("mapping");
         if(closure==null){
@@ -189,11 +208,11 @@ public abstract class AbstractASTTransformation implements ASTTransformation {
 		return fieldNode;
     }
 	
-	protected <T> FieldNode addStaticField(ClassNode classNode, String fieldname,Class<T> type,T initialValue) {
+	protected <T> FieldNode addStaticFinalField(ClassNode classNode, String fieldname, Class<T> type, T initialValue) {
 		FieldNode fieldNode = classNode.getDeclaredField(fieldname);
 		
 		if(fieldNode==null){
-			fieldNode = new FieldNode(fieldname,Modifier.STATIC+Modifier.PUBLIC,new ClassNode(type),classNode,new ConstantExpression(initialValue));
+			fieldNode = new FieldNode(fieldname,Modifier.STATIC+Modifier.PUBLIC+Modifier.FINAL,new ClassNode(type),classNode,new ConstantExpression(initialValue));
 			classNode.addField(fieldNode);
 		}
 		return fieldNode;

@@ -74,9 +74,13 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         boolean disabled = config.disabled
         boolean stampEnabled = config.stampEnabled
         boolean stampAlways = config.stampAlways
-
-        String stampCreatedBy = config.stampCreatedBy
-        String stampLastUpdatedBy = config.stampLastUpdatedBy
+        boolean stampTimestamp = config.stampTimestamp
+        
+        String stampCreatedByProperty       = config.stampCreatedByProperty || config.stampCreatedBy
+        String stampLastUpdatedByProperty   = config.stampLastUpdatedByProperty || config.stampLastUpdatedBy
+        String stampDateCreatedProperty     = config.stampDateCreatedProperty
+        String stampLastUpdatedProperty     = config.stampLastUpdatedProperty
+        
         boolean verbose = config.verbose
         boolean nonVerboseDelete = config.nonVerboseDelete
         boolean logFullClassName = config.logFullClassName
@@ -99,8 +103,8 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 listener.grailsApplication = application
                 listener.stampEnabled = stampEnabled
                 listener.stampAlways = stampAlways
-                listener.stampCreatedBy = stampCreatedBy
-                listener.stampLastUpdatedBy = stampLastUpdatedBy
+                listener.stampTimestamp = stampTimestamp
+                
                 listener.verbose = verbose
                 listener.usingHibernate = isHibernateDataStore
                 listener.nonVerboseDelete = nonVerboseDelete

@@ -4,13 +4,19 @@ import grails.util.GrailsClassUtils as GCU;
 
 import grails.test.mixin.integration.Integration
 import grails.transaction.*
+import grails.util.Holders
+import org.grails.orm.hibernate.cfg.GrailsDomainBinder
 import spock.lang.*
 
 @Integration
 @Rollback
 class StampSpec extends Specification {
 	def setup(){
-		assert Train.stampable
+		assert Train._stampable 
+		assert Train._dateCreatedStampableProperty
+		assert Train._createdByStampableProperty
+		assert Train._lastUpdatedStampableProperty
+		assert Train._lastUpdatedByStampableProperty
 	}
 	
 	void 'Test Stamp AST transformations'(){
@@ -50,12 +56,44 @@ class StampSpec extends Specification {
 	
 	void 'Test Auto Stamp'(){
 		given: 
-			def train = new Train()
-		when:
-			train.number="10"
+			def train = new Train(number:"10")
 			train.save(flush:true)
-		then: 
+		expect: 
 			train.createdBy == 'SYS'
 			train.lastUpdatedBy == 'SYS'
+			train.dateCreated
+			train.lastUpdated
+			train.dateCreated == train.lastUpdated
+		when: 
+			Thread.sleep(1000)
+			train.number = "20"
+			train.save(flush:true)
+		then:
+			train.dateCreated != train.lastUpdated
+	}
+
+	void 'Test custom fieldnames'(){
+		given:
+			def truck = new Truck(number:"2")
+		when:
+			truck.save(flush:true)
+		then:
+			truck.originalWho == 'SYS'
+			truck.lastWho == 'SYS'
+			truck.originalWhen
+			truck.lastWhen
+	}
+	
+	void 'Test if autoTimestamp is disabled'(){
+		given:
+			def truckMapping = GrailsDomainBinder.getMapping(
+				Holders.grailsApplication.domainClasses.find{it.name=='Truck'}.clazz
+			)
+			def trainMapping = GrailsDomainBinder.getMapping(
+					Holders.grailsApplication.domainClasses.find{it.name=='Truck'}.clazz
+			)
+		expect:
+			!truckMapping.autoTimestamp
+			!trainMapping.autoTimestamp
 	}
 }

@@ -14,12 +14,12 @@ import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 @GroovyASTTransformationClass({"grails.plugins.orm.auditable.StampASTTransformation"})
 public @interface MyStamp {
 	
-	StampInfo removed() default @StampInfo(type=Boolean.class);
+	StampInfo removed() default @StampInfo(fieldname="removed",type=Boolean.class);
 	
-	StampInfo dateCreated() default @StampInfo(type=Date.class);
-	StampInfo lastUpdated() default @StampInfo(type=Date.class);
+	StampInfo dateCreated() default @StampInfo(fieldname="dateCreated",type=Date.class);
+	StampInfo lastUpdated() default @StampInfo(fieldname="lastUpdated",type=Date.class);
 	
-	StampInfo createdBy() default @StampInfo(type=String.class, nullable=true);
-	StampInfo lastUpdatedBy() default @StampInfo(type=String.class,nullable=true);
+	StampInfo createdBy() default @StampInfo(fieldname="createdBy",type=String.class, nullable=true);
+	StampInfo lastUpdatedBy() default @StampInfo(fieldname="lastUpdatedBy",type=String.class,nullable=true);
 	
 }

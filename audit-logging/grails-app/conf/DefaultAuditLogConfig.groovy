@@ -26,8 +26,7 @@ defaultAuditLog {
   defaultActor = 'SYS'
   auditDomainClassName = null
   stampEnabled = true
-  stampCreatedBy = "createdBy"
-  stampLastUpdatedBy = "lastUpdatedBy"
+  stampTimestamp = true
   nonVerboseDelete = false
   logFullClassName = false
   sessionAttribute = ""
