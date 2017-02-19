@@ -90,7 +90,7 @@ class StampSpec extends Specification {
 				Holders.grailsApplication.domainClasses.find{it.name=='Truck'}.clazz
 			)
 			def trainMapping = GrailsDomainBinder.getMapping(
-					Holders.grailsApplication.domainClasses.find{it.name=='Truck'}.clazz
+					Holders.grailsApplication.domainClasses.find{it.name=='Train'}.clazz
 			)
 		expect:
 			!truckMapping.autoTimestamp
