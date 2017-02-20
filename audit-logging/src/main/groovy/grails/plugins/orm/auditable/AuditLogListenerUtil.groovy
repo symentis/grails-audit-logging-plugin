@@ -73,7 +73,7 @@ class AuditLogListenerUtil {
   }
 
   static isStampable(EventType eventType) {
-    eventType == EventType.PreDelete || eventType == EventType.PreUpdate || eventType == EventType.PreInsert
+    eventType == EventType.PreUpdate || eventType == EventType.PreInsert
   }
 
   /**
