@@ -8,8 +8,8 @@ The Grails Audit Logging plugin for Grails 3.x adds generic event based Audit Lo
  * For Grails 2.x documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
- * Grails 3.x (master branch)
- * Grails 2.x (1.x_maintenance branch)
+ * Grails 3.x: (master branch)
+ * Grails 2.x: [1.x_maintenance branch](./tree/1.x_maintenance)
 
 ## audit-quickstart
 Versions 1.1.0 (Grails 2.x) and 2.0.0 (Grails 3.x) are the first versions with audit-quickstart command support.
