@@ -9,14 +9,13 @@ env:
 
 branches:
   only:
-    - master
     - 1.x_maintenance
 
 before_install:
 - rm -rf ~/.sdkman
-- curl -s get.gvm.io > ~/install_gvm.sh
-- chmod 775 ~/install_gvm.sh
-- ~/install_gvm.sh
+- curl -s get.sdkman.io > ~/install_sdkman.sh
+- chmod 775 ~/install_sdkman.sh
+- ~/install_sdkman.sh
 - echo "sdkman_auto_answer=true" > ~/.sdkman/etc/config
 - source ~/.sdkman/bin/sdkman-init.sh
 - sdk install grails $GRAILS_VERSION || true
