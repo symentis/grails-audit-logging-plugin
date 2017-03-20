@@ -29,5 +29,5 @@ else
     grails set-grails-version ${GRAILS_VERSION}
 fi
 
-echo "grails test-app --non-interactive --stacktrace."
-grails test-app --non-interactive --stacktrace
+echo "grails test-app --non-interactive --stacktrace --verbose"
+grails test-app --non-interactive --stacktrace --verbose
