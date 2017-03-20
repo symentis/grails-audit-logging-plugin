@@ -410,8 +410,8 @@ stampLastUpdatedBy = 'lastUpdatedBy' // fieldname
 
 === Domain class stamping configuration (since 2.0.5)
 
-Since version 2.0.5, it is possible to specify the field configuratiobn on a per domain-class base in the @Stamp annotation.
-With this, you can specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fieldnames per domainclass.
+Since version 2.0.5, it is possible to specify the field configuration on a per domain-class base in the @Stamp annotation.
+With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdated fieldnames per domain class.
 
 Adding @Stamp to the entity disables the default Grails autoStamping by adding "autoTimestamp false" to the mapping (this can't be configured).
 
@@ -419,10 +419,10 @@ Example:
 [source,groovy]
 ----
  @Stamp(
-     createdBy = @StampInfo(fieldname="originalWho",type=Date.class),
-     dateCreated = @StampInfo(fieldname="originalWhen",type=Date.class),
-     lastUpdatedBy = @StampInfo(fieldname="lastWho",nullable = true),
-     lastUpdated = @StampInfo(fieldname="lastWhen",nullable = true)
+     createdBy = @StampInfo(fieldname="originalWho", type=Date.class),
+     dateCreated = @StampInfo(fieldname="originalWhen", type=Date.class),
+     lastUpdatedBy = @StampInfo(fieldname="lastWho", nullable = true),
+     lastUpdated = @StampInfo(fieldname="lastWhen", nullable = true)
      )
 ----
 
