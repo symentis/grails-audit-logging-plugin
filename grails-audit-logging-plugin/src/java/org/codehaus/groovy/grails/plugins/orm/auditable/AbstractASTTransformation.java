@@ -214,7 +214,6 @@ public abstract class AbstractASTTransformation implements ASTTransformation {
         if (!hasFieldInClosure(closure, fieldNode.getName())) {
             NamedArgumentListExpression namedarg = new NamedArgumentListExpression();
             namedarg.addMapEntryExpression(new ConstantExpression("nullable"), new ConstantExpression(true));
-            namedarg.addMapEntryExpression(new ConstantExpression("blank"), new ConstantExpression(true));
             MethodCallExpression constExpr = new MethodCallExpression(
                     VariableExpression.THIS_EXPRESSION,
                     new ConstantExpression(fieldNode.getName()),
