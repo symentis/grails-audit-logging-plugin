@@ -1607,8 +1607,8 @@ stampLastUpdatedBy = <span class="string"><span class="delimiter">'</span><span 
 <div class="sect2">
 <h3 id="domain-class-stamping-configuration-since-2-0-5">5.13. Domain class stamping configuration (since 2.0.5)</h3>
 <div class="paragraph">
-<p>Since version 2.0.5, it is possible to specify the field configuratiobn on a per domain-class base in the @Stamp annotation.
-With this, you can specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fieldnames per domainclass.</p>
+<p>Since version 2.0.5, it is possible to specify the field configuration on a per domain-class base in the @Stamp annotation.
+With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdated fieldnames per domain class.</p>
 </div>
 <div class="paragraph">
 <p>Adding @Stamp to the entity disables the default Grails autoStamping by adding "autoTimestamp false" to the mapping (this can&#8217;t be configured).</p>
@@ -1619,10 +1619,10 @@ With this, you can specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fiel
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"> <span class="annotation">@Stamp</span>(
-     createdBy = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">originalWho</span><span class="delimiter">&quot;</span></span>,type=<span class="predefined-type">Date</span>.class),
-     dateCreated = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">originalWhen</span><span class="delimiter">&quot;</span></span>,type=<span class="predefined-type">Date</span>.class),
-     lastUpdatedBy = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">lastWho</span><span class="delimiter">&quot;</span></span>,nullable = <span class="predefined-constant">true</span>),
-     lastUpdated = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">lastWhen</span><span class="delimiter">&quot;</span></span>,nullable = <span class="predefined-constant">true</span>)
+     createdBy = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">originalWho</span><span class="delimiter">&quot;</span></span>, type=<span class="predefined-type">Date</span>.class),
+     dateCreated = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">originalWhen</span><span class="delimiter">&quot;</span></span>, type=<span class="predefined-type">Date</span>.class),
+     lastUpdatedBy = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">lastWho</span><span class="delimiter">&quot;</span></span>, nullable = <span class="predefined-constant">true</span>),
+     lastUpdated = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">lastWhen</span><span class="delimiter">&quot;</span></span>, nullable = <span class="predefined-constant">true</span>)
      )</code></pre>
 </div>
 </div>
@@ -1718,7 +1718,7 @@ grails {
 <div id="footer">
 <div id="footer-text">
 Version 2.0.5-SNAPSHOT<br>
-Last updated 2017-03-20 09:41:11 UTC
+Last updated 2017-03-20 09:43:55 UTC
 </div>
 </div>
 </body>
