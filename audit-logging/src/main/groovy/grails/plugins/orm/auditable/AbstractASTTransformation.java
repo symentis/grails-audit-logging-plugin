@@ -1,6 +1,8 @@
 package grails.plugins.orm.auditable;
 
-import static org.springframework.asm.Opcodes.ACC_PUBLIC;
+import static org.codehaus.groovy.ast.MethodNode.ACC_PUBLIC;
+import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC;
+
 import groovy.lang.Closure;
 
 import java.lang.reflect.Modifier;
@@ -15,15 +17,7 @@ import org.codehaus.groovy.ast.FieldNode;
 import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.VariableScope;
-import org.codehaus.groovy.ast.expr.BinaryExpression;
-import org.codehaus.groovy.ast.expr.ClosureExpression;
-import org.codehaus.groovy.ast.expr.ConstantExpression;
-import org.codehaus.groovy.ast.expr.Expression;
-import org.codehaus.groovy.ast.expr.FieldExpression;
-import org.codehaus.groovy.ast.expr.ListExpression;
-import org.codehaus.groovy.ast.expr.MethodCallExpression;
-import org.codehaus.groovy.ast.expr.NamedArgumentListExpression;
-import org.codehaus.groovy.ast.expr.VariableExpression;
+import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.ast.stmt.BlockStatement;
 import org.codehaus.groovy.ast.stmt.ExpressionStatement;
 import org.codehaus.groovy.ast.stmt.ReturnStatement;
@@ -164,7 +158,30 @@ public abstract class AbstractASTTransformation implements ASTTransformation {
     	}
     	return false;
 	}
+	protected void addAutoTimestamp(ClassNode classNode, boolean value) {
+		FieldNode mappingClosure = classNode.getDeclaredField("mapping");
+		if(mappingClosure==null){
+			ClosureExpression mappingExpression = new ClosureExpression(Parameter.EMPTY_ARRAY, new BlockStatement());
+			mappingExpression.setVariableScope(new VariableScope());
 
+			mappingClosure = new FieldNode(
+				"mapping",ACC_PUBLIC | Modifier.STATIC,
+				new ClassNode(Closure.class),classNode,mappingExpression
+			);
+			classNode.addField(mappingClosure);
+		}
+		ClosureExpression exp = (ClosureExpression) mappingClosure.getInitialExpression();
+		BlockStatement block = (BlockStatement) exp.getCode();
+		if (!hasFieldInClosure(mappingClosure, "autoTimestamp")) {
+			MethodCallExpression constExpr = new MethodCallExpression(
+				VariableExpression.THIS_EXPRESSION,
+				new ConstantExpression("autoTimestamp"),
+				new ArgumentListExpression(new ConstantExpression(value))
+			);
+			block.addStatement(new ExpressionStatement(constExpr));			
+		}
+	}
+	
 	protected FieldNode addSqlTypeMapping(ClassNode classNode, FieldNode fieldNode,String sqlType) {
         FieldNode closure = classNode.getDeclaredField("mapping");
         if(closure==null){
@@ -189,11 +206,11 @@ public abstract class AbstractASTTransformation implements ASTTransformation {
 		return fieldNode;
     }
 	
-	protected <T> FieldNode addStaticField(ClassNode classNode, String fieldname,Class<T> type,T initialValue) {
+	protected <T> FieldNode addStaticFinalField(ClassNode classNode, String fieldname, Class<T> type, T initialValue) {
 		FieldNode fieldNode = classNode.getDeclaredField(fieldname);
 		
 		if(fieldNode==null){
-			fieldNode = new FieldNode(fieldname,Modifier.STATIC+Modifier.PUBLIC,new ClassNode(type),classNode,new ConstantExpression(initialValue));
+			fieldNode = new FieldNode(fieldname,Modifier.STATIC+Modifier.PUBLIC+Modifier.FINAL,new ClassNode(type),classNode,new ConstantExpression(initialValue));
 			classNode.addField(fieldNode);
 		}
 		return fieldNode;
@@ -214,7 +231,6 @@ public abstract class AbstractASTTransformation implements ASTTransformation {
         if (!hasFieldInClosure(closure, fieldNode.getName())) {
             NamedArgumentListExpression namedarg = new NamedArgumentListExpression();
             namedarg.addMapEntryExpression(new ConstantExpression("nullable"), new ConstantExpression(true));
-            namedarg.addMapEntryExpression(new ConstantExpression("blank"), new ConstantExpression(true));
             MethodCallExpression constExpr = new MethodCallExpression(
                     VariableExpression.THIS_EXPRESSION,
                     new ConstantExpression(fieldNode.getName()),

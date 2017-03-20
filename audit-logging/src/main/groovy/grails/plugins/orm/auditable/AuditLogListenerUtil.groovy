@@ -18,10 +18,12 @@
 */
 package grails.plugins.orm.auditable
 
+import grails.util.GrailsClassUtils
 import grails.util.Holders
 
 import org.grails.core.artefact.DomainClassArtefactHandler
 import grails.core.GrailsDomainClass
+import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.datastore.mapping.engine.event.EventType;
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
@@ -60,17 +62,18 @@ class AuditLogListenerUtil {
     return true
   }
 
-  static isStampable(domain, EventType eventType) {
-    boolean stampable = isStampable(eventType)
+  static isStampable(AbstractPersistenceEvent event) {
+    boolean stampable = isStampable(event.getEventType())
     if (stampable) {
-      def cpf = ClassPropertyFetcher.forClass(domain.class)
-      stampable = cpf.getPropertyValue('stampable')
+      stampable = GrailsClassUtils.getStaticPropertyValue(event.entityObject.class,'_stampable')      
+//      def cpf = ClassPropertyFetcher.forClass(domain.class)
+//      stampable = cpf.getPropertyValue('stampable')
     }
     stampable
   }
 
   static isStampable(EventType eventType) {
-    eventType == EventType.PreDelete || eventType == EventType.PreUpdate || eventType == EventType.PreInsert
+    eventType == EventType.PreUpdate || eventType == EventType.PreInsert
   }
 
   /**

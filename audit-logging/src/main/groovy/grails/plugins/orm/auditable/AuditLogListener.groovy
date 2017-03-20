@@ -19,7 +19,13 @@
 package grails.plugins.orm.auditable
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import grails.util.GrailsClassUtils
+import grails.util.GrailsStringUtils
+import grails.util.GrailsUtil
 import org.apache.commons.lang.ArrayUtils
+import org.grails.datastore.gorm.timestamp.DefaultTimestampProvider
+import org.grails.datastore.gorm.timestamp.TimestampProvider
+import org.grails.datastore.mapping.engine.EntityAccess
 
 import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
 import groovy.util.logging.Commons
@@ -72,15 +78,16 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     boolean usingHibernate = false
     
-    Boolean stampEnabled = true
-    Boolean stampAlways = false
-    String stampCreatedBy
-    String stampLastUpdatedBy
-
+    boolean stampEnabled = true
+    boolean stampAlways = false
+    boolean stampTimestamp = false
+    
     // Global list of attribute changes to ignore, defaults to ['version', 'lastUpdated']
     List<String> defaultIgnoreList
     List<String> defaultMaskList
     Map<String, String> replacementPatterns
+
+    private TimestampProvider timestampProvider = new DefaultTimestampProvider();
 
     AuditLogListener(Datastore datastore) {
         super(datastore)
@@ -91,14 +98,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         // GPAUDITLOGGING-64: Even we register AuditLogListeners per datasource, at least up to Grails 2.4.2 events for other datasources
         // get triggered in all other listeners.
         if (event.source != this.datastore) {
-            log.trace("Event received for other datastore. Ignoring event")
+            if(log.traceEnabled) log.trace("Event received for other datastore. Ignoring event")
             return
         }
-        if (stampEnabled && (stampAlways || isStampable(event.entityObject, event.eventType))) {
+        if (stampEnabled && (stampAlways || isStampable(event))) {
             stamp(event);
         }
         if (isAuditableEntity(event.entityObject, getEventName(event))) {
-            log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
+            if(log.traceEnabled) log.trace "Audit logging: ${event.eventType.name()} for ${event.entityObject.class.name}"
 
             switch (event.eventType) {
                 case EventType.PostInsert:
@@ -119,13 +126,43 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         def actor = getActor()
         
         if (EventType.PreInsert == event.eventType) {
+            stampTimestamp(event,entity)
+            
             stampCreatedBy(entity,actor,event)
             stampLastUpdatedBy(entity,actor,event)
         } else {
+            stampTimestampUpdate(event,entity)
             stampLastUpdatedBy(entity,actor,event)
         }
     }
-
+    
+    void stampTimestamp(AbstractPersistenceEvent event,def entity){
+        String dateCreatedProperty = GrailsClassUtils.getStaticPropertyValue(entity.class,'_dateCreatedStampableProperty')
+        Class<?> dateCreatedType = GrailsClassUtils.getPropertyType(entity.class,dateCreatedProperty)
+        def timestamp = timestampProvider.createTimestamp(dateCreatedType)
+        
+        entity.setProperty(dateCreatedProperty,timestamp)
+        if(usingHibernate) syncHibernateState(event,dateCreatedProperty,timestamp)
+        
+        String lastUpdatedProperty = GrailsClassUtils.getStaticPropertyValue(entity.class,'_lastUpdatedStampableProperty')
+        Class<?> lastUpdateType = GrailsClassUtils.getPropertyType(entity.class,lastUpdatedProperty)
+        if(!lastUpdateType.isAssignableFrom(dateCreatedType)){
+            timestamp = timestampProvider.createTimestamp(lastUpdateType)
+        }
+        entity.setProperty(lastUpdatedProperty,timestamp)
+        if(usingHibernate) syncHibernateState(event,lastUpdatedProperty,timestamp)
+    }
+    
+    void stampTimestampUpdate(AbstractPersistenceEvent event,def entity){
+        String lastUpdatedProperty = GrailsClassUtils.getStaticPropertyValue(entity.class,'_lastUpdatedStampableProperty')
+        Class<?> lastUpdateType = GrailsClassUtils.getPropertyType(entity.class,lastUpdatedProperty)
+        def timestamp = timestampProvider.createTimestamp(lastUpdateType)
+        
+        entity.setProperty(lastUpdatedProperty,timestamp)
+        
+        if(usingHibernate) syncHibernateState(event,lastUpdatedProperty,timestamp)
+    }
+    
     @Override
     boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
         return eventType.isAssignableFrom(PostInsertEvent) ||
@@ -275,29 +312,29 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
 
     protected stampCreatedBy(entity,actor,event) {
-        entity."${stampCreatedBy}" = actor 
-
+        String dateCreatedByProperty = GrailsClassUtils.getStaticPropertyValue(entity.class,'_createdByStampableProperty')
+        entity.setProperty(dateCreatedByProperty,actor)
         if(usingHibernate){
-            String[] propertyNames = event.nativeEvent.getPersister().getEntityMetamodel().getPropertyNames();
-            Object[] state = event.nativeEvent.state
-
-            syncHibernateState(state,propertyNames,stampCreatedBy,actor)
+            syncHibernateState(event,dateCreatedByProperty,actor)
         }
     }
 
     protected stampLastUpdatedBy(entity,actor,event) {
-        entity."${stampLastUpdatedBy}" = actor
-
+        String dateCreatedByProperty = GrailsClassUtils.getStaticPropertyValue(entity.class,'_createdByStampableProperty')
+        String lastUpdatedByProperty = GrailsClassUtils.getStaticPropertyValue(entity.class,'_lastUpdatedByStampableProperty')
+        entity.setProperty(lastUpdatedByProperty,actor)
+        
         if(usingHibernate){
-            String[] propertyNames = event.nativeEvent.getPersister().getEntityMetamodel().getPropertyNames();
-            Object[] state = event.nativeEvent.state
-
-            syncHibernateState(state,propertyNames,stampCreatedBy,entity."${stampCreatedBy}")
-            syncHibernateState(state,propertyNames,stampLastUpdatedBy,actor)
+            syncHibernateState(event,dateCreatedByProperty,entity.getProperty(dateCreatedByProperty))
+            syncHibernateState(event,lastUpdatedByProperty,actor)
         }
     }
 
-    private void syncHibernateState(Object[] state,String[] propertyNames,String propertyName,Object value){
+    private void syncHibernateState(AbstractPersistenceEvent event,String propertyName,Object value){
+        //event.nativeEvent.getPersister().getEntityMetamodel().getPropertyNames();
+        String[] propertyNames = event.nativeEvent.persister.entityMetamodel.propertyNames
+        Object[] state = event.nativeEvent.state
+
         int index = ArrayUtils.indexOf(propertyNames, propertyName);
         if(index>=0){
             state[index] = value
