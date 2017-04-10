@@ -41,7 +41,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = MyAuditLogEvent.findAllByClassName('test.Author')
-        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() - 2
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == null
@@ -93,7 +93,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = MyAuditLogEvent.findAllByClassName('test.Author')
-        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() - 2
 
         def bookEvents = MyAuditLogEvent.findAllByClassName('test.Book')
         bookEvents.size() == Book.gormPersistentEntity.persistentPropertyNames.size()
@@ -161,7 +161,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "verbose audit logging is created"
         def events = MyAuditLogEvent.findAllByClassName('test.Author')
-        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() - 2
 
         and:
         author.handlerCalled == "onSave"
@@ -205,7 +205,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "check logged"
         def events = MyAuditLogEvent.findAllByClassName('test.Author')
-        enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 0
+        enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() - 2 : events.size() == 0
 
         and:
         author.handlerCalled == "onSave"
@@ -237,7 +237,7 @@ class AuditInsertSpec extends IntegrationSpec {
 
         and: "check logged"
         def events = MyAuditLogEvent.findAllByClassName('test.Author')
-        enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() : events.size() == 1
+        enabled ? events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() - 2 : events.size() == 1
 
         and:
         author.handlerCalled == "onSave"
@@ -249,4 +249,45 @@ class AuditInsertSpec extends IntegrationSpec {
         'againV'          | true
         'againDisabledV'  | false
     }
+
+    void "Test globally ignored properties"() {
+        given:
+        def author = new Author(name: "Aaron", age: 50)
+
+        when:
+        author.save(flush: true, failOnError: true)
+
+        then: "ignored properties not logged"
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
+
+        events.size() == 7
+        ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+        ['version', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+            assert !events.find {it.propertyName == name}, "${name} was logged"
+        }
+    }
+
+    void "Test locally ignored properties"() {
+        given:
+        Author.auditable = [ignore: ['famous', 'age', 'dateCreated']]
+        def author = new Author(name: "Aaron", age: 50)
+
+        when:
+        author.save(flush: true, failOnError: true)
+
+        then: "ignored properties not logged"
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
+
+        events.size() == 6
+        ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+        ['famous', 'age', 'dateCreated'].each { name ->
+            assert !events.find {it.propertyName == name}, "${name} was logged"
+        }
+    }
+
+
 }

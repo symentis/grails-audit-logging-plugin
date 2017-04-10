@@ -327,7 +327,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 	  if(ignoreEvent(domain, "onSave")) {
 		  return
 	  }
-	  
+
 	  def map = makeMap(entity.persistentProperties*.name as Set, domain)
       if (!callHandlersOnly(domain)) {
         logChanges(domain, map, null, getEntityId(domain), getEventName(event), getClassName(entity))
@@ -508,9 +508,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     newMap?.remove('version')
     oldMap?.remove('version')
 
+    List ignoreList = ignoreList(domain)
+
     if (newMap && oldMap) {
       log.trace "There are new and old values to log"
       newMap.each { String key, val ->
+        if (key in ignoreList) {
+          return
+        }
         if (val != oldMap[key]) {
           def audit = auditClass.newInstance(
             actor:getActor(),
@@ -530,6 +535,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     if (newMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
       log.trace "there are new values and logging is verbose ... "
       newMap.each { String key, val ->
+        if (key in ignoreList) {
+          return
+        }
         def audit = auditClass.newInstance(
           actor:getActor(),
           uri:getUri(domain),
@@ -547,6 +555,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     if (oldMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
       log.trace "there is only an old map of values available and logging is set to verbose... "
       oldMap.each { String key, val ->
+        if (key in ignoreList) {
+          return
+        }
         def audit = auditClass.newInstance(
           actor:getActor(),
           uri:getUri(domain),
