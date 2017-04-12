@@ -94,7 +94,7 @@ import org.grails.datastore.mapping.core.Datastore
  * Release 1.1.2 #136 Ignore list not used for insert and delete. Thanks to P. Taylor
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.1.2"
+    def version = "1.1.3-SNAPSHOT"
     def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
