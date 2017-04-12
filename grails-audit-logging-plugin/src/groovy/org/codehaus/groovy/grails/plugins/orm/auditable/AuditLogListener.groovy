@@ -237,6 +237,32 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     return ignore
   }
 
+
+  /**
+   * Get the list of auditable properties.  This is used to override
+   * the default behaviour of auditing all properties except those in the
+   * ignore list.
+   *
+   *   static auditable = [auditableProperties: ['dateCreated','lastUpdated','myField']]
+   *
+   *
+   */
+  List auditableProperties(domain) {
+
+    Map auditableMap = getAuditableMap(domain)
+    if (auditableMap?.containsKey('auditableProperties')) {
+      log.debug "Found auditableProperty list on this entity ${domain.class.name}"
+      def list = auditableMap['auditableProperties']
+      if (list instanceof List) {
+        return list
+      }
+    }
+
+    null
+  }
+
+
+
   /**
    * The default properties to mask list is:  ['password']
    * if you want to provide your own mask list, specify in the DomainClass:
@@ -460,14 +486,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
    * to provide a list of fields for onChange to ignore.
    */
   protected boolean significantChange(domain, Map oldMap, Map newMap) {
+    def auditableProperties = auditableProperties(domain)
     def ignore = ignoreList(domain)
-    ignore?.each { String key ->
-      oldMap.remove(key)
-      newMap.remove(key)
-    }
     boolean changed = false
     oldMap.each { String k, Object v ->
-      if (v != newMap[k]) {
+      if (isPropertyAuditable(k, auditableProperties, ignore) && v != newMap[k]) {
         changed = true
       }
     }
@@ -493,6 +516,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
   }
 
+
   /**
    * Leans heavily on the "toString()" of a property
    * ... this feels crufty... should be tighter...
@@ -508,12 +532,13 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     newMap?.remove('version')
     oldMap?.remove('version')
 
+    List auditableProperties = auditableProperties(domain)
     List ignoreList = ignoreList(domain)
 
     if (newMap && oldMap) {
       log.trace "There are new and old values to log"
       newMap.each { String key, val ->
-        if (key in ignoreList) {
+        if (!isPropertyAuditable(key, auditableProperties, ignoreList)) {
           return
         }
         if (val != oldMap[key]) {
@@ -535,7 +560,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     if (newMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
       log.trace "there are new values and logging is verbose ... "
       newMap.each { String key, val ->
-        if (key in ignoreList) {
+        if (!isPropertyAuditable(key, auditableProperties, ignoreList)) {
           return
         }
         def audit = auditClass.newInstance(
@@ -555,7 +580,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     if (oldMap && verbose && !AuditLogListenerThreadLocal.auditLogNonVerbose) {
       log.trace "there is only an old map of values available and logging is set to verbose... "
       oldMap.each { String key, val ->
-        if (key in ignoreList) {
+        if (!isPropertyAuditable(key, auditableProperties, ignoreList)) {
           return
         }
         def audit = auditClass.newInstance(
@@ -759,6 +784,21 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     } finally {
       AuditLogListenerThreadLocal.clearAuditLogDisabled()
     }
+  }
+
+  /**
+   * Returns a boolean indicating if the given property should be audited or ignored.
+   * If there is an auditableProperties list the property is auditable if it is in that
+   * list.  Otherwise the property is auditable if is is not in the ignoreList.
+   */
+  boolean isPropertyAuditable(def fieldName, List auditableProperties, List ignoreList) {
+    if (auditableProperties) {
+      return fieldName in auditableProperties
+    } else if (ignoreList) {
+      return !(fieldName in ignoreList)
+    }
+
+    true
   }
 
   protected ConfigObject getAuditConfig() { AuditLoggingUtils.auditConfig }

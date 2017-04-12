@@ -217,6 +217,52 @@ class AuditUpdateSpec extends IntegrationSpec {
 
     }
 
+    void "Test auditableProperties"() {
+        given:
+        Author.auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.age = 50
+        author.famous = false
+        author.name = 'Bob'
+        author.save(flush: true, failOnError: true)
+
+        then: "only properties in auditableProperties are logged"
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
+
+        events.size() == 3
+
+        ['name', 'famous', 'lastUpdated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+    }
+
+    void "Test auditableProperties orverrides ignore list"() {
+        given:
+        Author.auditable = [
+                auditableProperties: ['name', 'famous', 'lastUpdated'],
+                ignore: ['name', 'famous']
+        ]
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.age = 50
+        author.famous = false
+        author.name = 'Bob'
+        author.save(flush: true, failOnError: true)
+
+        then: "only properties in auditableProperties are logged"
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
+
+        events.size() == 3
+
+        ['name', 'famous', 'lastUpdated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+    }
+
+
     void "Test handler is called"() {
         given:
         def author = Author.findByName("Aaron")
