@@ -49,7 +49,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "audit logging is created"
         def events = MyAuditLogEvent.findAllByClassName('test.Author')
-        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() - 2
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == "37"
@@ -93,7 +93,7 @@ class AuditDeleteSpec extends IntegrationSpec {
 
         then: "verbose audit logging is created"
         def events = MyAuditLogEvent.findAllByClassName('test.Author')
-        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size()
+        events.size() == Author.gormPersistentEntity.persistentPropertyNames.size() - 2
 
         and:
         author.handlerCalled == "onDelete"
@@ -131,6 +131,49 @@ class AuditDeleteSpec extends IntegrationSpec {
 			events.get(0).eventName == "DELETE"
 		
 	}
+
+    void "Test globally ignored properties"() {
+        given:
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.delete(flush: true, failOnError: true)
+
+        then: "ignored properties not logged"
+
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
+
+        events.size() == 7
+        ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+        ['version', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+            assert !events.find {it.propertyName == name}, "${name} was logged"
+        }
+
+    }
+
+    void "Test locally ignored properties"() {
+        given:
+        Author.auditable = [ignore: ['famous', 'age', 'dateCreated']]
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.delete(flush: true, failOnError: true)
+
+        then: "ignored properties not logged"
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
+
+        events.size() == 6
+        ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+        ['famous', 'age', 'dateCreated'].each { name ->
+            assert !events.find {it.propertyName == name}, "${name} was logged"
+        }
+
+    }
+
 
 }
 

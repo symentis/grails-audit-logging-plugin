@@ -196,6 +196,27 @@ class AuditUpdateSpec extends IntegrationSpec {
         events.size() == 0
     }
 
+    void "Test locally ignored properties"() {
+        given:
+        Author.auditable = [ignore: ['name', 'famous', 'lastUpdated']]
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.age = 50
+        author.famous = false
+        author.name = 'Bob'
+        author.save(flush: true, failOnError: true)
+
+        then: "ignored properties not logged"
+        def events = MyAuditLogEvent.findAllByClassName('test.Author')
+
+        events.size() == 1
+
+        def first = events.find { it.propertyName == 'age' }
+        first.persistedObjectVersion == author.version - 1
+
+    }
+
     void "Test handler is called"() {
         given:
         def author = Author.findByName("Aaron")
