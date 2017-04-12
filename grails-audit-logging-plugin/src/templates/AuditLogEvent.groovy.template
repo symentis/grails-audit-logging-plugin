@@ -56,10 +56,6 @@ class ${auditClassName} implements Serializable {
 
         oldValue(nullable: true)
         newValue(nullable: true)
-
-        // for large column support (as in < 1.0.6 plugin versions), use
-        // oldValue(nullable: true, maxSize: 65534)
-        // newValue(nullable: true, maxSize: 65534)
     }
 
     static mapping = {
@@ -80,6 +76,10 @@ class ${auditClassName} implements Serializable {
         autoImport false
 
         version false
+
+        // for large column support (as in < 1.0.6 plugin versions), use this
+        // oldValue type: 'text'
+        // newValue type: 'text'
     }
 
     /**
