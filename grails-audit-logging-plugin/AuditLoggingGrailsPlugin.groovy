@@ -90,10 +90,11 @@ import org.grails.datastore.mapping.core.Datastore
  *               #94 automatic type conversion does not work
  *               #90 / GPAUDITLOGGING-80 Add support for enabling/disabling auto import of AuditLogEvent domain class in HQL queries
  *               #89 / GPAUDITLOGGING-78 custom naming of id sequence generator
- * Release 1.1.1 #126 Support Many-To-Many (backport from master). Thanks to Thanks to Andrey Zhuchkov
+ * Release 1.1.1 #126 Support Many-To-Many (backport from master). Thanks to Andrey Zhuchkov
+ * Release 1.1.2 #136 Ignore list not used for insert and delete. Thanks to P. Taylor
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.1.1"
+    def version = "1.1.2"
     def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
