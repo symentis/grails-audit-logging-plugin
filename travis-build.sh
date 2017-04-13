@@ -4,7 +4,8 @@ set -e
 rm -rf audit-logging/build
 rm -rf audit-test/build
 
-./gradlew -q clean check install --stacktrace
+echo "Testing $TRAVIS_BRANCH"
+./gradlew clean check install --stacktrace
 
 EXIT_STATUS=0
 echo "Publishing archives for branch $TRAVIS_BRANCH"

@@ -1,17 +1,17 @@
-#*Grails Audit Logging Plugin*#
+# Grails Audit Logging Plugin
 
 The Grails Audit Logging plugin for Grails 3.x adds generic event based Audit Logging to a Grails project and also adds support to domain models for hooking into the GORM events system.
 
-##**Documentation**##
+## Documentation
  * For Grails 3.x release documentation, see [Plugin Documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/latest/)
  * For Grails 3.x snapshot documentation, see [Snapshot Plugin Documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/snapshot/plugin.html)
  * For Grails 2.x documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
-##**Supported Grails versions**##
- * Grails 3.x (master branch)
- * Grails 2.x (1.x_maintenance branch)
+## Supported Grails versions
+ * Grails 3.x: (master branch)
+ * Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
-##**audit-quickstart**##
+## audit-quickstart
 Versions 1.1.0 (Grails 2.x) and 2.0.0 (Grails 3.x) are the first versions with audit-quickstart command support.
 
 Therefore, you need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version(s) and later. See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
@@ -25,16 +25,16 @@ grails audit-quickstart org.example.myproject MyAuditLogEvent
   
 ```
 
-##**Issue Management**##
+## Issue Management
 
 See [GitHub Issues](https://github.com/robertoschwald/grails-audit-logging-plugin/issues "Issues")
 
-##**Pull Requests**##
+## Pull Requests
 Pull requests are highly appreciated and welcome!
 
 Please add integration tests for new features to the audit-test application.
 
-##**Contributors**##
+## Contributors
 Special thanks to all the contributors to the project (in alphabetical order):
 
 	Aaron Long
@@ -56,10 +56,10 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	Project lead: Robert Oschwald
 
 
-##**Continuous Integration Server**##
+## Continuous Integration Server
 [![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
 
-## Bintray##
+## Bintray
 <a href='https://bintray.com/robertoschwald/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
 
 ***
