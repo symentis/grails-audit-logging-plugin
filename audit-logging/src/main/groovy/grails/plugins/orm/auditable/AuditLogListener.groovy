@@ -180,7 +180,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     // new session will be created even if it doesn't exists. 
                     // This is a problem with rest requests where it's not desirable
                     // that a session is created for each request
-                    session = attr? FieldUtils.readDeclaredField(attr,'session',true) : null
+                    session = FieldUtils.readDeclaredField(attr,'session',true)
                 }
                 catch(Exception e){}
                 
