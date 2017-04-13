@@ -172,14 +172,18 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         def actor = null
         if (actorClosure) {
             def attr = RequestContextHolder.getRequestAttributes()
-            // When requesting the session via the getSession() method a 
-            // new session will be created even if it doesn't exists. 
-            // This is a problem with rest requests where it's not desirable
-            // that a session is created for each request
-            def session = FieldUtils.readDeclaredField(attr,'session',true)
-            
             //def session = attr?.session
             if (attr) {
+                def session
+                try{
+                    // When requesting the session via the getSession() method a 
+                    // new session will be created even if it doesn't exists. 
+                    // This is a problem with rest requests where it's not desirable
+                    // that a session is created for each request
+                    session = attr? FieldUtils.readDeclaredField(attr,'session',true) : null
+                }
+                catch(Exception e){}
+                
                 try {
                     actor = actorClosure.call(attr, session /* session is possible null */) 
                 }
