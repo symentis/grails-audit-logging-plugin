@@ -19,28 +19,19 @@
 package grails.plugins.orm.auditable
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import grails.core.GrailsDomainClass
 import grails.util.GrailsClassUtils
-import grails.util.GrailsStringUtils
-import grails.util.GrailsUtil
+import groovy.util.logging.Commons
 import org.apache.commons.lang.ArrayUtils
+import org.apache.commons.lang.reflect.FieldUtils
 import org.grails.datastore.gorm.timestamp.DefaultTimestampProvider
 import org.grails.datastore.gorm.timestamp.TimestampProvider
-import org.grails.datastore.mapping.engine.EntityAccess
-
-import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
-import groovy.util.logging.Commons
-
-import grails.core.GrailsDomainClass
 import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
-import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
-import org.grails.datastore.mapping.engine.event.EventType
-import org.grails.datastore.mapping.engine.event.PostInsertEvent
-import org.grails.datastore.mapping.engine.event.PreDeleteEvent
-import org.grails.datastore.mapping.engine.event.PreInsertEvent
-import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+import org.grails.datastore.mapping.engine.event.*
 import org.springframework.context.ApplicationEvent
 import org.springframework.web.context.request.RequestContextHolder
+
+import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
 
 /**
  * Grails interceptor for logging saves, updates, deletes and acting on
@@ -181,10 +172,16 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         def actor = null
         if (actorClosure) {
             def attr = RequestContextHolder.getRequestAttributes()
-            def session = attr?.session
-            if (attr && session) {
+            // When requesting the session via the getSession() method a 
+            // new session will be created even if it doesn't exists. 
+            // This is a problem with rest requests where it's not desirable
+            // that a session is created for each request
+            def session = FieldUtils.readDeclaredField(attr,'session',true)
+            
+            //def session = attr?.session
+            if (attr) {
                 try {
-                    actor = actorClosure.call(attr, session)
+                    actor = actorClosure.call(attr, session /* session is possible null */) 
                 }
                 catch (ex) {
                     log.error "The auditLog.actorClosure threw this exception: ", ex
