@@ -95,7 +95,7 @@ import org.grails.datastore.mapping.core.Datastore
  * Release 1.1.3 #113 Whitelist properties instead of blacklist. Thanks to P. Taylor
  */
 class AuditLoggingGrailsPlugin {
-    def version = "1.1.3"
+    def version = "1.1.4-SNAPSHOT"
     def grailsVersion = '2.1 > *'
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
