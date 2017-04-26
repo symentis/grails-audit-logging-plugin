@@ -333,7 +333,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
     private void syncHibernateState(AbstractPersistenceEvent event,String propertyName,Object value){
         //event.nativeEvent.getPersister().getEntityMetamodel().getPropertyNames();
-        String[] propertyNames = event.nativeEvent.persister.entityMetamodel.propertyNames
+        String[] propertyNames = event.nativeEvent.persister.entityMetamodel.properties*.name
         Object[] state = event.nativeEvent.state
 
         int index = ArrayUtils.indexOf(propertyNames, propertyName);
