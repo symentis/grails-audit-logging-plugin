@@ -18,13 +18,10 @@
 */
 package test
 
-import grails.plugins.orm.auditable.AuditLogListener
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import org.springframework.util.StringUtils
 import spock.lang.Specification
-import spock.lang.Unroll
 
 /**
  * Test replacementPattern config option
@@ -39,7 +36,7 @@ class ReplacementPatternSpec extends Specification {
         Author.auditable = true
     }
 
-    void "Test replacementPattern converts a.b.MySample to MySample"() {
+    void "Test replacementPattern converts a.b.MySample to .MySample"() {
         given:
         def author = new Author(name: "a.b.MySample", age: 1, famous: true)
 

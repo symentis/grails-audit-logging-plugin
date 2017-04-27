@@ -18,7 +18,6 @@
 */
 package test
 
-import grails.plugins.orm.auditable.AuditLogListenerUtil
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.test.mixin.integration.Integration
 import grails.transaction.*

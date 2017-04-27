@@ -18,8 +18,6 @@
 */
 package test
 
-import spock.lang.*
-
 /**
  * Test Audit Logging with handlersOnly auditing.
  */
