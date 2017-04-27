@@ -19,6 +19,7 @@
 package test
 
 import grails.plugins.orm.auditable.AuditLogListenerUtil
+import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.test.mixin.integration.Integration
 import grails.transaction.*
 import spock.lang.*
@@ -26,6 +27,8 @@ import spock.lang.*
 @Integration
 @Rollback
 class AuditDeleteSpec extends Specification {
+
+  def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
 
   void setupData() {
     Author.auditable = true
@@ -57,7 +60,7 @@ class AuditDeleteSpec extends Specification {
     then: "audit logging is created"
     def events = AuditTrail.findAllByClassName('test.Author')
 
-    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
+    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
 
     def first = events.find { it.propertyName == 'age' }
     first.oldValue == "37"
@@ -66,10 +69,10 @@ class AuditDeleteSpec extends Specification {
 
     and: 'all books are deleted'
     def b1Events = AuditTrail.findAllByClassNameAndPersistedObjectId('test.Book', 'Hunger Games')
-    b1Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
+    b1Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
 
     def b2Events = AuditTrail.findAllByClassNameAndPersistedObjectId('test.Book', 'Catching Fire')
-    b2Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
+    b2Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
   }
 
   void "Test conditional delete logging"() {
@@ -103,7 +106,7 @@ class AuditDeleteSpec extends Specification {
 
     then: "verbose audit logging is created"
     def events = AuditTrail.findAllByClassName('test.Author')
-    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
+    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
 
     and:
     author.handlerCalled == "onDelete"
@@ -140,7 +143,49 @@ class AuditDeleteSpec extends Specification {
     events.size() == 1
     and:
     events.get(0).eventName == "DELETE"
+  }
 
+  void "Test globally ignored properties"() {
+    given:
+    setupData()
+    def author = Author.findByName("Aaron")
+
+    when:
+    author.delete(flush: true, failOnError: true)
+
+    then: "ignored properties not logged"
+
+    def events = AuditTrail.findAllByClassName('test.Author')
+
+    events.size() == 7
+    ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
+      assert events.find {it.propertyName == name}, "${name} was not logged"
+    }
+    ['version', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+      assert !events.find {it.propertyName == name}, "${name} was logged"
+    }
+
+  }
+
+  void "Test locally ignored properties"() {
+    given:
+    setupData()
+    Author.auditable = [ignore: ['famous', 'age', 'dateCreated']]
+    def author = Author.findByName("Aaron")
+
+    when:
+    author.delete(flush: true, failOnError: true)
+
+    then: "ignored properties not logged"
+    def events = AuditTrail.findAllByClassName('test.Author')
+
+    events.size() == 6
+    ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+      assert events.find {it.propertyName == name}, "${name} was not logged"
+    }
+    ['famous', 'age', 'dateCreated'].each { name ->
+      assert !events.find {it.propertyName == name}, "${name} was logged"
+    }
   }
 
 }

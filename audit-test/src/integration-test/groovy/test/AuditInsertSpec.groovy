@@ -19,6 +19,7 @@
 package test
 
 import grails.plugins.orm.auditable.AuditLogListener
+import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import org.springframework.util.StringUtils
 import spock.lang.Unroll
 
@@ -29,6 +30,9 @@ import spock.lang.*
 @Integration
 @Rollback
 class AuditInsertSpec extends Specification {
+
+    def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
+
     void setup() {
         Author.auditable = true
     }
@@ -45,7 +49,7 @@ class AuditInsertSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == null
@@ -75,7 +79,7 @@ class AuditInsertSpec extends Specification {
 
         then: "review log is created"
         def events = AuditTrail.findAllByClassName('test.Review')
-        events.size() == (Review.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+        events.size() == (Review.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
 
         and: "the object id uses the naem from Review and the title from Book"
         def first = events.first()
@@ -97,10 +101,10 @@ class AuditInsertSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
 
         def bookEvents = AuditTrail.findAllByClassName('test.Book')
-        bookEvents.size() == (Book.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+        bookEvents.size() == (Book.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
     }
 
     void "Test logging with a different id"() {
@@ -165,7 +169,7 @@ class AuditInsertSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size()
+        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
 
         and:
         author.handlerCalled == "onSave"
@@ -209,7 +213,7 @@ class AuditInsertSpec extends Specification {
 
         and: "check logged"
         def events = AuditTrail.findAllByClassName('test.Author')
-        enabled ? events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size() : events.size() == 0
+        enabled ? events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size() : events.size() == 0
 
         and:
         author.handlerCalled == "onSave"
@@ -242,7 +246,7 @@ class AuditInsertSpec extends Specification {
         and: "check logged"
         def events = AuditTrail.findAllByClassName('test.Author')
         println events*.eventName
-        enabled ? events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - ['id', 'version']).size() : events.size() == 1
+        enabled ? events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size() : events.size() == 1
 
         and:
         author.handlerCalled == "onSave"
@@ -254,4 +258,44 @@ class AuditInsertSpec extends Specification {
         'againV'          | true
         'againDisabledV'  | false
     }
+
+    void "Test globally ignored properties"() {
+        given:
+        def author = new Author(name: "Aaron", age: 50)
+
+        when:
+        author.save(flush: true, failOnError: true)
+
+        then: "ignored properties not logged"
+        def events = AuditTrail.findAllByClassName('test.Author')
+
+        events.size() == 7
+        ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+        ['version', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+            assert !events.find {it.propertyName == name}, "${name} was logged"
+        }
+    }
+
+    void "Test locally ignored properties"() {
+        given:
+        Author.auditable = [ignore: ['famous', 'age', 'dateCreated']]
+        def author = new Author(name: "Aaron", age: 50)
+
+        when:
+        author.save(flush: true, failOnError: true)
+
+        then: "ignored properties not logged"
+        def events = AuditTrail.findAllByClassName('test.Author')
+
+        events.size() == 6
+        ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+        ['famous', 'age', 'dateCreated'].each { name ->
+            assert !events.find {it.propertyName == name}, "${name} was logged"
+        }
+    }
+
 }
