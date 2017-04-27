@@ -38,6 +38,7 @@ grails:
               - application/json
               - text/json
             multipartForm: multipart/form-data
+            pdf: application/pdf
             rss: application/rss+xml
             text: text/plain
             hal: 
