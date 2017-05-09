@@ -1157,7 +1157,7 @@ If you use the old configuration key, the plugin will log a notice.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.disabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, audit logging is disabled, but the eventHandlers are still triggered.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, audit logging is disabled, but the eventHandlers are still triggered. Note: You can set "auditLog.disabled" in  DataSource configurations you do not want to have the AuditLogListener registered in. This could be useful if you have multiple DataSource definitions, but want to audit only a few of them.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.nonVerboseDelete</p></td>
@@ -1718,7 +1718,7 @@ grails {
 <div id="footer">
 <div id="footer-text">
 Version 2.0.5-SNAPSHOT<br>
-Last updated 2017-05-09 07:22:45 UTC
+Last updated 2017-05-09 08:51:01 UTC
 </div>
 </div>
 </body>
