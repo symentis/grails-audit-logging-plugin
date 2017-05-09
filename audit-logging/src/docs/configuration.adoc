@@ -27,7 +27,7 @@ If you use the old configuration key, the plugin will log a notice.
 
 |grails.plugin.auditLog.disabled
 |false
-|If set to true, audit logging is disabled, but the eventHandlers are still triggered.
+|If set to true, audit logging is disabled, but the eventHandlers are still triggered. Note: You can set "auditLog.disabled" in  DataSource configurations you do not want to have the AuditLogListener registered in. This could be useful if you have multiple DataSource definitions, but want to audit only a few of them.
 
 |grails.plugin.auditLog.nonVerboseDelete
 |false
