@@ -3,11 +3,11 @@ jdk:
 - oraclejdk7
 before_script:
 - rm -rf target
-script: ./travis-build.sh
+script: "./travis-build.sh"
 sudo: false
 cache:
   directories:
-  - $HOME/.gradle
+  - "$HOME/.gradle"
 env:
   global:
   - TERM=dumb
@@ -15,6 +15,6 @@ env:
   - GIT_EMAIL="robertoschwald@gmail.com"
   - secure: QgwDKgm+TFRpt6fnAjbI4MGmBOIqfCm0ycyIom927aZPvhp4fzzI6wGIN06RTAPNao95BnV7TwSgonRExPfqIMCrMzDj4BXVYkK9uXUXTUPYw24+9cEv2ZvnyEurg/MR2ajpu3MHtam+7uGO8mh4pYq+693RpiU+IZFkB5vPWcM=
   - secure: mRX4Ye6O4iHcxV48DD8Oaz+7FmrN7vMf67g3Ym24zfzLLaxbl77z0XCMQYblU4s/OBqP9BNo4Y7v6HzCxJyWwMIRqz9txk/DkUUAzTSYHIxQwJqnZTdZNjh9muVmvGuyyBj7z/IhBtKVhNDEXn+OW6f0tdiHeLnaAy6kAovvwCA=
-  - secure: Dz7Flw3cPnG5HgGSb49xvfdu8knvokK3+yO665P8kO/5lgzKjftonQkemxDmcAoiJYmgxJRVXO842sQ8A4vy90h+WzLpJBUdJAEAF27FS5Tq6DyzxrFaOu87DSOdJXPthpMUd0z7+5+7fyoaRY6gPcWiDn2BZ9SqjoJ0sskd1cI=
   - secure: FNQ6Nb+IMMaPQSrgA9eNPbSqYC7lziJteOq38uoBjVV9EZhmvYBn/viWfBjCE+qs/bykxLRKOdXZePf9kXChG0yY0AfRTDx46mjMzdzLwBKJQhsm0ObZEWN/mLn7Vjhl8bJSdJbuDBM5goNeAAs9OptR5FTDPUBnRYeetIGV6TU=
   - secure: gk9vC3Y9ghO/+63ef3TsCAWeRX8eBIBtbNtXuvRqS8Rb0Z7ybuFGFpMOZw7bV1oH8DgrFGbo4PM1Kxe5XQFNZKl3BQxrMVDoNmr3Rm2+DRf/aNCXRxSzOZLzuLARtCP6eNgOSWSBDk6VWTtqwXY2HRYJlXMqhFtV/E0xGx9cLAQ=
+  - secure: bEUIdsKwyl1pGcyPxpZpW9FMhm+Ek1DnpAkYWJUzn6TwV+Nras5Q4yhlt3hGjF8niyHwgbp3XYcWg/UYxuogMzQqv2uQouU9ZQnf+ks+F1dIsDGiU2DXsTy4WRllgVkUr+GgK3c3eeVOzROuv5qlBk/nfBoNMxD/hGIhLyR0Ny4=
