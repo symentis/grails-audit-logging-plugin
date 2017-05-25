@@ -239,7 +239,7 @@ Old- and new values are stored in detailed to the audit logging table. Enable ve
 
 ----
 
-This setting is disabled by default.
+This setting is enabled by default.
 
 [WARNING]
 ====
