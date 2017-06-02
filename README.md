@@ -42,6 +42,7 @@ Special thanks to all the contributors to the project (in alphabetical order):
 
 	Aaron Long
 	Aldrin
+	Andrey Zhuchkov
 	Ankur Tripathi
 	Burt Beckwith 
 	Dennie de Lange
@@ -53,6 +54,8 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	Juergen Baumann
 	Madhava Jay
 	Matthew A Stewart
+	Paul Taylor
+	Sebastien Arbogast
 	Shawn Hartsock
 	Tom Crossland
 	
