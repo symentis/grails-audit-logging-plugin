@@ -516,8 +516,8 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Grails Audit Logging Plugin - Reference Documentation</h1>
 <div class="details">
 <span id="author" class="author">Robert Oschwald</span><br>
-<span id="revnumber">version 2.0.5-SNAPSHOT,</span>
-<span id="revdate">2017-06-02</span>
+<span id="revnumber">version 2.0.5,</span>
+<span id="revdate">2017-06-04</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -636,6 +636,57 @@ please file a GitHub issue.</p>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
+<li>
+<p>2.0.5</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Only pass session to actorClosure if a session actually exists.</p>
+</li>
+<li>
+<p>Updated syncHibernateState to use correct name array</p>
+</li>
+<li>
+<p>Fix ignore list not used for insert and delete</p>
+</li>
+<li>
+<p>Fix #147 Document per-datasource auditLog.disabled config key</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.0.4</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Added option to specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fieldnames per domainclass</p>
+</li>
+<li>
+<p>Removed blank constraint for nullable stampable properties.</p>
+</li>
+<li>
+<p>Remove preDelete as stampable event, does not make sense to stamp a delete event.</p>
+</li>
+<li>
+<p>Constraint fixes</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.0.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #129 Issue with Hibernate stamping. Stamping was ignored with dynamicUpdate = true and stamping was ignored on cascading saves.</p>
+</li>
+<li>
+<p>Fix #130 Docs for verbose mode</p>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>2.0.2</p>
 <div class="ulist">
@@ -978,7 +1029,7 @@ please file a GitHub issue.</p>
 <pre class="CodeRay highlight"><code data-lang="groovy">/** Project dependencies **/
 dependencies {
    ...
-   compile 'org.grails.plugins:audit-logging:2.0.5-SNAPSHOT'
+   compile 'org.grails.plugins:audit-logging:2.0.5'
 }</code></pre>
 </div>
 </div>
@@ -1717,8 +1768,8 @@ grails {
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 2.0.5-SNAPSHOT<br>
-Last updated 2017-06-02 08:58:48 UTC
+Version 2.0.5<br>
+Last updated 2017-06-04 13:46:40 UTC
 </div>
 </div>
 </body>
