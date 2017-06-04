@@ -1,4 +1,19 @@
 == Change Log
+* 2.0.5
+** Only pass session to actorClosure if a session actually exists.
+** Updated syncHibernateState to use correct name array
+** Fix ignore list not used for insert and delete
+** Fix #147 Document per-datasource auditLog.disabled config key
+
+* 2.0.4
+** Added option to specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fieldnames per domainclass
+** Removed blank constraint for nullable stampable properties.
+** Remove preDelete as stampable event, does not make sense to stamp a delete event.
+** Constraint fixes
+
+* 2.0.3
+** Fix #129 Issue with Hibernate stamping. Stamping was ignored with dynamicUpdate = true and stamping was ignored on cascading saves.
+** Fix #130 Docs for verbose mode
 
 * 2.0.2
 ** Fix #118, use Grails 3.0.10 internally.
