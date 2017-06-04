@@ -4,24 +4,23 @@ set -e
 rm -rf audit-logging/build
 rm -rf audit-test/build
 
-echo "Testing $TRAVIS_BRANCH"
+echo "*** Testing $TRAVIS_BRANCH"
 ./gradlew clean check install --stacktrace
 
 EXIT_STATUS=0
-echo "Publishing archives for branch $TRAVIS_BRANCH"
 if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
 
-  echo "Publishing archives"
+  echo "*** Publishing archives for branch $TRAVIS_BRANCH"
 
   if [[ -n $TRAVIS_TAG ]]; then
-      echo "Publishing to Bintray.."
+      echo " *** Publishing to Bintray.."
       ./gradlew audit-logging:bintrayUpload -S || EXIT_STATUS=$?
   else
-      echo "Publishing to Grails Artifactory"
+      echo " *** Publishing to Grails Artifactory, as no release-tag was found."
       ./gradlew audit-logging:publish -S || EXIT_STATUS=$?
   fi
 
-  echo "Building docs and publish to gh-pages branch.."
+  echo "*** Building docs and publish to gh-pages branch.."
   
   ./gradlew docs --stacktrace || EXIT_STATUS=$?
   
@@ -31,7 +30,7 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
   echo "https://$GH_TOKEN:@github.com" > ~/.git-credentials
 
   echo " "
-  echo "** Updating gh-pages branch **"
+  echo "*** Updating gh-pages branch **"
   cd audit-logging/build
   git clone https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git -b gh-pages gh-pages --single-branch > /dev/null
   cd gh-pages
