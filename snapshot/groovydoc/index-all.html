@@ -195,7 +195,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="grails/plugins/orm/auditable/AuditLogListenerThreadLocal.html#clearAuditLogNonVerbose()" title="Method in AuditLogListenerThreadLocal">clearAuditLogNonVerbose()</a></span> - Method in <a href="grails/plugins/orm/auditable/AuditLogListenerThreadLocal.html">AuditLogListenerThreadLocal</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="grails/plugins/orm/auditable/AuditLogListener.html#conditionallyMask(def, java.lang.String, def)" title="Method in AuditLogListener">conditionallyMask(def, String, def)</a></span> - Method in <a href="grails/plugins/orm/auditable/AuditLogListener.html">AuditLogListener</a>
+<dt><span class="strong"><a href="grails/plugins/orm/auditable/AuditLogListener.html#conditionallyMaskAndTruncate(def, java.lang.String, def)" title="Method in AuditLogListener">conditionallyMaskAndTruncate(def, String, def)</a></span> - Method in <a href="grails/plugins/orm/auditable/AuditLogListener.html">AuditLogListener</a>
 </dt><dd> <div class="block">@param domain the auditable domain object</div></dd>
 <dt><span class="strong"><a href="grails/plugins/orm/auditable/AuditLogEventController.html#create()" title="Method in AuditLogEventController">create()</a></span> - Method in <a href="grails/plugins/orm/auditable/AuditLogEventController.html">AuditLogEventController</a>
 </dt><dd> <div class="block"></div></dd>
@@ -355,8 +355,6 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="grails/plugins/orm/auditable/AuditLogListener.html#logChanges(def, java.util.Map, java.util.Map, def, def, def)" title="Method in AuditLogListener">logChanges(def, Map, Map, def, def, def)</a></span> - Method in <a href="grails/plugins/orm/auditable/AuditLogListener.html">AuditLogListener</a>
 </dt><dd> <div class="block">Leans heavily on the "toString()" of a property
  ... this feels crufty... should be tighter...</div></dd>
-<dt><span class="strong"><a href="grails/plugins/orm/auditable/AuditLogListener.html#logIds(def)" title="Method in AuditLogListener">logIds(def)</a></span> - Method in <a href="grails/plugins/orm/auditable/AuditLogListener.html">AuditLogListener</a>
-</dt><dd> <div class="block"></div></dd>
 </dl>
 
     
@@ -486,6 +484,8 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="grails/plugins/orm/auditable/AbstractASTTransformation.html#transformGeneral(org.codehaus.groovy.ast.AnnotationNode, org.codehaus.groovy.ast.ClassNode)" title="Method in AbstractASTTransformation">transformGeneral(AnnotationNode, ClassNode)</a></span> - Method in <a href="grails/plugins/orm/auditable/AbstractASTTransformation.html">AbstractASTTransformation</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="grails/plugins/orm/auditable/StampASTTransformation.html#transformGeneral(org.codehaus.groovy.ast.AnnotationNode, org.codehaus.groovy.ast.ClassNode)" title="Method in StampASTTransformation">transformGeneral(AnnotationNode, ClassNode)</a></span> - Method in <a href="grails/plugins/orm/auditable/StampASTTransformation.html">StampASTTransformation</a>
+</dt><dd> <div class="block"></div></dd>
+<dt><span class="strong"><a href="grails/plugins/orm/auditable/AuditLogListener.html#truncate(def, int)" title="Method in AuditLogListener">truncate(def, int)</a></span> - Method in <a href="grails/plugins/orm/auditable/AuditLogListener.html">AuditLogListener</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="grails/plugins/orm/auditable/StampInfo.html#type" title="Field in StampInfo">type</a></span> - Field in <a href="grails/plugins/orm/auditable/StampInfo.html">StampInfo</a>
 </dt><dd> <div class="block">@default class</div></dd>
