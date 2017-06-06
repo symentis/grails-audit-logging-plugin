@@ -11,8 +11,9 @@ appender('STDOUT', ConsoleAppender) {
 }
 
 logger("grails.plugins.orm.auditable", TRACE)
+logger("test", TRACE)
 
-root(ERROR, ['STDOUT'])
+root(WARN, ['STDOUT'])
 
 if(Environment.current == Environment.DEVELOPMENT) {
     def targetDir = BuildSettings.TARGET_DIR

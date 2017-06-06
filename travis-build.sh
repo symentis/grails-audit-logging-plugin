@@ -8,9 +8,14 @@ echo "*** Testing $TRAVIS_BRANCH"
 ./gradlew clean check install --stacktrace
 
 EXIT_STATUS=0
-if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
 
-  echo "*** Publishing archives for branch $TRAVIS_BRANCH"
+if [ $TRAVIS_PULL_REQUEST == 'true' ]; then
+  exit $EXIT_STATUS
+fi
+
+if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' ]]; then
+
+  echo "Publishing archives for branch $TRAVIS_BRANCH"
 
   if [[ -n $TRAVIS_TAG ]]; then
       echo " *** Publishing to Bintray.."
@@ -39,37 +44,37 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
   mv ../docs/index.html ../docs/plugin.html
   mv ../docs/ghpages.html ../docs/index.html
 
-  # If this is the master branch then update the snapshot
-  if [[ $TRAVIS_BRANCH == 'master' ]]; then
-    mkdir -p snapshot
-    cp -r ../docs/. ./snapshot/
-    git add snapshot/*
+
+  # If there is a tag present then this becomes the latest
+  if [[ -n $TRAVIS_TAG ]]; then
+      mkdir -p latest
+      cp -r ../docs/. ./latest/
+      git add latest/*
+
+      version="$TRAVIS_TAG"
+      version=${version:1}
+      majorVersion=${version:0:4}
+      majorVersion="${majorVersion}x"
+
+      mkdir -p "$version"
+      cp -r ../docs/. "./$version/"
+      git add "$version/*"
+
+      mkdir -p "$majorVersion"
+      cp -r ../docs/. "./$majorVersion/"
+      git add "$majorVersion/*"
+  else
+      # If this is the master branch then update the snapshot docs
+      if [[ $TRAVIS_BRANCH == 'master' ]]; then
+        mkdir -p snapshot
+        cp -r ../docs/. ./snapshot/
+        git add snapshot/*
+      fi
   fi
 
-    # If there is a tag present then this becomes the latest
-    if [[ -n $TRAVIS_TAG ]]; then
-        mkdir -p latest
-        cp -r ../docs/. ./latest/
-        git add latest/*
-
-        version="$TRAVIS_TAG"
-        version=${version:1}
-        majorVersion=${version:0:4}
-        majorVersion="${majorVersion}x"
-
-        mkdir -p "$version"
-        cp -r ../docs/. "./$version/"
-        git add "$version/*"
-
-        mkdir -p "$majorVersion"
-        cp -r ../docs/. "./$majorVersion/"
-        git add "$majorVersion/*"
-
-    fi
-
-    git commit -a -m "Updating docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
-    git push origin HEAD
-    cd ..
-    rm -rf gh-pages
+  git commit -m "Updating docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+  git push origin HEAD
+  cd ..
+  rm -rf gh-pages
 fi
 exit $EXIT_STATUS

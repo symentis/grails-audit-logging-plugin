@@ -19,6 +19,7 @@ package grails.plugins.orm.auditable
  * under the License.
 */
 import grails.plugins.*
+import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.core.*
 
 /**
@@ -40,7 +41,7 @@ import org.grails.datastore.mapping.core.*
  * http://grails.org/plugin/audit-logging
  *
  */
-
+@Slf4j
 class AuditLoggingGrailsPlugin extends Plugin {
 
     def grailsVersion = '3.0.0 > *'
@@ -112,6 +113,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
                 listener.transactional = transactional
                 listener.sessionAttribute = sessionAttribute
                 listener.actorKey = actorKey
+                listener.truncateLength = determineTruncateLength(applicationContext)
                 listener.actorClosure = actorClosure
                 listener.defaultIgnoreList = config.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
                 listener.defaultMaskList = config.defaultMask?.asImmutable() ?: ['password'].asImmutable()
@@ -124,14 +126,34 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         }
     }
 
+    /**
+     * Determine the truncateLength based on the configured truncateLength and the actual auditDomainClass maxSize constraint for newValue.
+     */
+    private Integer determineTruncateLength(ctx) {
+        String confAuditDomainClassName = AuditLoggingConfigUtils.auditConfig.auditDomainClassName
+        if (confAuditDomainClassName == null){
+            throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
+        }
+        def dc = ctx.grailsApplication.getDomainClass(confAuditDomainClassName)
+        if (!dc) {
+            throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")
+        }
+        Class AuditLogEventClazz = dc.clazz
+        Integer domainMaxSize = AuditLogEventClazz.constrainedProperties ['newValue']['maxSize'] ?: 255
+        def configuredTruncateLength = AuditLoggingConfigUtils.auditConfig.truncateLength
+        if (!configuredTruncateLength.isEmpty() && configuredTruncateLength <= domainMaxSize){
+            return configuredTruncateLength
+        } else {
+            log.debug "truncateLength not configured or truncateLength exceeds the ${AuditLoggingConfigUtils.auditConfig.auditDomainClassName} newValue maxSize constraint. Truncating at maxSize: ${domainMaxSize}."
+            return domainMaxSize
+        }
+    }
+
     void onConfigChange(Map<String, Object> event) {
         AuditLoggingConfigUtils.resetAuditConfig()
-
         def conf = AuditLoggingConfigUtils.auditConfig
         if (!conf || !conf.active) {
             return
         }
-        
-        log.trace 'onConfigChange'
     }
 }

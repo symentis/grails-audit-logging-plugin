@@ -53,7 +53,7 @@ class AuditTrail implements Serializable {
     propertyName(nullable:true)
 
     oldValue(nullable:true)
-    newValue(nullable:true)
+    newValue(maxSize:10000, nullable:true)
 
     // for large column support (as in < 1.0.6 plugin versions), use
     // oldValue(nullable: true, maxSize: 65534)
