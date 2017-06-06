@@ -11,6 +11,7 @@ appender('STDOUT', ConsoleAppender) {
 }
 
 logger("grails.plugins.orm.auditable", TRACE)
+logger("test", TRACE)
 
 root(WARN, ['STDOUT'])
 
