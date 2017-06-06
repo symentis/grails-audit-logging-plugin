@@ -60,6 +60,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     Boolean logIds = false
     Boolean transactional = false
     Boolean logFullClassName = false
+    Integer truncateLength
     String sessionAttribute
     String actorKey
     String propertyMask
@@ -175,19 +176,18 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             //def session = attr?.session
             if (attr) {
                 def session
-                try{
-                    // When requesting the session via the getSession() method a 
-                    // new session will be created even if it doesn't exists. 
+                try {
+                    // When requesting the session via the getSession() method a
+                    // new session will be created even if it doesn't exists.
                     // This is a problem with rest requests where it's not desirable
                     // that a session is created for each request
                     session = FieldUtils.readDeclaredField(attr,'session',true)
+                } catch(Exception ignore){
+                  log.debug("Cannot get session. " + ignore)
                 }
-                catch(Exception e){}
-                
                 try {
-                    actor = actorClosure.call(attr, session /* session is possible null */) 
-                }
-                catch (ex) {
+                    actor = actorClosure.call(attr, session /* session is possibly null */)
+                } catch (ex) {
                     log.error "The auditLog.actorClosure threw this exception: ", ex
                     log.error "The auditLog.actorClosure will be disabled now."
                     actorClosure = null
@@ -588,8 +588,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                         persistedObjectId: persistedObjectId?.toString(),
                         persistedObjectVersion: persistedObjectVersion,
                         propertyName: key,
-                        oldValue: conditionallyMask(domain, key, oldMap[key]),
-                        newValue: conditionallyMask(domain, key, newMap[key]))
+                        oldValue: conditionallyMaskAndTruncate(domain, key, oldMap[key]),
+                        newValue: conditionallyMaskAndTruncate(domain, key, newMap[key]))
                     saveAuditLog(audit)
                 }
             }
@@ -610,7 +610,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     persistedObjectVersion: persistedObjectVersion,
                     propertyName: key,
                     oldValue: null,
-                    newValue: conditionallyMask(domain, key, val))
+                    newValue: conditionallyMaskAndTruncate(domain, key, val))
                 saveAuditLog(audit)
             }
             return
@@ -629,7 +629,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     persistedObjectId: persistedObjectId?.toString(),
                     persistedObjectVersion: persistedObjectVersion,
                     propertyName: key,
-                    oldValue: conditionallyMask(domain, key, val),
+                    oldValue: conditionallyMaskAndTruncate(domain, key, val),
                     newValue: null)
                 saveAuditLog(audit)
             }
@@ -662,7 +662,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * @param value the value of the property
      * @return
      */
-    String conditionallyMask(domain, String key, value) {
+    String conditionallyMaskAndTruncate(domain, String key, value) {
         try {
             if (value == null) {
                 return null
@@ -675,15 +675,20 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (maskList(domain)?.contains(key)) {
             log.trace("Masking property ${key} with ${propertyMask}")
             propertyMask
+        } else if (truncateLength) {
+            truncate(value, truncateLength)
         } else {
-            logIds(value)
+            truncate(value, Integer.MAX_VALUE)
         }
     }
 
-    String logIds(value) {
+    String truncate(value, int max) {
         if (value == null) {
             return null
         }
+
+        log.trace "trimming object's string representation based on ${max} characters."
+
         // GPAUDITLOGGING-43
         def str = null
         if (logIds) {
@@ -697,7 +702,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         } else {
             str = "$value".trim() // GPAUDITLOGGING-40
         }
+
         str = replaceByReplacementPatterns(str)
+        (str?.length() > max) ? str?.substring(0, max) : str
     }
 
     private String appendWithId(obj, str) {
@@ -725,7 +732,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         replacementPatterns?.each { String from, String to ->
             str = str.replace(from, to)
         }
-        return str
+        str
     }
 
     /**
@@ -804,9 +811,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
     }
 
-    /*
-    Execute given Closure without any audit logging.
-    */
+    /**
+     * Execute given Closure without any audit logging.
+     */
     static withoutAuditLog = { Closure c ->
         AuditLogListenerThreadLocal.auditLogDisabled = true
         try {
