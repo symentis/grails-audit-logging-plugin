@@ -145,7 +145,8 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         if (AuditLoggingConfigUtils.auditConfig.getProperty('TRUNCATE_LENGTH')){
             log.warn("grails.plugin.auditLog.TRUNCATE_LENGTH is deprecated. Please rename to 'grails.plugin.auditLog.truncateLength'. Ignoring.")
         }
-        Integer configuredTruncateLength = AuditLoggingConfigUtils.auditConfig.getOrDefault('truncateLength',255)
+        def configuredTruncateLength = AuditLoggingConfigUtils.auditConfig.getProperty('truncateLength')
+        if (configuredTruncateLength instanceof ConfigObject) return domainMaxSize
         if (configuredTruncateLength <= domainMaxSize){
             return configuredTruncateLength
         } else {
