@@ -227,13 +227,13 @@ If instead you want to trigger on version and lastUpdated changes you may specif
 static auditable = [ignore:[]]
 ----
 
-=== Properties to audit (whitelist)
-Instead of excluding certain properties from auditing, it is also possible to define list of properties to audit using 'auditableProperties'.
-auditableProperties has precedence over 'ignore'.
+===  Whitelist attributes to audit (since 2.0.6)
+Since version 2.0.6, instead of blacklisting which attributes to ignore, you can also define a list of properties to audit (whitelist) per Domain class.
+The auditableProperties setting has precedence over ignore. Thanks to Paul Taylor for this feature.
 
 [source,groovy]
 ----
-static auditable = [auditableProperties: ['dateCreated', 'lastUpdated', 'myField']]
+static auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
 ----
 
 === Verbose mode
