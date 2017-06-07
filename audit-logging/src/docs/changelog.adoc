@@ -1,22 +1,22 @@
 == Change Log
 * 2.0.6
-** Re-introduced truncateLength support (but changed config parameter from TRUNCATE_LENGTH to truncateLength)
-** Fixed verbose param default description in documentation (thanks to Matthew Moss)
+** Fix #142 Re-introduced truncateLength support (and changed config parameter from 'TRUNCATE_LENGTH' to 'truncateLength')
+** Fixed verbose param default description in documentation (Thanks to Matthew Moss)
 
 * 2.0.5
-** Only pass session to actorClosure if a session actually exists.
-** Updated syncHibernateState to use correct name array
-** Fix ignore list not used for insert and delete
+** Only pass session to actorClosure if a session actually exists. (Thanks to Dennie de Lange)
+** Updated syncHibernateState to use correct name array (Thanks to Matthias Born)
+** Fix ignore list not used for insert and delete (Backport from 1.x)
 ** Fix #147 Document per-datasource auditLog.disabled config key
 
 * 2.0.4
 ** Added option to specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fieldnames per domainclass
-** Removed blank constraint for nullable stampable properties.
-** Remove preDelete as stampable event, does not make sense to stamp a delete event.
+** and removed blank constraint for nullable stampable properties.
+** Remove preDelete as stampable event, does not make sense to stamp a delete event. (Thanks to Dennie de Lange)
 ** Constraint fixes
 
 * 2.0.3
-** Fix #129 Issue with Hibernate stamping. Stamping was ignored with dynamicUpdate = true and stamping was ignored on cascading saves.
+** Fix #129 Issue with Hibernate stamping. Stamping was ignored with dynamicUpdate = true and stamping was ignored on cascading saves. (thanks to Dennie de Lange)
 ** Fix #130 Docs for verbose mode
 
 * 2.0.2
@@ -25,11 +25,11 @@
 
 * 2.0.1
 ** Fix #117 Clean build. Version 2.0.0 had issues with Spring Security due to unclean build.
-** Fix #116 (paritially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.
+** Fix #116 (partially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.
 
 * 2.0.0
-** First Grails3 version. Thanks to Graeme.
-** audit-quickstart command to create the AuditLog domain artifact
+** First Grails 3 version. Thanks to Graeme Rocher.
+** Added audit-quickstart command to create the AuditLog domain artifact
 ** #96 Make identifiers available in the maps during onChange event. Thanks to dmahapatro.
 ** branch: master.
 ** For 1.0.x plugin version (Grails2), see 1.x_maintenance branch
