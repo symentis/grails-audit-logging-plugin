@@ -23,6 +23,7 @@ import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import groovy.util.logging.Slf4j
+import spock.lang.Shared
 import spock.lang.Specification
 
 @Integration
@@ -31,9 +32,15 @@ import spock.lang.Specification
 class AuditTruncateSpec extends Specification {
     def grailsApplication
 
+    @Shared
+    def defaultIgnoreList
+
+    void setup() {
+        defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
+    }
+
     void "No_Truncate"() {
         given:
-        def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
         def oldTruncLength = getFirstListenerTruncateLength()
         setListenersTruncateLength(255)
 
@@ -64,7 +71,6 @@ class AuditTruncateSpec extends Specification {
 
     void "Truncate_at_255"() {
         given:
-        def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
         def oldTruncLength = getFirstListenerTruncateLength()
         setListenersTruncateLength(255)
         def tunnel = new Tunnel(name: "shortdesc", description:"${'b'*1024}")
@@ -94,7 +100,6 @@ class AuditTruncateSpec extends Specification {
 
     void "Truncate_at_1024"() {
         given:
-        def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
         def oldTruncLength = getFirstListenerTruncateLength()
         setListenersTruncateLength(1024)
 

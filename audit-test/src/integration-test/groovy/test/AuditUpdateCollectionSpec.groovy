@@ -25,6 +25,7 @@ import spock.lang.*
 @Integration
 @Rollback
 class AuditUpdateCollectionSpec extends Specification {
+
     void setupData() {
         Author.auditable = true
 

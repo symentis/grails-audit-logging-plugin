@@ -11,6 +11,7 @@ import spock.lang.*
 @Integration
 @Rollback
 class StampSpec extends Specification {
+
 	def setup(){
 		assert Train._stampable 
 		assert Train._dateCreatedStampableProperty

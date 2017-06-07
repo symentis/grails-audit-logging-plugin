@@ -21,6 +21,7 @@ package test
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
+import spock.lang.Shared
 import spock.lang.Specification
 
 /**
@@ -30,9 +31,11 @@ import spock.lang.Specification
 @Rollback
 class ReplacementPatternSpec extends Specification {
 
-    def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
+    @Shared
+    def defaultIgnoreList
 
     void setup() {
+        defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
         Author.auditable = true
     }
 
