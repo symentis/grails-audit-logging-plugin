@@ -1,4 +1,4 @@
-== Configuration
+RUN== Configuration
 
 The plugin configuration can be specified in the application.groovy file.
 It supports Environments blocks for environment-specific configuration.
@@ -37,9 +37,9 @@ If you use the old configuration key, the plugin will log a notice.
 |false
 |Log the entity including the package name
 
-|grails.plugin.auditLog.TRUNCATE_LENGTH
+|grails.plugin.auditLog.truncateLength
 |255
-|Configure the truncation length of detail information. Must me <= field size of oldMap and newMap in your Auditing domain class.
+|Configure the truncation length of newValue detail information. Must me <= field size of oldMap and newMap in your Auditing domain class. If you define the truncate length larger than your AuditTrail classes newValue maxSize constraint, the field size of newValue is used instead. If you do not define truncateLength, the written data in newValue is truncated at the field size boundary.
 
 |grails.plugin.auditLog.stampEnabled
 |false
@@ -277,18 +277,18 @@ static auditable = [mask:'password','otherField']
 === Verbose log truncation length
 
 If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
-columns (Default is 255). Configure the TRUNCATE_LENGTH in application.groovy:
+columns (Default is 255). Configure the truncateLength in application.groovy:
 
 [source,groovy]
 ----
 
- TRUNCATE_LENGTH = 400 // don't forget to ensure "oldMap" and "newMap" fields are large enough!
+ truncateLength = 400 // don't forget to ensure "oldValue" and "newValue" fields are large enough!
 
 ----
 
 [WARNING]
 ====
-When you set TRUNCATE_LENGTH to a value > 255 you must ensure that oldMap and newMap fields in your audit-log domain class
+When you set truncateLength to a value > 255 you must ensure that oldValue and newValue fields in your audit-log domain class
 are large enough. Example setting with the same maxSize constraints as the former "largeValueColumnTypes" setting:
 
 [source,groovy]
@@ -300,7 +300,7 @@ static constraints = {
 }
 ----
 
-When you forgot to set the constraints in your AuditLog class while setting TRUNCATE_LENGTH > 255,
+When you forgot to set the constraints in your AuditLog class while setting truncateLength > 255,
 a truncation warning may occur and only partial information is logged.
 ====
 
@@ -456,7 +456,7 @@ grails {
      auditDomainClassName = 'my.example.project.MyAuditTrail'
      verbose = true // verbosely log all changed values to db
      logIds = true  // log db-ids of associated objects.
-     TRUNCATE_LENGTH = 1000
+     truncateLength = 1000
      cacheDisabled = true  // only for 1.x. Disable caching of AuditDomainClass.
      replacementPatterns = ["local.example.xyz.":""] // replace with empty string.
      actorClosure = { request, session ->

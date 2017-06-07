@@ -11,7 +11,8 @@ grails {
       defaultActor = 'SYS'
       useDatasource = 'second' // store in "second" datasource
       replacementPatterns = ["a.b":""]
-      // truncateLength=200
+      TRUNCATE_LENGTH=255 // deprecated warning must occur.
+      truncateLength=1000000
     }
   }
 }

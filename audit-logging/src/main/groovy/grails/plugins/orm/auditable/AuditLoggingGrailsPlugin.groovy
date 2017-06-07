@@ -139,12 +139,17 @@ When called, the event handlers have access to oldObj and newObj definitions tha
             throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")
         }
         Class AuditLogEventClazz = dc.clazz
-        Integer domainMaxSize = AuditLogEventClazz.constrainedProperties ['newValue']['maxSize'] ?: 255
-        def configuredTruncateLength = AuditLoggingConfigUtils.auditConfig.truncateLength
-        if (!configuredTruncateLength.isEmpty() && configuredTruncateLength <= domainMaxSize){
+        Integer oldValueMaxSize = AuditLogEventClazz.constrainedProperties ['oldValue']['maxSize'] as Integer ?: 255
+        Integer newValueMaxSize = AuditLogEventClazz.constrainedProperties ['newValue']['maxSize'] as Integer ?: 255
+        Integer domainMaxSize = oldValueMaxSize < newValueMaxSize ?  oldValueMaxSize : newValueMaxSize
+        if (AuditLoggingConfigUtils.auditConfig.getProperty('TRUNCATE_LENGTH')){
+            log.warn("grails.plugin.auditLog.TRUNCATE_LENGTH is deprecated. Please rename to 'grails.plugin.auditLog.truncateLength'. Ignoring.")
+        }
+        Integer configuredTruncateLength = AuditLoggingConfigUtils.auditConfig.getOrDefault('truncateLength',255)
+        if (configuredTruncateLength <= domainMaxSize){
             return configuredTruncateLength
         } else {
-            log.debug "truncateLength not configured or truncateLength exceeds the ${AuditLoggingConfigUtils.auditConfig.auditDomainClassName} newValue maxSize constraint. Truncating at maxSize: ${domainMaxSize}."
+            log.warn "Configured truncateLength ${configuredTruncateLength} exceeds the ${AuditLoggingConfigUtils.auditConfig.auditDomainClassName} oldValue or newValue 'maxSize' constraint. Truncating at maxSize: ${domainMaxSize}."
             return domainMaxSize
         }
     }
