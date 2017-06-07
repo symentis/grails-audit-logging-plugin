@@ -1,4 +1,8 @@
 == Change Log
+* 2.0.6
+** Re-introduced truncateLength support (but changed config parameter from TRUNCATE_LENGTH to truncateLength)
+** Fixed verbose param default description in documentation (thanks to Matthew Moss)
+
 * 2.0.5
 ** Only pass session to actorClosure if a session actually exists.
 ** Updated syncHibernateState to use correct name array
