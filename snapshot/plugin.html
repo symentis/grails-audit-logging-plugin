@@ -637,10 +637,10 @@ please file a GitHub issue.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Re-introduced truncateLength support (but changed config parameter from TRUNCATE_LENGTH to truncateLength)</p>
+<p>Fix #142 Re-introduced truncateLength support (and changed config parameter from <em>TRUNCATE_LENGTH</em> to <em>truncateLength</em>)</p>
 </li>
 <li>
-<p>Fixed verbose param default description in documentation (thanks to Matthew Moss)</p>
+<p>Fixed verbose param default description in documentation (Thanks to Matthew Moss)</p>
 </li>
 </ul>
 </div>
@@ -650,13 +650,13 @@ please file a GitHub issue.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Only pass session to actorClosure if a session actually exists.</p>
+<p>Only pass session to actorClosure if a session actually exists. (Thanks to Dennie de Lange)</p>
 </li>
 <li>
-<p>Updated syncHibernateState to use correct name array</p>
+<p>Updated syncHibernateState to use correct name array (Thanks to Matthias Born)</p>
 </li>
 <li>
-<p>Fix ignore list not used for insert and delete</p>
+<p>Fix ignore list not used for insert and delete (Backport from 1.x)</p>
 </li>
 <li>
 <p>Fix #147 Document per-datasource auditLog.disabled config key</p>
@@ -672,10 +672,10 @@ please file a GitHub issue.</p>
 <p>Added option to specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fieldnames per domainclass</p>
 </li>
 <li>
-<p>Removed blank constraint for nullable stampable properties.</p>
+<p>and removed blank constraint for nullable stampable properties.</p>
 </li>
 <li>
-<p>Remove preDelete as stampable event, does not make sense to stamp a delete event.</p>
+<p>Remove preDelete as stampable event, does not make sense to stamp a delete event. (Thanks to Dennie de Lange)</p>
 </li>
 <li>
 <p>Constraint fixes</p>
@@ -688,7 +688,7 @@ please file a GitHub issue.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Fix #129 Issue with Hibernate stamping. Stamping was ignored with dynamicUpdate = true and stamping was ignored on cascading saves.</p>
+<p>Fix #129 Issue with Hibernate stamping. Stamping was ignored with dynamicUpdate = true and stamping was ignored on cascading saves. (thanks to Dennie de Lange)</p>
 </li>
 <li>
 <p>Fix #130 Docs for verbose mode</p>
@@ -717,7 +717,7 @@ please file a GitHub issue.</p>
 <p>Fix #117 Clean build. Version 2.0.0 had issues with Spring Security due to unclean build.</p>
 </li>
 <li>
-<p>Fix #116 (paritially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.</p>
+<p>Fix #116 (partially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.</p>
 </li>
 </ul>
 </div>
@@ -727,10 +727,10 @@ please file a GitHub issue.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>First Grails3 version. Thanks to Graeme.</p>
+<p>First Grails 3 version. Thanks to Graeme Rocher.</p>
 </li>
 <li>
-<p>audit-quickstart command to create the AuditLog domain artifact</p>
+<p>Added audit-quickstart command to create the AuditLog domain artifact</p>
 </li>
 <li>
 <p>#96 Make identifiers available in the maps during onChange event. Thanks to dmahapatro.</p>
@@ -1776,7 +1776,7 @@ grails {
 <div id="footer">
 <div id="footer-text">
 Version 2.0.6-SNAPSHOT<br>
-Last updated 2017-06-07 11:47:59 UTC
+Last updated 2017-06-07 11:57:59 UTC
 </div>
 </div>
 </body>
