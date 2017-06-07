@@ -227,9 +227,9 @@ If instead you want to trigger on version and lastUpdated changes you may specif
 static auditable = [ignore:[]]
 ----
 
-===  Whitelist attributes to audit (since 2.0.6)
-Since version 2.0.6, instead of blacklisting which attributes to ignore, you can also define a list of properties to audit (whitelist) per Domain class.
-The auditableProperties setting has precedence over ignore. Thanks to Paul Taylor for this feature.
+===  Whitelist properties to audit (since 2.0.6)
+Since version 2.0.6, instead of blacklisting which properties to ignore, you can also define a list of properties to audit (whitelist) per Domain class.
+The 'auditableProperties' setting has precedence over 'ignore'. Thanks to Paul Taylor for this feature.
 
 [source,groovy]
 ----
