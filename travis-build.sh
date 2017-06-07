@@ -5,9 +5,7 @@ rm -rf audit-logging/build
 rm -rf audit-test/build
 
 echo "*** Testing $TRAVIS_BRANCH"
-./gradlew clean --stacktrace -i
-./gradlew check --stacktrace -i
-./gradlew install --stacktrace -i
+./gradlew clean check install --stacktrace
 
 EXIT_STATUS=0
 
