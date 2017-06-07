@@ -517,7 +517,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="details">
 <span id="author" class="author">Robert Oschwald</span><br>
 <span id="revnumber">version 2.0.6-SNAPSHOT,</span>
-<span id="revdate">2017-06-06</span>
+<span id="revdate">2017-06-07</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -539,32 +539,28 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#1-auditing-of-domain-class">4.1. 1. Auditing of domain class</a></li>
 <li><a href="#2-auditing-plus-domain-event-handlers">4.2. 2. Auditing plus domain event handlers</a></li>
 <li><a href="#3-use-event-handlers-only-no-auditing">4.3. 3. Use event handlers only (no auditing)</a></li>
+<li><a href="#auditing-current-user-information-actorclosure">4.4. Auditing Current User Information (actorClosure)</a></li>
+<li><a href="#property-ignore-list">4.5. Property Ignore List</a></li>
+<li><a href="#verbose-mode">4.6. Verbose mode</a></li>
+<li><a href="#logging-of-associated-objectids-since-0-5-5">4.7. Logging of associated objectIds (since 0.5.5)</a></li>
+<li><a href="#property-value-masking-since-0-5-5">4.8. Property value masking (since 0.5.5)</a></li>
+<li><a href="#verbose-log-truncation-length">4.9. Verbose log truncation length</a></li>
+<li><a href="#transactional-auditlog-events">4.10. Transactional AuditLog events</a></li>
+<li><a href="#disable-auditing-by-config-since-0-5-5-3">4.11. Disable auditing by config (since 0.5.5.3)</a></li>
+<li><a href="#nonverbosedelete-logging-since-1-0-1">4.12. nonVerboseDelete logging (since 1.0.1)</a></li>
+<li><a href="#log-full-domain-class-name-since-1-0-3">4.13. log full domain class name (since 1.0.3)</a></li>
+<li><a href="#getauditloguri-closure-since-1-0-4">4.14. getAuditLogUri closure (since 1.0.4)</a></li>
+<li><a href="#domain-class-stamping-support-since-1-0-4">4.15. Domain class stamping support (since 1.0.4)</a></li>
+<li><a href="#domain-class-stamping-configuration-since-2-0-5">4.16. Domain class stamping configuration (since 2.0.5)</a></li>
+<li><a href="#ignoring-certain-events-since-1-0-5-2-0-0">4.17. Ignoring certain events (since 1.0.5 / 2.0.0)</a></li>
+<li><a href="#domain-name-replacements-since-2-0-1">4.18. Domain Name replacements (since 2.0.1)</a></li>
+<li><a href="#example-configuration">4.19. Example configuration</a></li>
 </ul>
 </li>
-<li><a href="#configuration">5. Configuration</a>
+<li><a href="#implementation">5. Implementation</a>
 <ul class="sectlevel2">
-<li><a href="#auditing-current-user-information-actorclosure">5.1. Auditing Current User Information (actorClosure)</a></li>
-<li><a href="#property-ignore-list">5.2. Property Ignore List</a></li>
-<li><a href="#verbose-mode">5.3. Verbose mode</a></li>
-<li><a href="#logging-of-associated-objectids-since-0-5-5">5.4. Logging of associated objectIds (since 0.5.5)</a></li>
-<li><a href="#property-value-masking-since-0-5-5">5.5. Property value masking (since 0.5.5)</a></li>
-<li><a href="#verbose-log-truncation-length">5.6. Verbose log truncation length</a></li>
-<li><a href="#transactional-auditlog-events">5.7. Transactional AuditLog events</a></li>
-<li><a href="#disable-auditing-by-config-since-0-5-5-3">5.8. Disable auditing by config (since 0.5.5.3)</a></li>
-<li><a href="#nonverbosedelete-logging-since-1-0-1">5.9. nonVerboseDelete logging (since 1.0.1)</a></li>
-<li><a href="#log-full-domain-class-name-since-1-0-3">5.10. log full domain class name (since 1.0.3)</a></li>
-<li><a href="#getauditloguri-closure-since-1-0-4">5.11. getAuditLogUri closure (since 1.0.4)</a></li>
-<li><a href="#domain-class-stamping-support-since-1-0-4">5.12. Domain class stamping support (since 1.0.4)</a></li>
-<li><a href="#domain-class-stamping-configuration-since-2-0-5">5.13. Domain class stamping configuration (since 2.0.5)</a></li>
-<li><a href="#ignoring-certain-events-since-1-0-5-2-0-0">5.14. Ignoring certain events (since 1.0.5 / 2.0.0)</a></li>
-<li><a href="#domain-name-replacements-since-2-0-1">5.15. Domain Name replacements (since 2.0.1)</a></li>
-<li><a href="#example-configuration">5.16. Example configuration</a></li>
-</ul>
-</li>
-<li><a href="#implementation">6. Implementation</a>
-<ul class="sectlevel2">
-<li><a href="#auditlogeventlistener">6.1. AuditLogEventListener</a></li>
-<li><a href="#plugin-descriptor">6.2. Plugin Descriptor</a></li>
+<li><a href="#auditlogeventlistener">5.1. AuditLogEventListener</a></li>
+<li><a href="#plugin-descriptor">5.2. Plugin Descriptor</a></li>
 </ul>
 </li>
 </ul>
@@ -1151,12 +1147,9 @@ After installing the plugin, you must perform the following command to let the p
 <div class="paragraph">
 <p>With "handlersOnly:true" specified, no AuditLogEvents will be persisted to the database and only the event handlers will be called.</p>
 </div>
+<div class="paragraph">
+<p>RUN== Configuration</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="configuration">5. Configuration</h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>The plugin configuration can be specified in the application.groovy file.
 It supports Environments blocks for environment-specific configuration.</p>
@@ -1221,9 +1214,9 @@ If you use the old configuration key, the plugin will log a notice.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Log the entity including the package name</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.TRUNCATE_LENGTH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.truncateLength</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">255</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure the truncation length of detail information. Must me &#8656; field size of oldMap and newMap in your Auditing domain class.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure the truncation length of newValue detail information. Must me &#8656; field size of oldMap and newMap in your Auditing domain class. If you define the truncate length larger than your AuditTrail classes newValue maxSize constraint, the field size of newValue is used instead. If you do not define truncateLength, the written data in newValue is truncated at the field size boundary.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampEnabled</p></td>
@@ -1252,8 +1245,9 @@ If you use the old configuration key, the plugin will log a notice.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <div class="sect2">
-<h3 id="auditing-current-user-information-actorclosure">5.1. Auditing Current User Information (actorClosure)</h3>
+<h3 id="auditing-current-user-information-actorclosure">4.4. Auditing Current User Information (actorClosure)</h3>
 <div class="paragraph">
 <p>With version &gt;= 0.5, additional configuration can be specified in the application.groovy file of the project to help log the
 authenticated user for various security systems.
@@ -1293,7 +1287,7 @@ name (the person performing the action which triggered the event, e.g. the usern
 </table>
 </div>
 <div class="sect3">
-<h4 id="spring-security-core-plugin-1-1-2-or-higher">5.1.1. Spring Security Core Plugin 1.1.2 or higher</h4>
+<h4 id="spring-security-core-plugin-1-1-2-or-higher">4.4.1. Spring Security Core Plugin 1.1.2 or higher</h4>
 <div class="paragraph">
 <p>If you save data from an unprotected URL (configAttribute:IS_AUTHENTICATED_ANONYMOUSLY), the principal is a String-object
 not a Principal-object. To cope with this behaviour you should use the following Closure definition in application.groovy:</p>
@@ -1325,7 +1319,7 @@ not a Principal-object. To cope with this behaviour you should use the following
 </div>
 </div>
 <div class="sect3">
-<h4 id="spring-security-core-1-0-1-plugin">5.1.2. Spring Security Core 1.0.1 Plugin</h4>
+<h4 id="spring-security-core-1-0-1-plugin">4.4.2. Spring Security Core 1.0.1 Plugin</h4>
 <div class="paragraph">
 <p>Based off of Jorge Aguilera&#8217;s example, the Spring Security Plugin uses the SpringSecurityService.</p>
 </div>
@@ -1344,7 +1338,7 @@ not a Principal-object. To cope with this behaviour you should use the following
 </div>
 </div>
 <div class="sect3">
-<h4 id="acegi-plugin">5.1.3. Acegi Plugin</h4>
+<h4 id="acegi-plugin">4.4.3. Acegi Plugin</h4>
 <div class="paragraph">
 <p>Thanks to Jorge Aguilera for his example on how to integrate with the Acegi plugin:</p>
 </div>
@@ -1363,7 +1357,7 @@ not a Principal-object. To cope with this behaviour you should use the following
 </div>
 </div>
 <div class="sect3">
-<h4 id="cas-authentication">5.1.4. CAS Authentication</h4>
+<h4 id="cas-authentication">4.4.4. CAS Authentication</h4>
 <div class="paragraph">
 <p>For example if you are using a system such as CAS you can specify the CAS user attribute using a special configuration
 property to get the CAS user name. In application.groovy  add the following lines:</p>
@@ -1391,7 +1385,7 @@ property to get the CAS user name. In application.groovy  add the following line
 </div>
 </div>
 <div class="sect3">
-<h4 id="shiro-plugin">5.1.5. Shiro Plugin</h4>
+<h4 id="shiro-plugin">4.4.5. Shiro Plugin</h4>
 <div class="paragraph">
 <p>With Shiro, add the following lines to use the currently logged in user&#8217;s username:</p>
 </div>
@@ -1410,7 +1404,7 @@ property to get the CAS user name. In application.groovy  add the following line
 </div>
 </div>
 <div class="sect3">
-<h4 id="other-security-systems">5.1.6. Other security systems</h4>
+<h4 id="other-security-systems">4.4.6. Other security systems</h4>
 <div class="paragraph">
 <p>If you are using a custom authentication system in your controller that puts the user data into the session you can set
 up the actorClosure to work with your security system instead.</p>
@@ -1418,7 +1412,7 @@ up the actorClosure to work with your security system instead.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="property-ignore-list">5.2. Property Ignore List</h3>
+<h3 id="property-ignore-list">4.5. Property Ignore List</h3>
 <div class="paragraph">
 <p>It&#8217;s possible to configure which properties get ignored by auditing. The default ignore field list is:</p>
 </div>
@@ -1445,7 +1439,7 @@ up the actorClosure to work with your security system instead.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="verbose-mode">5.3. Verbose mode</h3>
+<h3 id="verbose-mode">4.6. Verbose mode</h3>
 <div class="paragraph">
 <p>You can enable verbose mode. If enabled, column by column change logging in insert and delete events is enabled.
 Old- and new values are stored in detailed to the audit logging table. Enable verbose logging with:</p>
@@ -1476,7 +1470,7 @@ verbose mode in a code block.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="logging-of-associated-objectids-since-0-5-5">5.4. Logging of associated objectIds (since 0.5.5)</h3>
+<h3 id="logging-of-associated-objectids-since-0-5-5">4.7. Logging of associated objectIds (since 0.5.5)</h3>
 <div class="paragraph">
 <p>You can log the object-ids of associated objects. Logging will be performed in the format: "[id:&lt;objId&gt;]objDetails".
 You can enable id-logging with</p>
@@ -1491,7 +1485,7 @@ You can enable id-logging with</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="property-value-masking-since-0-5-5">5.5. Property value masking (since 0.5.5)</h3>
+<h3 id="property-value-masking-since-0-5-5">4.8. Property value masking (since 0.5.5)</h3>
 <div class="paragraph">
 <p>You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are
 not stored into the audit log table if verbose mode is enabled. Instead, a mask of "<strong><strong></strong><strong></strong></strong>" will be logged.
@@ -1504,14 +1498,14 @@ By default, "password" properties are masked. You can mask property fields in do
 </div>
 </div>
 <div class="sect2">
-<h3 id="verbose-log-truncation-length">5.6. Verbose log truncation length</h3>
+<h3 id="verbose-log-truncation-length">4.9. Verbose log truncation length</h3>
 <div class="paragraph">
 <p>If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
-columns (Default is 255). Configure the TRUNCATE_LENGTH in application.groovy:</p>
+columns (Default is 255). Configure the truncateLength in application.groovy:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"> TRUNCATE_LENGTH = <span class="integer">400</span> <span class="comment">// don't forget to ensure &quot;oldMap&quot; and &quot;newMap&quot; fields are large enough!</span></code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"> truncateLength = <span class="integer">400</span> <span class="comment">// don't forget to ensure &quot;oldValue&quot; and &quot;newValue&quot; fields are large enough!</span></code></pre>
 </div>
 </div>
 <div class="admonitionblock warning">
@@ -1522,7 +1516,7 @@ columns (Default is 255). Configure the TRUNCATE_LENGTH in application.groovy:</
 </td>
 <td class="content">
 <div class="paragraph">
-<p>When you set TRUNCATE_LENGTH to a value &gt; 255 you must ensure that oldMap and newMap fields in your audit-log domain class
+<p>When you set truncateLength to a value &gt; 255 you must ensure that oldValue and newValue fields in your audit-log domain class
 are large enough. Example setting with the same maxSize constraints as the former "largeValueColumnTypes" setting:</p>
 </div>
 <div class="listingblock">
@@ -1535,7 +1529,7 @@ are large enough. Example setting with the same maxSize constraints as the forme
 </div>
 </div>
 <div class="paragraph">
-<p>When you forgot to set the constraints in your AuditLog class while setting TRUNCATE_LENGTH &gt; 255,
+<p>When you forgot to set the constraints in your AuditLog class while setting truncateLength &gt; 255,
 a truncation warning may occur and only partial information is logged.</p>
 </div>
 </td>
@@ -1544,7 +1538,7 @@ a truncation warning may occur and only partial information is logged.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="transactional-auditlog-events">5.7. Transactional AuditLog events</h3>
+<h3 id="transactional-auditlog-events">4.10. Transactional AuditLog events</h3>
 <div class="paragraph">
 <p>In application.groovy, you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
 and commit transactions around audit log save events.
@@ -1561,7 +1555,7 @@ This setting should not be changed from defaults lightly as it can cause problem
 </div>
 </div>
 <div class="sect2">
-<h3 id="disable-auditing-by-config-since-0-5-5-3">5.8. Disable auditing by config (since 0.5.5.3)</h3>
+<h3 id="disable-auditing-by-config-since-0-5-5-3">4.11. Disable auditing by config (since 0.5.5.3)</h3>
 <div class="paragraph">
 <p>You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted
 to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable
@@ -1582,7 +1576,7 @@ does not work. See GPAUDITLOGGING-68</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="nonverbosedelete-logging-since-1-0-1">5.9. nonVerboseDelete logging (since 1.0.1)</h3>
+<h3 id="nonverbosedelete-logging-since-1-0-1">4.12. nonVerboseDelete logging (since 1.0.1)</h3>
 <div class="paragraph">
 <p>If verbose logging is enabled (see above), you can log deletes in a non-verbose manner. This means, only the delete event
 is logged, but not the properties the deleted object hold prior the deletion.</p>
@@ -1597,7 +1591,7 @@ is logged, but not the properties the deleted object hold prior the deletion.</p
 </div>
 </div>
 <div class="sect2">
-<h3 id="log-full-domain-class-name-since-1-0-3">5.10. log full domain class name (since 1.0.3)</h3>
+<h3 id="log-full-domain-class-name-since-1-0-3">4.13. log full domain class name (since 1.0.3)</h3>
 <div class="paragraph">
 <p>By default, only the entity class name is logged. If you want to log the entity full name (including the package name),
 you can enable full logging. Thanks to tcrossland for this feature.</p>
@@ -1612,7 +1606,7 @@ you can enable full logging. Thanks to tcrossland for this feature.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="getauditloguri-closure-since-1-0-4">5.11. getAuditLogUri closure (since 1.0.4)</h3>
+<h3 id="getauditloguri-closure-since-1-0-4">4.14. getAuditLogUri closure (since 1.0.4)</h3>
 <div class="paragraph">
 <p>By default, the "uri" field is filled with the request uri which caused the action.
 You can define a closure "getAuditLogUri" on a per-domain object base to define what should be written to the AuditLog
@@ -1636,7 +1630,7 @@ It is recommended to not perform costly calls.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="domain-class-stamping-support-since-1-0-4">5.12. Domain class stamping support (since 1.0.4)</h3>
+<h3 id="domain-class-stamping-support-since-1-0-4">4.15. Domain class stamping support (since 1.0.4)</h3>
 <div class="paragraph">
 <p>Since version 1.0.4, it is possible to enable domain class stamping support.
 With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get
@@ -1656,7 +1650,7 @@ stampLastUpdatedBy = <span class="string"><span class="delimiter">'</span><span 
 </div>
 </div>
 <div class="sect2">
-<h3 id="domain-class-stamping-configuration-since-2-0-5">5.13. Domain class stamping configuration (since 2.0.5)</h3>
+<h3 id="domain-class-stamping-configuration-since-2-0-5">4.16. Domain class stamping configuration (since 2.0.5)</h3>
 <div class="paragraph">
 <p>Since version 2.0.5, it is possible to specify the field configuration on a per domain-class base in the @Stamp annotation.
 With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdated fieldnames per domain class.</p>
@@ -1679,7 +1673,7 @@ With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdate
 </div>
 </div>
 <div class="sect2">
-<h3 id="ignoring-certain-events-since-1-0-5-2-0-0">5.14. Ignoring certain events (since 1.0.5 / 2.0.0)</h3>
+<h3 id="ignoring-certain-events-since-1-0-5-2-0-0">4.17. Ignoring certain events (since 1.0.5 / 2.0.0)</h3>
 <div class="paragraph">
 <p>Since version 1.0.5, it is possible to ignore certain events on a per-domain base.</p>
 </div>
@@ -1690,7 +1684,7 @@ With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdate
 </div>
 </div>
 <div class="sect2">
-<h3 id="domain-name-replacements-since-2-0-1">5.15. Domain Name replacements (since 2.0.1)</h3>
+<h3 id="domain-name-replacements-since-2-0-1">4.18. Domain Name replacements (since 2.0.1)</h3>
 <div class="paragraph">
 <p>With the replacementPatterns Map, it is possible to rewrite domain names, e.g. to remove dedicated package names:</p>
 </div>
@@ -1701,7 +1695,7 @@ With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdate
 </div>
 </div>
 <div class="sect2">
-<h3 id="example-configuration">5.16. Example configuration</h3>
+<h3 id="example-configuration">4.19. Example configuration</h3>
 <div class="paragraph">
 <p>Example application.groovy configuration with various settings as described above:</p>
 </div>
@@ -1714,7 +1708,7 @@ grails {
      auditDomainClassName = <span class="string"><span class="delimiter">'</span><span class="content">my.example.project.MyAuditTrail</span><span class="delimiter">'</span></span>
      verbose = <span class="predefined-constant">true</span> <span class="comment">// verbosely log all changed values to db</span>
      logIds = <span class="predefined-constant">true</span>  <span class="comment">// log db-ids of associated objects.</span>
-     TRUNCATE_LENGTH = <span class="integer">1000</span>
+     truncateLength = <span class="integer">1000</span>
      cacheDisabled = <span class="predefined-constant">true</span>  <span class="comment">// only for 1.x. Disable caching of AuditDomainClass.</span>
      replacementPatterns = [<span class="string"><span class="delimiter">&quot;</span><span class="content">local.example.xyz.</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>] <span class="comment">// replace with empty string.</span>
      actorClosure = { request, session -&gt;
@@ -1739,16 +1733,16 @@ grails {
 </div>
 </div>
 <div class="sect1">
-<h2 id="implementation">6. Implementation</h2>
+<h2 id="implementation">5. Implementation</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="auditlogeventlistener">6.1. AuditLogEventListener</h3>
+<h3 id="auditlogeventlistener">5.1. AuditLogEventListener</h3>
 <div class="paragraph">
 <p>The Audit Logging plugin registers a PersistenceEventListener (AuditLogListener) bean per datasource, which listens to GORM events.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="plugin-descriptor">6.2. Plugin Descriptor</h3>
+<h3 id="plugin-descriptor">5.2. Plugin Descriptor</h3>
 <div class="paragraph">
 <p>The Plugin Descriptor (AuditLogListenerGrailsPlugin) configures the plugin during startup.</p>
 </div>
@@ -1769,7 +1763,7 @@ grails {
 <div id="footer">
 <div id="footer-text">
 Version 2.0.6-SNAPSHOT<br>
-Last updated 2017-06-06 17:37:01 UTC
+Last updated 2017-06-07 10:34:26 UTC
 </div>
 </div>
 </body>
