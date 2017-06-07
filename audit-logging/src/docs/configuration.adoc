@@ -227,6 +227,15 @@ If instead you want to trigger on version and lastUpdated changes you may specif
 static auditable = [ignore:[]]
 ----
 
+=== Properties to audit (whitelist)
+Instead of excluding certain properties from auditing, it is also possible to define list of properties to audit using 'auditableProperties'.
+auditableProperties has precedence over 'ignore'.
+
+[source,groovy]
+----
+static auditable = [auditableProperties: ['dateCreated', 'lastUpdated', 'myField']]
+----
+
 === Verbose mode
 
 You can enable verbose mode. If enabled, column by column change logging in insert and delete events is enabled.

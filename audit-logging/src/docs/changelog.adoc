@@ -2,6 +2,7 @@
 * 2.0.6
 ** Fix #142 Re-introduced truncateLength support (and changed config parameter from 'TRUNCATE_LENGTH' to 'truncateLength')
 ** Fixed verbose param default description in documentation (Thanks to Matthew Moss)
+** Fix #139 Allow whitelist of properties to be used instead of a ignore list.
 
 * 2.0.5
 ** Only pass session to actorClosure if a session actually exists. (Thanks to Dennie de Lange)
