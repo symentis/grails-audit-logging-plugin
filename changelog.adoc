@@ -2,6 +2,18 @@
 
 * For 2.0.x changes (Grails3), see master branch
 
+=== 1.1.3
+
+* #113 Whitelist properties instead of blacklist. Thanks to P. Taylor
+
+=== 1.1.2
+
+* #136 Ignore list not used for insert and delete. Thanks to P. Taylor
+* Removed blank constraint for nullable stampable properties.
+* Remove preDelete as stampable event, does not make sense to stamp a delete event.
+* #135 updated AuditLogEvent template to set ‘text’ type for large column support
+
+
 === 1.1.1
 
 * #126 Support for Many-To-Many assications (backported from 2.x master). Thanks to Andrey Zhuchkov

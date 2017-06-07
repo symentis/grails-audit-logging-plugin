@@ -92,6 +92,9 @@ import org.grails.datastore.mapping.core.Datastore
  *               #89 / GPAUDITLOGGING-78 custom naming of id sequence generator
  * Release 1.1.1 #126 Support Many-To-Many (backport from master). Thanks to Andrey Zhuchkov
  * Release 1.1.2 #136 Ignore list not used for insert and delete. Thanks to P. Taylor
+ *               Removed blank constraint for nullable stampable properties.
+ *               Remove preDelete as stampable event, does not make sense to stamp a delete event.
+ *               #135 updated AuditLogEvent template to set ‘text’ type for large column support
  * Release 1.1.3 #113 Whitelist properties instead of blacklist. Thanks to P. Taylor
  */
 class AuditLoggingGrailsPlugin {
