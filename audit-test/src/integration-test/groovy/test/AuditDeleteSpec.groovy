@@ -20,14 +20,20 @@ package test
 
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.test.mixin.integration.Integration
-import grails.transaction.*
-import spock.lang.*
+import grails.transaction.Rollback
+import spock.lang.Shared
+import spock.lang.Specification
 
 @Integration
 @Rollback
 class AuditDeleteSpec extends Specification {
 
-  def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
+  @Shared
+  def defaultIgnoreList
+
+  void setup() {
+    defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
+  }
 
   void setupData() {
     Author.auditable = true
@@ -184,6 +190,45 @@ class AuditDeleteSpec extends Specification {
     }
     ['famous', 'age', 'dateCreated'].each { name ->
       assert !events.find {it.propertyName == name}, "${name} was logged"
+    }
+  }
+
+  void "Test auditableProperties"() {
+    given:
+    setupData()
+    Author.auditable = [auditableProperties: ['famous', 'age', 'dateCreated']]
+    def author = Author.findByName("Aaron")
+
+    when:
+    author.delete(flush: true, failOnError: true)
+
+    then: "only properties in auditableProperties are logged"
+    def events = AuditTrail.findAllByClassName('test.Author')
+
+    events.size() == 3
+    ['famous', 'age', 'dateCreated'].each { name ->
+      assert events.find {it.propertyName == name}, "${name} was not logged"
+    }
+  }
+
+  void "Test auditableProperties overrides ignore list"() {
+    given:
+    setupData()
+    Author.auditable = [
+      auditableProperties: ['famous', 'age', 'dateCreated'],
+      ignore: ['famous', 'age']
+    ]
+    def author = Author.findByName("Aaron")
+
+    when:
+    author.delete(flush: true, failOnError: true)
+
+    then: "only properties in auditableProperties are logged"
+    def events = AuditTrail.findAllByClassName('test.Author')
+
+    events.size() == 3
+    ['famous', 'age', 'dateCreated'].each { name ->
+      assert events.find {it.propertyName == name}, "${name} was not logged"
     }
   }
 

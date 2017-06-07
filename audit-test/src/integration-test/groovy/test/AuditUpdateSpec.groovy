@@ -25,6 +25,7 @@ import spock.lang.*
 @Integration
 @Rollback
 class AuditUpdateSpec extends Specification {
+
     void setupData() {
         Author.auditable = true
 
@@ -228,6 +229,53 @@ class AuditUpdateSpec extends Specification {
 
         def first = events.find { it.propertyName == 'age' }
         first.persistedObjectVersion == author.version - 1
+    }
+
+    void "Test auditableProperties"() {
+        given:
+        setupData()
+        Author.auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.age = 50
+        author.famous = false
+        author.name = 'Bob'
+        author.save(flush: true, failOnError: true)
+
+        then: "only properties in auditableProperties are logged"
+        def events = AuditTrail.findAllByClassName('test.Author')
+
+        events.size() == 3
+
+        ['name', 'famous', 'lastUpdated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+    }
+
+    void "Test auditableProperties overrides ignore list"() {
+        given:
+        setupData()
+        Author.auditable = [
+          auditableProperties: ['name', 'famous', 'lastUpdated'],
+          ignore: ['name', 'famous']
+        ]
+        def author = Author.findByName("Aaron")
+
+        when:
+        author.age = 50
+        author.famous = false
+        author.name = 'Bob'
+        author.save(flush: true, failOnError: true)
+
+        then: "only properties in auditableProperties are logged"
+        def events = AuditTrail.findAllByClassName('test.Author')
+
+        events.size() == 3
+
+        ['name', 'famous', 'lastUpdated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
     }
 
     void "Test handler is called"() {

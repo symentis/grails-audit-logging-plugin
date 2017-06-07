@@ -20,20 +20,22 @@ package test
 
 import grails.plugins.orm.auditable.AuditLogListener
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
-import org.springframework.util.StringUtils
-import spock.lang.Unroll
-
 import grails.test.mixin.integration.Integration
-import grails.transaction.*
-import spock.lang.*
+import grails.transaction.Rollback
+import org.springframework.util.StringUtils
+import spock.lang.Shared
+import spock.lang.Specification
+import spock.lang.Unroll
 
 @Integration
 @Rollback
 class AuditInsertSpec extends Specification {
 
-    def defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
+    @Shared
+    def defaultIgnoreList
 
     void setup() {
+        defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
         Author.auditable = true
     }
 
@@ -297,5 +299,43 @@ class AuditInsertSpec extends Specification {
             assert !events.find {it.propertyName == name}, "${name} was logged"
         }
     }
+
+    void "Test auditableProperties"() {
+        given:
+        Author.auditable = [auditableProperties: ['name', 'age', 'dateCreated']]
+        def author = new Author(name: "Aaron", age: 50, famous: true, ssn: '123-981-0001')
+
+        when:
+        author.save(flush: true, failOnError: true)
+
+        then: "only properties in auditableProperties are logged"
+        def events = AuditTrail.findAllByClassName('test.Author')
+
+        events.size() == 3
+        ['name', 'age', 'dateCreated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+    }
+
+    void "Test auditableProperties overrides ignore list"() {
+        given:
+        Author.auditable = [
+          auditableProperties: ['name', 'age', 'dateCreated'],
+          ignore: ['name', 'age']
+        ]
+        def author = new Author(name: "Aaron", age: 50, famous: true, ssn: '123-981-0001')
+
+        when:
+        author.save(flush: true, failOnError: true)
+
+        then: "only properties in auditableProperties are logged"
+        def events = AuditTrail.findAllByClassName('test.Author')
+
+        events.size() == 3
+        ['name', 'age', 'dateCreated'].each { name ->
+            assert events.find {it.propertyName == name}, "${name} was not logged"
+        }
+    }
+
 
 }
