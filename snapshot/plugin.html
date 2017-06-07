@@ -541,20 +541,21 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#3-use-event-handlers-only-no-auditing">4.3. 3. Use event handlers only (no auditing)</a></li>
 <li><a href="#auditing-current-user-information-actorclosure">4.4. Auditing Current User Information (actorClosure)</a></li>
 <li><a href="#property-ignore-list">4.5. Property Ignore List</a></li>
-<li><a href="#verbose-mode">4.6. Verbose mode</a></li>
-<li><a href="#logging-of-associated-objectids-since-0-5-5">4.7. Logging of associated objectIds (since 0.5.5)</a></li>
-<li><a href="#property-value-masking-since-0-5-5">4.8. Property value masking (since 0.5.5)</a></li>
-<li><a href="#verbose-log-truncation-length">4.9. Verbose log truncation length</a></li>
-<li><a href="#transactional-auditlog-events">4.10. Transactional AuditLog events</a></li>
-<li><a href="#disable-auditing-by-config-since-0-5-5-3">4.11. Disable auditing by config (since 0.5.5.3)</a></li>
-<li><a href="#nonverbosedelete-logging-since-1-0-1">4.12. nonVerboseDelete logging (since 1.0.1)</a></li>
-<li><a href="#log-full-domain-class-name-since-1-0-3">4.13. log full domain class name (since 1.0.3)</a></li>
-<li><a href="#getauditloguri-closure-since-1-0-4">4.14. getAuditLogUri closure (since 1.0.4)</a></li>
-<li><a href="#domain-class-stamping-support-since-1-0-4">4.15. Domain class stamping support (since 1.0.4)</a></li>
-<li><a href="#domain-class-stamping-configuration-since-2-0-5">4.16. Domain class stamping configuration (since 2.0.5)</a></li>
-<li><a href="#ignoring-certain-events-since-1-0-5-2-0-0">4.17. Ignoring certain events (since 1.0.5 / 2.0.0)</a></li>
-<li><a href="#domain-name-replacements-since-2-0-1">4.18. Domain Name replacements (since 2.0.1)</a></li>
-<li><a href="#example-configuration">4.19. Example configuration</a></li>
+<li><a href="#properties-to-audit-whitelist">4.6. Properties to audit (whitelist)</a></li>
+<li><a href="#verbose-mode">4.7. Verbose mode</a></li>
+<li><a href="#logging-of-associated-objectids-since-0-5-5">4.8. Logging of associated objectIds (since 0.5.5)</a></li>
+<li><a href="#property-value-masking-since-0-5-5">4.9. Property value masking (since 0.5.5)</a></li>
+<li><a href="#verbose-log-truncation-length">4.10. Verbose log truncation length</a></li>
+<li><a href="#transactional-auditlog-events">4.11. Transactional AuditLog events</a></li>
+<li><a href="#disable-auditing-by-config-since-0-5-5-3">4.12. Disable auditing by config (since 0.5.5.3)</a></li>
+<li><a href="#nonverbosedelete-logging-since-1-0-1">4.13. nonVerboseDelete logging (since 1.0.1)</a></li>
+<li><a href="#log-full-domain-class-name-since-1-0-3">4.14. log full domain class name (since 1.0.3)</a></li>
+<li><a href="#getauditloguri-closure-since-1-0-4">4.15. getAuditLogUri closure (since 1.0.4)</a></li>
+<li><a href="#domain-class-stamping-support-since-1-0-4">4.16. Domain class stamping support (since 1.0.4)</a></li>
+<li><a href="#domain-class-stamping-configuration-since-2-0-5">4.17. Domain class stamping configuration (since 2.0.5)</a></li>
+<li><a href="#ignoring-certain-events-since-1-0-5-2-0-0">4.18. Ignoring certain events (since 1.0.5 / 2.0.0)</a></li>
+<li><a href="#domain-name-replacements-since-2-0-1">4.19. Domain Name replacements (since 2.0.1)</a></li>
+<li><a href="#example-configuration">4.20. Example configuration</a></li>
 </ul>
 </li>
 <li><a href="#implementation">5. Implementation</a>
@@ -641,6 +642,9 @@ please file a GitHub issue.</p>
 </li>
 <li>
 <p>Fixed verbose param default description in documentation (Thanks to Matthew Moss)</p>
+</li>
+<li>
+<p>Fix #139 Allow whitelist of properties to be used instead of a ignore list.</p>
 </li>
 </ul>
 </div>
@@ -1452,7 +1456,19 @@ up the actorClosure to work with your security system instead.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="verbose-mode">4.6. Verbose mode</h3>
+<h3 id="properties-to-audit-whitelist">4.6. Properties to audit (whitelist)</h3>
+<div class="paragraph">
+<p>Instead of excluding certain properties from auditing, it is also possible to define list of properties to audit using <em>auditableProperties</em>.
+auditableProperties has precedence over <em>ignore</em>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="directive">static</span> auditable = [<span class="key">auditableProperties</span>: [<span class="string"><span class="delimiter">'</span><span class="content">dateCreated</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">lastUpdated</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">myField</span><span class="delimiter">'</span></span>]]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="verbose-mode">4.7. Verbose mode</h3>
 <div class="paragraph">
 <p>You can enable verbose mode. If enabled, column by column change logging in insert and delete events is enabled.
 Old- and new values are stored in detailed to the audit logging table. Enable verbose logging with:</p>
@@ -1483,7 +1499,7 @@ verbose mode in a code block.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="logging-of-associated-objectids-since-0-5-5">4.7. Logging of associated objectIds (since 0.5.5)</h3>
+<h3 id="logging-of-associated-objectids-since-0-5-5">4.8. Logging of associated objectIds (since 0.5.5)</h3>
 <div class="paragraph">
 <p>You can log the object-ids of associated objects. Logging will be performed in the format: "[id:&lt;objId&gt;]objDetails".
 You can enable id-logging with</p>
@@ -1498,7 +1514,7 @@ You can enable id-logging with</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="property-value-masking-since-0-5-5">4.8. Property value masking (since 0.5.5)</h3>
+<h3 id="property-value-masking-since-0-5-5">4.9. Property value masking (since 0.5.5)</h3>
 <div class="paragraph">
 <p>You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are
 not stored into the audit log table if verbose mode is enabled. Instead, a mask of "<strong><strong></strong><strong></strong></strong>" will be logged.
@@ -1511,7 +1527,7 @@ By default, "password" properties are masked. You can mask property fields in do
 </div>
 </div>
 <div class="sect2">
-<h3 id="verbose-log-truncation-length">4.9. Verbose log truncation length</h3>
+<h3 id="verbose-log-truncation-length">4.10. Verbose log truncation length</h3>
 <div class="paragraph">
 <p>If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
 columns (Default is 255). Configure the truncateLength in application.groovy:</p>
@@ -1551,7 +1567,7 @@ a truncation warning may occur and only partial information is logged.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="transactional-auditlog-events">4.10. Transactional AuditLog events</h3>
+<h3 id="transactional-auditlog-events">4.11. Transactional AuditLog events</h3>
 <div class="paragraph">
 <p>In application.groovy, you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
 and commit transactions around audit log save events.
@@ -1568,7 +1584,7 @@ This setting should not be changed from defaults lightly as it can cause problem
 </div>
 </div>
 <div class="sect2">
-<h3 id="disable-auditing-by-config-since-0-5-5-3">4.11. Disable auditing by config (since 0.5.5.3)</h3>
+<h3 id="disable-auditing-by-config-since-0-5-5-3">4.12. Disable auditing by config (since 0.5.5.3)</h3>
 <div class="paragraph">
 <p>You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted
 to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable
@@ -1589,7 +1605,7 @@ does not work. See GPAUDITLOGGING-68</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="nonverbosedelete-logging-since-1-0-1">4.12. nonVerboseDelete logging (since 1.0.1)</h3>
+<h3 id="nonverbosedelete-logging-since-1-0-1">4.13. nonVerboseDelete logging (since 1.0.1)</h3>
 <div class="paragraph">
 <p>If verbose logging is enabled (see above), you can log deletes in a non-verbose manner. This means, only the delete event
 is logged, but not the properties the deleted object hold prior the deletion.</p>
@@ -1604,7 +1620,7 @@ is logged, but not the properties the deleted object hold prior the deletion.</p
 </div>
 </div>
 <div class="sect2">
-<h3 id="log-full-domain-class-name-since-1-0-3">4.13. log full domain class name (since 1.0.3)</h3>
+<h3 id="log-full-domain-class-name-since-1-0-3">4.14. log full domain class name (since 1.0.3)</h3>
 <div class="paragraph">
 <p>By default, only the entity class name is logged. If you want to log the entity full name (including the package name),
 you can enable full logging. Thanks to tcrossland for this feature.</p>
@@ -1619,7 +1635,7 @@ you can enable full logging. Thanks to tcrossland for this feature.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="getauditloguri-closure-since-1-0-4">4.14. getAuditLogUri closure (since 1.0.4)</h3>
+<h3 id="getauditloguri-closure-since-1-0-4">4.15. getAuditLogUri closure (since 1.0.4)</h3>
 <div class="paragraph">
 <p>By default, the "uri" field is filled with the request uri which caused the action.
 You can define a closure "getAuditLogUri" on a per-domain object base to define what should be written to the AuditLog
@@ -1643,7 +1659,7 @@ It is recommended to not perform costly calls.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="domain-class-stamping-support-since-1-0-4">4.15. Domain class stamping support (since 1.0.4)</h3>
+<h3 id="domain-class-stamping-support-since-1-0-4">4.16. Domain class stamping support (since 1.0.4)</h3>
 <div class="paragraph">
 <p>Since version 1.0.4, it is possible to enable domain class stamping support.
 With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get
@@ -1663,7 +1679,7 @@ stampLastUpdatedBy = <span class="string"><span class="delimiter">'</span><span 
 </div>
 </div>
 <div class="sect2">
-<h3 id="domain-class-stamping-configuration-since-2-0-5">4.16. Domain class stamping configuration (since 2.0.5)</h3>
+<h3 id="domain-class-stamping-configuration-since-2-0-5">4.17. Domain class stamping configuration (since 2.0.5)</h3>
 <div class="paragraph">
 <p>Since version 2.0.5, it is possible to specify the field configuration on a per domain-class base in the @Stamp annotation.
 With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdated fieldnames per domain class.</p>
@@ -1686,7 +1702,7 @@ With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdate
 </div>
 </div>
 <div class="sect2">
-<h3 id="ignoring-certain-events-since-1-0-5-2-0-0">4.17. Ignoring certain events (since 1.0.5 / 2.0.0)</h3>
+<h3 id="ignoring-certain-events-since-1-0-5-2-0-0">4.18. Ignoring certain events (since 1.0.5 / 2.0.0)</h3>
 <div class="paragraph">
 <p>Since version 1.0.5, it is possible to ignore certain events on a per-domain base.</p>
 </div>
@@ -1697,7 +1713,7 @@ With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdate
 </div>
 </div>
 <div class="sect2">
-<h3 id="domain-name-replacements-since-2-0-1">4.18. Domain Name replacements (since 2.0.1)</h3>
+<h3 id="domain-name-replacements-since-2-0-1">4.19. Domain Name replacements (since 2.0.1)</h3>
 <div class="paragraph">
 <p>With the replacementPatterns Map, it is possible to rewrite domain names, e.g. to remove dedicated package names:</p>
 </div>
@@ -1708,7 +1724,7 @@ With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdate
 </div>
 </div>
 <div class="sect2">
-<h3 id="example-configuration">4.19. Example configuration</h3>
+<h3 id="example-configuration">4.20. Example configuration</h3>
 <div class="paragraph">
 <p>Example application.groovy configuration with various settings as described above:</p>
 </div>
@@ -1776,7 +1792,7 @@ grails {
 <div id="footer">
 <div id="footer-text">
 Version 2.0.6-SNAPSHOT<br>
-Last updated 2017-06-07 12:55:20 UTC
+Last updated 2017-06-07 13:12:27 UTC
 </div>
 </div>
 </body>
