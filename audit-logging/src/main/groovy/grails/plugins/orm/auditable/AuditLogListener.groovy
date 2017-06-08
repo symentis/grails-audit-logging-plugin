@@ -695,15 +695,20 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             // ignore (GPAUDITLOGGING-61)
             return
         }
-
-        if (maskList(domain)?.contains(key)) {
-            log.trace("Masking property ${key} with ${propertyMask}")
-            propertyMask
-        } else if (truncateLength) {
-            truncate(value, truncateLength)
+        if (getDomainClass(domain).getPersistentProperty(key).isEmbedded()){
+            squashEmbeddedProperties(domain, key, value)
         } else {
-            truncate(value, Integer.MAX_VALUE)
+            if (maskList(domain)?.contains(key)) {
+                log.trace("Masking property ${key} with ${propertyMask}")
+                propertyMask
+            } else if (truncateLength) {
+                truncate(value, truncateLength)
+            } else {
+                truncate(value, Integer.MAX_VALUE)
+            }
         }
+
+        // TODO fix path
     }
 
     String truncate(value, int max) {
@@ -866,4 +871,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         true
     }
 
+    String squashEmbeddedProperties(domain, String key, value){
+        def clazz = getDomainClass(domain)
+        if (!clazz.getPersistentProperty(key).isEmbedded()) return null
+        def embeddedClazz = getDomainClass value
+        // value is an Embedded Object -> return all properties of it.
+        Set<String> dirtyProperties = getDirtyPropertyNames(value, embeddedClazz)
+    }
 }

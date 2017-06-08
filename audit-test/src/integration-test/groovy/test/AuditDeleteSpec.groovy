@@ -162,7 +162,7 @@ class AuditDeleteSpec extends Specification {
 
     def events = AuditTrail.findAllByClassName('test.Author')
 
-    events.size() == 7
+    events.size() == 8
     ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
       assert events.find {it.propertyName == name}, "${name} was not logged"
     }
@@ -184,7 +184,7 @@ class AuditDeleteSpec extends Specification {
     then: "ignored properties not logged"
     def events = AuditTrail.findAllByClassName('test.Author')
 
-    events.size() == 6
+    events.size() == 7
     ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy'].each { name ->
       assert events.find {it.propertyName == name}, "${name} was not logged"
     }
