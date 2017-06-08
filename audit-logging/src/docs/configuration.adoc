@@ -1,4 +1,4 @@
-RUN== Configuration
+== Configuration
 
 The plugin configuration can be specified in the application.groovy file.
 It supports Environments blocks for environment-specific configuration.
