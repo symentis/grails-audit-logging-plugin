@@ -138,8 +138,12 @@ class AuditTrail implements Serializable {
 
   String toString() {
     String actorStr = actor ? "user ${actor}" : "user ?"
-    "audit log ${dateCreated} ${actorStr} " +
-      "${eventName} ${className} " +
-      "id:${persistedObjectId} version:${persistedObjectVersion}"
+    new StringBuilder()
+      .append("audit log: ${dateCreated} ${actorStr} ")
+      .append("${eventName} ${className} oldValue:${oldValue} newValue:${newValue} ")
+      .append("id:${persistedObjectId} version:${persistedObjectVersion}")
+      .toString()
+
+
   }
 }

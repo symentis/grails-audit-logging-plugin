@@ -247,7 +247,6 @@ class AuditInsertSpec extends Specification {
 
         and: "check logged"
         def events = AuditTrail.findAllByClassName('test.Author')
-        println events*.eventName
         enabled ? events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size() : events.size() == 1
 
         and:
@@ -270,7 +269,6 @@ class AuditInsertSpec extends Specification {
 
         then: "ignored properties not logged"
         def events = AuditTrail.findAllByClassName('test.Author')
-        println("Events: ${events}")
         events.size() == 8
         ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
             assert events.find {it.propertyName == name}, "${name} was not logged"
@@ -290,7 +288,6 @@ class AuditInsertSpec extends Specification {
 
         then: "ignored properties not logged"
         def events = AuditTrail.findAllByClassName('test.Author')
-        println("Events: ${events}")
         events.size() == 7
         ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy'].each { name ->
             assert events.find {it.propertyName == name}, "${name} was not logged"
@@ -353,6 +350,7 @@ class AuditInsertSpec extends Specification {
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
         events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        println events
 
         def bookEvents = AuditTrail.findAllByClassName('test.Book')
         bookEvents.size() == (Book.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()

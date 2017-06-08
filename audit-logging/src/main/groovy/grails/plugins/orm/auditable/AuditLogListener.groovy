@@ -693,22 +693,20 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
         } catch (Exception e) {
             // ignore (GPAUDITLOGGING-61)
-            return
+            return null
         }
         if (getDomainClass(domain).getPersistentProperty(key).isEmbedded()){
-            squashEmbeddedProperties(domain, key, value)
+            return getEmbeddedProperties(domain, key, value)
         } else {
             if (maskList(domain)?.contains(key)) {
                 log.trace("Masking property ${key} with ${propertyMask}")
-                propertyMask
+                return propertyMask
             } else if (truncateLength) {
-                truncate(value, truncateLength)
+                return truncate(value, truncateLength)
             } else {
-                truncate(value, Integer.MAX_VALUE)
+                return truncate(value, Integer.MAX_VALUE)
             }
         }
-
-        // TODO fix path
     }
 
     String truncate(value, int max) {
@@ -871,11 +869,19 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         true
     }
 
-    String squashEmbeddedProperties(domain, String key, value){
+    private String getEmbeddedProperties(domain, String key, value){
         def clazz = getDomainClass(domain)
         if (!clazz.getPersistentProperty(key).isEmbedded()) return null
         def embeddedClazz = getDomainClass value
-        // value is an Embedded Object -> return all properties of it.
-        Set<String> dirtyProperties = getDirtyPropertyNames(value, embeddedClazz)
+        // Set<String> dirtyProperties = getDirtyPropertyNames(value, embeddedClazz)
+        // TODO We do NOT get dirtyPropertyNames from the embedded Object. GORM limitation?
+        // value is an Embedded Object -> concat all persistent property name:value of it.
+        String valStr = "${domain.class.simpleName}.${key}("
+        def map = makeMap(embeddedClazz.persistentProperties*.name as Set, value)
+        map.each { k,v ->
+            def val = domain."$key"."${k}"
+            valStr += "$k:$val "
+        }
+        valStr?.trim() + ")"
     }
 }
