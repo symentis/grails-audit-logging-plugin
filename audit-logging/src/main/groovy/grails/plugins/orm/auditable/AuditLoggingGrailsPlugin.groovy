@@ -136,7 +136,7 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         }
         def dc = ctx.grailsApplication.getDomainClass(confAuditDomainClassName)
         if (!dc) {
-            throw new IllegalArgumentException("The configured audit logging domain class '$auditClassName' is not a domain class")
+            throw new IllegalArgumentException("The configured audit logging domain class '$confAuditDomainClassName' is not a domain class")
         }
         Class AuditLogEventClazz = dc.clazz
         def oldValueMaxSize = AuditLogEventClazz.constrainedProperties ['oldValue']['maxSize'] ?: 255
