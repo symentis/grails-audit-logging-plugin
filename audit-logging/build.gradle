@@ -18,7 +18,7 @@ buildscript {
 }
 
 plugins {
-    id "io.spring.dependency-management" version "0.5.1.RELEASE"
+    id "io.spring.dependency-management" version "1.0.3.RELEASE"
     id "com.jfrog.bintray" version "1.4"
 }
 
