@@ -115,7 +115,7 @@ class AuditUpdateCollectionSpec extends Specification {
 
         and: "the book inserted is logged too"
         def bookEvents = AuditTrail.findAllByClassName('test.Book')
-        bookEvents.size() == (Book.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
+        bookEvents.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, ['id', 'version']).size()
         bookEvents.first().eventName == 'INSERT'
     }
 

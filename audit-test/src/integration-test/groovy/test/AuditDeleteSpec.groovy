@@ -65,7 +65,7 @@ class AuditDeleteSpec extends Specification {
     then: "audit logging is created"
     def events = AuditTrail.findAllByClassName('test.Author')
 
-    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
+    events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
     def first = events.find { it.propertyName == 'age' }
     first.oldValue == "37"
@@ -74,10 +74,10 @@ class AuditDeleteSpec extends Specification {
 
     and: 'all books are deleted'
     def b1Events = AuditTrail.findAllByClassNameAndPersistedObjectId('test.Book', 'Hunger Games')
-    b1Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
+    b1Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
 
     def b2Events = AuditTrail.findAllByClassNameAndPersistedObjectId('test.Book', 'Catching Fire')
-    b2Events.size() == (Book.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
+    b2Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
   }
 
   void "Test conditional delete logging"() {
@@ -111,7 +111,7 @@ class AuditDeleteSpec extends Specification {
 
     then: "verbose audit logging is created"
     def events = AuditTrail.findAllByClassName('test.Author')
-    events.size() == (Author.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
+    events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
     and:
     author.handlerCalled == "onDelete"

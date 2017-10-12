@@ -69,6 +69,8 @@ dependencies {
 
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails.plugins:geb"
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+    testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
 
     // Note: It is recommended to update to a more robust driver (Chrome, Firefox etc.)
     testRuntime 'org.seleniumhq.selenium:selenium-htmlunit-driver:2.44.0'

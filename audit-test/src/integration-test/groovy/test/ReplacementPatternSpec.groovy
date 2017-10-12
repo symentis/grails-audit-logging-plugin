@@ -51,7 +51,7 @@ class ReplacementPatternSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
         first.oldValue == null
@@ -70,7 +70,7 @@ class ReplacementPatternSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
         first.oldValue == null

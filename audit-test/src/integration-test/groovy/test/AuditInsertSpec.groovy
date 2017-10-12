@@ -51,7 +51,7 @@ class AuditInsertSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == null
@@ -103,10 +103,10 @@ class AuditInsertSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
         def bookEvents = AuditTrail.findAllByClassName('test.Book')
-        bookEvents.size() == (Book.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        bookEvents.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
     }
 
     void "Test logging with a different id"() {
@@ -171,7 +171,7 @@ class AuditInsertSpec extends Specification {
 
         and: "verbose audit logging is created"
         def events = AuditTrail.findAllByClassName('test.Author')
-        events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
         and:
         author.handlerCalled == "onSave"
@@ -215,7 +215,7 @@ class AuditInsertSpec extends Specification {
 
         and: "check logged"
         def events = AuditTrail.findAllByClassName('test.Author')
-        enabled ? events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size() : events.size() == 0
+        enabled ? events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size() : events.size() == 0
 
         and:
         author.handlerCalled == "onSave"
@@ -248,7 +248,7 @@ class AuditInsertSpec extends Specification {
         and: "check logged"
         def events = AuditTrail.findAllByClassName('test.Author')
         println events*.eventName
-        enabled ? events.size() == (Author.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size() : events.size() == 1
+        enabled ? events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size() : events.size() == 1
 
         and:
         author.handlerCalled == "onSave"
