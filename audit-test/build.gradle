@@ -13,10 +13,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "io.spring.dependency-management" version "0.5.4.RELEASE"
-}
-
 version file("$rootDir/version.txt").text.trim()
 group "audit.test"
 
