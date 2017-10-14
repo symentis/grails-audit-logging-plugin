@@ -20,7 +20,10 @@ package grails.plugins.orm.auditable
 */
 import grails.plugins.*
 import groovy.util.logging.Slf4j
+import org.grails.core.io.support.GrailsFactoriesLoader
 import org.grails.datastore.mapping.core.*
+import org.grails.validation.discovery.ConstrainedDiscovery
+import org.springframework.context.ApplicationContext
 
 /**
  * @author Robert Oschwald
@@ -129,18 +132,21 @@ When called, the event handlers have access to oldObj and newObj definitions tha
     /**
      * Determine the truncateLength based on the configured truncateLength and the actual auditDomainClass maxSize constraint for newValue.
      */
-    private Integer determineTruncateLength(ctx) {
+    private Integer determineTruncateLength(ApplicationContext ctx) {
         String confAuditDomainClassName = AuditLoggingConfigUtils.auditConfig.auditDomainClassName
         if (confAuditDomainClassName == null){
             throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
         }
-        def dc = ctx.grailsApplication.getDomainClass(confAuditDomainClassName)
-        if (!dc) {
+
+        def auditPersistentEntity = ctx.getBean('grailsDomainClassMappingContext').getPersistentEntity(confAuditDomainClassName)
+        if (!auditPersistentEntity) {
             throw new IllegalArgumentException("The configured audit logging domain class '$confAuditDomainClassName' is not a domain class")
         }
-        Class AuditLogEventClazz = dc.clazz
-        def oldValueMaxSize = AuditLogEventClazz.constrainedProperties ['oldValue']['maxSize'] ?: 255
-        def newValueMaxSize = AuditLogEventClazz.constrainedProperties ['newValue']['maxSize'] ?: 255
+
+        def constrainedDiscovery = GrailsFactoriesLoader.loadFactory(ConstrainedDiscovery.class)
+        def constrainedProperties = constrainedDiscovery.findConstrainedProperties(auditPersistentEntity)
+        def oldValueMaxSize = constrainedProperties['oldValue']['maxSize'] ?: 255
+        def newValueMaxSize = constrainedProperties['newValue']['maxSize'] ?: 255
         def domainMaxSize = oldValueMaxSize < newValueMaxSize ?  oldValueMaxSize : newValueMaxSize
         if (AuditLoggingConfigUtils.auditConfig.getProperty('TRUNCATE_LENGTH')){
             log.warn("grails.plugin.auditLog.TRUNCATE_LENGTH is deprecated. Please rename to 'grails.plugin.auditLog.truncateLength'. Ignoring.")
