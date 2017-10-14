@@ -296,12 +296,10 @@ class AuditInsertSpec extends Specification {
     }
 
     void "Test locally ignored properties"() {
-        given:
+        when:
         Author.auditable = [ignore: ['famous', 'age', 'dateCreated']]
         def author = new Author(name: "Aaron", age: 50)
-
-        when:
-        author.save(flush: true, failOnError: true)
+        author.save()
 
         then: "ignored properties not logged"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
