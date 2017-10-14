@@ -8,15 +8,15 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.5.0'
-        classpath "org.grails.plugins:hibernate:4.3.10.5"
+        classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.14.2'
+        classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
     }
 }
 
 version file("$rootDir/version.txt").text.trim()
 group "audit.test"
 
-apply plugin: "spring-boot"
+apply plugin: "org.springframework.boot"
 apply plugin: "war"
 apply plugin: "asset-pipeline"
 apply plugin: 'eclipse'
@@ -39,13 +39,6 @@ repositories {
     maven { url "https://repo.grails.org/grails/core" }
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.grails:grails-bom:$grailsVersion"
-    }
-    applyMavenExclusions false
-}
-
 dependencies {
     compile project(":audit-logging") // "INLINE" Plugin using gradle multi-project feature.
 
@@ -53,25 +46,31 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.springframework.boot:spring-boot-starter-tomcat"
+
+    compile "org.grails:grails-core"
     compile "org.grails:grails-dependencies"
     compile "org.grails:grails-web-boot"
+    compile "org.grails.plugins:hibernate5"
 
-    compile "org.grails.plugins:hibernate"
     compile "org.grails.plugins:cache"
+    compile "org.hibernate:hibernate-core"
     compile "org.hibernate:hibernate-ehcache"
     compile "org.grails.plugins:scaffolding"
 
-    runtime "org.grails.plugins:asset-pipeline"
+    runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.2"
 
+    testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails.plugins:geb"
-    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
-    testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
+    testCompile "org.grails:grails-web-testing-support"
 
     // Note: It is recommended to update to a more robust driver (Chrome, Firefox etc.)
-    testRuntime 'org.seleniumhq.selenium:selenium-htmlunit-driver:2.44.0'
+    testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
+    testRuntime "com.h2database:h2"
 
     console "org.grails:grails-console"
+
+    runtime "org.apache.tomcat:tomcat-jdbc"
 }
 
 task wrapper(type: Wrapper) {

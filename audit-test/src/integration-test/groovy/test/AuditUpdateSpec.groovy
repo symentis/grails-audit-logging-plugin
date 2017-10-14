@@ -19,6 +19,7 @@
 package test
 
 import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.*
 import spock.lang.*
 
@@ -41,8 +42,10 @@ class AuditUpdateSpec extends Specification {
         heliport.save(flush: true, failOnError: true)
 
         // Remove all logging of the inserts, we are focused on updates here
-        AuditTrail.where { id != null }.deleteAll()
-        assert AuditTrail.count() == 0
+        AuditTrail.withNewSession {
+            AuditTrail.where { id != null }.deleteAll()
+            assert AuditTrail.count() == 0
+        }
 
         author.handlerCalled = ""
     }
@@ -57,7 +60,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -74,7 +77,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def first = events.find { it.propertyName == 'famous' }
@@ -93,7 +96,7 @@ class AuditUpdateSpec extends Specification {
         heliport.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Heliport')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Heliport') }
         events.size() == 1
 
         def first = events.find { it.propertyName == 'name' }
@@ -110,7 +113,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -129,7 +132,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def first = events.find { it.propertyName == 'publisher' }
@@ -150,7 +153,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
@@ -170,7 +173,7 @@ class AuditUpdateSpec extends Specification {
         publisher.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Publisher')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Publisher') }
         events.size() == 0
     }
 
@@ -185,7 +188,7 @@ class AuditUpdateSpec extends Specification {
         publisher.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Publisher')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Publisher') }
         events.size() == 1
 
         def first = events.first()
@@ -206,7 +209,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 0
     }
 
@@ -223,7 +226,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then: "ignored properties not logged"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
         events.size() == 1
 
@@ -244,7 +247,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then: "only properties in auditableProperties are logged"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
         events.size() == 3
 
@@ -269,7 +272,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then: "only properties in auditableProperties are logged"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
         events.size() == 3
 
@@ -288,7 +291,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then: "verbose audit logging is created"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         and:
@@ -306,7 +309,7 @@ class AuditUpdateSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then: "nothing logged"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 0
 
         and:

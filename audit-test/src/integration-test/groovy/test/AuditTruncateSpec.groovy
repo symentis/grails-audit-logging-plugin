@@ -20,7 +20,7 @@ package test
 
 import grails.plugins.orm.auditable.AuditLogListener
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import groovy.util.logging.Slf4j
 import spock.lang.Shared
@@ -53,7 +53,7 @@ class AuditTruncateSpec extends Specification {
         tunnel.id
 
         and: "description is not truncated from auditLog"
-        def events = AuditTrail.findAllByClassName('test.Tunnel')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
         events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
@@ -67,6 +67,7 @@ class AuditTruncateSpec extends Specification {
         cleanup:
         log.info "Reset truncate length"
         setListenersTruncateLength oldTruncLength
+        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Truncate_at_255"() {
@@ -82,7 +83,7 @@ class AuditTruncateSpec extends Specification {
         tunnel.id
 
         and: "description is truncated at 255 from auditLog"
-        def events = AuditTrail.findAllByClassName('test.Tunnel')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
         events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
@@ -96,6 +97,7 @@ class AuditTruncateSpec extends Specification {
 
         cleanup:
         setListenersTruncateLength oldTruncLength
+        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Truncate_at_1024"() {
@@ -112,7 +114,7 @@ class AuditTruncateSpec extends Specification {
         tunnel.id
 
         and: "description is truncated at 255 from auditLog"
-        def events = AuditTrail.findAllByClassName('test.Tunnel')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
         events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
@@ -127,6 +129,7 @@ class AuditTruncateSpec extends Specification {
         cleanup:
         log.debug "Reset truncate length"
         setListenersTruncateLength oldTruncLength
+        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     private int getFirstListenerTruncateLength(){

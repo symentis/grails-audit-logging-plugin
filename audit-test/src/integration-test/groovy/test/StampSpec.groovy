@@ -1,12 +1,11 @@
 package test
 
-import grails.util.GrailsClassUtils as GCU;
-
-import grails.test.mixin.integration.Integration
-import grails.transaction.*
+import grails.testing.mixin.integration.Integration
+import grails.transaction.Rollback
+import grails.util.GrailsClassUtils as GCU
 import grails.util.Holders
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
-import spock.lang.*
+import spock.lang.Specification
 
 @Integration
 @Rollback

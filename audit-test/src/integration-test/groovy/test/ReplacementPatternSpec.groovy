@@ -20,6 +20,7 @@ package test
 
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Shared
 import spock.lang.Specification
@@ -37,6 +38,7 @@ class ReplacementPatternSpec extends Specification {
     void setup() {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
         Author.auditable = true
+        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Test replacementPattern converts a.b.MySample to .MySample"() {
@@ -50,9 +52,8 @@ class ReplacementPatternSpec extends Specification {
         author.id
 
         and: "verbose audit logging is created"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
-
         def first = events.find { it.propertyName == 'name' }
         first.oldValue == null
         first.newValue == ".MySample"
@@ -69,7 +70,7 @@ class ReplacementPatternSpec extends Specification {
         author.id
 
         and: "verbose audit logging is created"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
