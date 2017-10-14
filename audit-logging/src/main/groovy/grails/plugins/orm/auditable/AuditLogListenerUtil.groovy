@@ -170,15 +170,14 @@ class AuditLogListenerUtil {
     }
   }
 
-  static List<String> getAssosiationNames(PersistentEntity entity) {
+  static List<Association> getAssosiations(PersistentEntity entity) {
     PersistentEntity currentEntity = entity
-    List<String> associationNames = new ArrayList<>()
+    List<Association> associations = new ArrayList<>()
     while (currentEntity != null) {
-      List<Association> associations = currentEntity.getAssociations().findAll { it.associatedEntity != null }
-      associationNames.addAll(associations.collect { it.name })
+      associations.addAll(currentEntity.getAssociations().findAll { it.associatedEntity != null })
       currentEntity = currentEntity.getParentEntity()
     }
-    return associationNames
+    return associations
   }
 
   /**

@@ -29,6 +29,7 @@ import org.grails.datastore.gorm.timestamp.TimestampProvider
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.*
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.types.OneToMany
 import org.springframework.context.ApplicationEvent
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -517,7 +518,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * TODO - Need a way to load the old value generically for a collection
      */
     protected static getPersistentValue(domain, String property, PersistentEntity entity) {
-        if (getAssosiationNames(entity).contains(property)) {
+        if (getAssosiations(entity).findAll {it instanceof OneToMany}.collect { it.name }.contains(property)) {
             "N/A"
         } else {
             domain.getPersistentValue(property)
@@ -533,7 +534,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
         // In some cases, collections aren't listed as being dirty in the dirty property names.
         // We need to check them individually.
-        getAssosiationNames(entity).each { String associationName ->
+        getAssosiations(entity).collect { it.name }.each { String associationName ->
             def collection = domain."${associationName}"
             if (collection?.respondsTo('isDirty') && collection?.isDirty()) {
                 dirtyProperties << associationName
