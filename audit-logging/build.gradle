@@ -1,9 +1,9 @@
 import java.text.SimpleDateFormat
 
 buildscript {
-    ext {
-        grailsVersion = project.grailsVersion
-    }
+//    ext {
+//        grailsVersion = project.grailsVersion
+//    }
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
@@ -41,8 +41,8 @@ ext {
     gradleWrapperVersion = project.gradleWrapperVersion
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+//sourceCompatibility = 1.7
+//targetCompatibility = 1.7
 
 
 repositories {
@@ -53,11 +53,12 @@ repositories {
 
 dependencies {
     provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
     provided "org.springframework.boot:spring-boot-autoconfigure"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
 
+    provided "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
     provided "org.grails:grails-web-boot"
+
     provided "org.grails:grails-dependencies"
     provided "org.grails:grails-datastore-gorm"
     provided 'javax.servlet:javax.servlet-api:3.1.0'
@@ -130,22 +131,24 @@ asciidoctor {
             revdate: buildDate()
 }
 
-task docs(dependsOn: asciidoctor) << {
-    File dir = new File(buildDir, 'docs')
-    dir.mkdirs()
+task docs(dependsOn: 'asciidoctor') {
+    doLast {
+        File dir = new File(buildDir, 'docs')
+        dir.mkdirs()
 
-    ['pdf', 'epub'].each { String ext ->
-        File f = new File(dir, 'index.' + ext)
-        if (f.exists()) {
-            f.renameTo new File(dir, project.name + '-' + project.version + '.' + ext)
+        ['pdf', 'epub'].each { String ext ->
+            File f = new File(dir, 'index.' + ext)
+            if (f.exists()) {
+                f.renameTo new File(dir, project.name + '-' + project.version + '.' + ext)
+            }
         }
-    }
 
-    new File(buildDir, 'docs/ghpages.html') << file('src/docs/templates/index.tmpl').text.replaceAll("@VERSION@", project.version).replaceAll("@DOCDATE@", buildDate())
+        new File(buildDir, 'docs/ghpages.html') << file('src/docs/templates/index.tmpl').text.replaceAll("@VERSION@", project.version).replaceAll("@DOCDATE@", buildDate())
 
-    copy {
-        from 'src/docs'
-        into new File(buildDir, 'docs').path
-        include '**/*.png'
+        copy {
+            from 'src/docs'
+            into new File(buildDir, 'docs').path
+            include '**/*.png'
+        }
     }
 }

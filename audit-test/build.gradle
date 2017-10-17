@@ -78,6 +78,8 @@ task wrapper(type: Wrapper) {
 }
 
 test {
-    testLogging.showStandardStreams = true
-    testLogging.exceptionFormat = 'full'
+    testLogging {
+      showStandardStreams = true
+      exceptionFormat = 'full'
+    }
 }
