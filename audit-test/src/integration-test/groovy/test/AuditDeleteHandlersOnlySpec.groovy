@@ -21,7 +21,7 @@ package test
 /**
  * Test Audit Logging with handlersOnly auditing.
  */
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.*
 import spock.lang.*
 
@@ -43,8 +43,10 @@ class AuditDeleteHandlersOnlySpec extends Specification {
         codes*.save(flush: true)
 
         // Remove all logging of the inserts, we are focused on deletes here
-        AuditTrail.where { id != null }.deleteAll()
-        assert AuditTrail.count() == 0
+        AuditTrail.withNewSession {
+            AuditTrail.where { id != null }.deleteAll()
+            assert AuditTrail.count() == 0
+        }
     }
 
     void "test onDelete handler has an id available"() {

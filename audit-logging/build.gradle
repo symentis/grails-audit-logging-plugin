@@ -18,7 +18,6 @@ buildscript {
 }
 
 plugins {
-    id "io.spring.dependency-management" version "0.5.1.RELEASE"
     id "com.jfrog.bintray" version "1.4"
 }
 
@@ -28,13 +27,13 @@ group "org.grails.plugins"
 apply plugin: 'maven-publish'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: "spring-boot"
+apply plugin: "org.springframework.boot"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-gsp"
 apply plugin: 'org.asciidoctor.convert'
 
 // Used for publishing to central repository, remove if not needed
-apply from: 'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
+//apply from: 'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
 //apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
 
 ext {
@@ -52,13 +51,6 @@ repositories {
     maven { url "https://repo.grails.org/grails/core" }
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.grails:grails-bom:$grailsVersion"
-    }
-    applyMavenExclusions false
-}
-
 dependencies {
     provided 'org.springframework.boot:spring-boot-starter-logging'
     provided "org.springframework.boot:spring-boot-starter-actuator"
@@ -67,6 +59,7 @@ dependencies {
 
     provided "org.grails:grails-web-boot"
     provided "org.grails:grails-dependencies"
+    provided "org.grails:grails-datastore-gorm"
     provided 'javax.servlet:javax.servlet-api:3.1.0'
 
     testCompile "org.grails:grails-plugin-testing"

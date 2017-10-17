@@ -20,7 +20,6 @@ package grails.plugins.orm.auditable
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import grails.compiler.GrailsCompileStatic
-import grails.core.GrailsDomainClass
 import grails.util.GrailsClassUtils
 import groovy.util.logging.Commons
 import org.apache.commons.lang.ArrayUtils
@@ -29,10 +28,13 @@ import org.grails.datastore.gorm.timestamp.DefaultTimestampProvider
 import org.grails.datastore.gorm.timestamp.TimestampProvider
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.*
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.types.OneToMany
 import org.springframework.context.ApplicationEvent
 import org.springframework.web.context.request.RequestContextHolder
 
 import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
+
 /**
  * Grails interceptor for logging saves, updates, deletes and acting on
  * individual properties changes and delegating calls back to the Domain Class
@@ -375,13 +377,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     protected void onPreDelete(PreDeleteEvent event) {
         def domain = event.entityObject
         try {
-            def entity = getDomainClass(domain)
+            def entity = getPersistentEntity(domain)
 
             if (ignoreEvent(domain, "onDelete")) {
                 return
             }
 
-            def map = makeMap(entity.persistentProperties*.name as Set, domain)
+            def persistentProperties = (entity.persistentProperties*.name - 'version') as Set
+            def map = makeMap(persistentProperties, domain)
             if (!callHandlersOnly(domain)) {
                 if (nonVerboseDelete) {
                     log.debug("Forced Non-Verbose logging by config onPreDelete.")
@@ -392,7 +395,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     logChanges(domain, null, map, getEntityId(domain), getEventName(event), getClassName(entity))
                 }
             } else {
-                def identifier = entity.identifier.name
+                def identifier = entity.identity?.name ?: 'id'
                 if (!map.containsKey(identifier) && domain."$identifier") {
                     map << [(identifier): domain."$identifier"]
                 }
@@ -414,17 +417,18 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     protected void onPostInsert(PostInsertEvent event) {
         def domain = event.entityObject
         try {
-            def entity = getDomainClass(domain)
+            def persistentEntity = getPersistentEntity(domain)
 
             if (ignoreEvent(domain, "onSave")) {
                 return
             }
 
-            def map = makeMap(entity.persistentProperties*.name as Set, domain)
+            def propertyNames = (persistentEntity.persistentProperties*.name - ['version']) as Set
+            def map = makeMap( propertyNames, domain)
             if (!callHandlersOnly(domain)) {
-                logChanges(domain, map, null, getEntityId(domain), getEventName(event), getClassName(entity))
+                logChanges(domain, map, null, getEntityId(domain), getEventName(event), getClassName(persistentEntity))
             } else {
-                def identifier = entity.identifier.name
+                def identifier = persistentEntity.identity?.name ?: 'id'
                 if (!map.containsKey(identifier) && domain."$identifier") {
                     map << [(identifier): domain."$identifier"]
                 }
@@ -457,18 +461,18 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     protected void onPreUpdate(PreUpdateEvent event) {
         def domain = event.entityObject
         try {
-            def entity = getDomainClass(domain)
+            def persistentEntity = getPersistentEntity(domain)
 
             if (ignoreEvent(domain, "onChange")) {
                 return
             }
 
             // Get all the dirty properties
-            Set<String> dirtyProperties = getDirtyPropertyNames(domain, entity)
+            Set<String> dirtyProperties = getDirtyPropertyNames(domain, persistentEntity)
             if (dirtyProperties) {
                 // Get the prior values for everything that is dirty
                 Map oldMap = dirtyProperties.collectEntries { String property ->
-                    [property, getPersistentValue(domain, property, entity)]
+                    [property, getPersistentValue(domain, property, persistentEntity)]
                 }
 
                 // Get the current values for everything that is dirty
@@ -480,9 +484,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
                 // Allow user to override whether you do auditing for them
                 if (!callHandlersOnly(domain)) {
-                    logChanges(domain, newMap, oldMap, getEntityId(domain), getEventName(event), getClassName(entity))
+                    logChanges(domain, newMap, oldMap, getEntityId(domain), getEventName(event), getClassName(persistentEntity))
                 } else {
-                    def identifier = entity.identifier.name
+                    def identifier = persistentEntity.identity?.name ?: 'id'
                     if (!(oldMap.containsKey(identifier) || newMap.containsKey(identifier)) && domain."$identifier") {
                         [oldMap, newMap]*.leftShift([(identifier): domain."$identifier"])
                     }
@@ -499,12 +503,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     /**
      * Get the class name to log.
      *
-     * @param entity A {@link GrailsDomainClass} instance.
-     * @return The {@link GrailsDomainClass#getFullName()}, if {@link #logFullClassName} is true,
-     * {@link GrailsDomainClass#getName()}, otherwise.
+     * @param entity A {@link PersistentEntity} instance.
+     * @return The {@link PersistentEntity#getName()}, if {@link #logFullClassName} is true,
+     * {@link PersistentEntity#getDecapitalizedName()}, otherwise.
      */
-    protected String getClassName(GrailsDomainClass entity) {
-        logFullClassName ? entity.fullName : entity.name
+    protected String getClassName(PersistentEntity entity) {
+        logFullClassName ? entity.name : entity.decapitalizedName
     }
 
     /**
@@ -513,8 +517,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      *
      * TODO - Need a way to load the old value generically for a collection
      */
-    protected getPersistentValue(domain, String property, GrailsDomainClass entity) {
-        if (entity.associationMap.containsKey(property)) {
+    protected static getPersistentValue(domain, String property, PersistentEntity entity) {
+        if (getAssosiations(entity).findAll {it instanceof OneToMany}.collect { it.name }.contains(property)) {
             "N/A"
         } else {
             domain.getPersistentValue(property)
@@ -525,12 +529,12 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * Return dirty property names for the given domain class. This method includes some
      * special case logic for hasMany properties, which don't follow normal isDirty rules.
      */
-    protected Set<String> getDirtyPropertyNames(domain, GrailsDomainClass entity) {
+    protected static Set<String> getDirtyPropertyNames(domain, PersistentEntity entity) {
         Set<String> dirtyProperties = domain.dirtyPropertyNames ?: []
 
         // In some cases, collections aren't listed as being dirty in the dirty property names.
         // We need to check them individually.
-        entity.associationMap.each { String associationName, value ->
+        getAssosiations(entity).collect { it.name }.each { String associationName ->
             def collection = domain."${associationName}"
             if (collection?.respondsTo('isDirty') && collection?.isDirty()) {
                 dirtyProperties << associationName
@@ -604,7 +608,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     return
                 }
                 if (val != oldMap[key]) {
-                    GrailsDomainClass audit = getAuditLogDomainInstance(
+                    def audit = getAuditLogDomainInstance(
                         actor: getActor(),
                         uri: getUri(domain),
                         className: className,
@@ -801,7 +805,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      *
      * SEE: GRAILSPLUGINS-391
      */
-    def saveAuditLog = { GrailsDomainClass audit ->
+    def saveAuditLog = { audit ->
         audit.with {
             dateCreated = lastUpdated = new Date()
         }

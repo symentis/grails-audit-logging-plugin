@@ -18,9 +18,9 @@
 */
 package test
 
-import grails.test.mixin.integration.Integration
-import grails.transaction.*
-import spock.lang.*
+import grails.testing.mixin.integration.Integration
+import grails.transaction.Rollback
+import spock.lang.Specification
 
 @Integration
 @Rollback
@@ -36,8 +36,10 @@ class AuditUpdateCollectionSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         // Remove all logging of the inserts, we are focused on updates here
-        AuditTrail.where { id != null }.deleteAll()
-        assert AuditTrail.count() == 0
+        AuditTrail.withNewSession {
+            AuditTrail.where { id != null }.deleteAll()
+            assert AuditTrail.count() == 0
+        }
 
         author.handlerCalled = ""
     }
@@ -53,11 +55,11 @@ class AuditUpdateCollectionSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then: "the author didn't change"
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 0
 
         and: "the book did"
-        def bookEvents = AuditTrail.findAllByClassName('test.Book')
+        def bookEvents = AuditTrail.withCriteria { eq('className', 'test.Book') }
         bookEvents.size() == 1
     }
 
@@ -73,7 +75,7 @@ class AuditUpdateCollectionSpec extends Specification {
         then:
         author.books.size() == 2
 
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         and: "the new value lists the values using the entityId override to show title"
@@ -100,7 +102,7 @@ class AuditUpdateCollectionSpec extends Specification {
         then: "another book"
         author.books.size() == 4
 
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         and: "the new value lists the values using the entityId override to show title"
@@ -114,8 +116,8 @@ class AuditUpdateCollectionSpec extends Specification {
         e.newValue.contains('[id:Something]')
 
         and: "the book inserted is logged too"
-        def bookEvents = AuditTrail.findAllByClassName('test.Book')
-        bookEvents.size() == (Book.gormPersistentEntity.persistentPropertyNames - ['id', 'version']).size()
+        def bookEvents = AuditTrail.withCriteria { eq('className', 'test.Book') }
+        bookEvents.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, ['id', 'version']).size()
         bookEvents.first().eventName == 'INSERT'
     }
 
@@ -131,7 +133,7 @@ class AuditUpdateCollectionSpec extends Specification {
         then:
         author.books.size() == 0
 
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def e = events.first()
@@ -141,7 +143,7 @@ class AuditUpdateCollectionSpec extends Specification {
         e.newValue == null
 
         and: "no delete orphan so books are NOT changed"
-        def bookEvents = AuditTrail.findAllByClassName('test.Book')
+        def bookEvents = AuditTrail.withCriteria { eq('className', 'test.Book') }
         bookEvents.size() == 0
     }
 
@@ -155,7 +157,7 @@ class AuditUpdateCollectionSpec extends Specification {
         author.save(flush: true, failOnError: true)
 
         then:
-        def events = AuditTrail.findAllByClassName('test.Author')
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def e = events.first()

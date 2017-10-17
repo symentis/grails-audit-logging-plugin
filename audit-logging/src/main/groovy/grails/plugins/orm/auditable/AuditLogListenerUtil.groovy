@@ -20,13 +20,12 @@ package grails.plugins.orm.auditable
 
 import grails.util.GrailsClassUtils
 import grails.util.Holders
-
-import org.grails.core.artefact.DomainClassArtefactHandler
-import grails.core.GrailsDomainClass
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
-import org.grails.web.servlet.mvc.GrailsWebRequest
-import org.grails.datastore.mapping.engine.event.EventType;
+import org.grails.datastore.mapping.engine.event.EventType
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
+import org.grails.web.servlet.mvc.GrailsWebRequest
 
 import javax.servlet.http.HttpSession
 
@@ -115,7 +114,7 @@ class AuditLogListenerUtil {
     }
 
     // Use the identifier property if this is a domain class or just 'id' if not
-    def identifier = getDomainClass(domain)?.identifier?.name ?: 'id'
+    def identifier = getPersistentEntity(domain)?.identity?.name ?: 'id'
     domain."${identifier}" as String
   }
 
@@ -124,7 +123,7 @@ class AuditLogListenerUtil {
     if (val instanceof Enum) {
       return val.name()
     }
-    if (getDomainClass(val)) {
+    if (getPersistentEntity(val)) {
       return getEntityId(val)
     }
     val as String
@@ -135,9 +134,9 @@ class AuditLogListenerUtil {
    *
    * @param domain the domain instance
    */
-  static GrailsDomainClass getAuditLogDomainInstance(params) {
+  static def getAuditLogDomainInstance(params) {
     Class<?> dc = getAuditDomainClass()
-    dc.newInstance(params) as GrailsDomainClass
+    dc.newInstance(params)
   }
 
   /**
@@ -151,11 +150,11 @@ class AuditLogListenerUtil {
     if (auditLogClassName == null){
       throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
     }
-    def dc = Holders.grailsApplication.getDomainClass(auditLogClassName)
+    def dc = Holders.applicationContext.getBean('grailsDomainClassMappingContext').getPersistentEntity(auditLogClassName)
     if (!dc) {
       throw new IllegalArgumentException("The specified user domain class '$auditLogClassName' is not a domain class")
     }
-    dc.clazz
+    dc.javaClass
   }
 
   /**
@@ -163,12 +162,22 @@ class AuditLogListenerUtil {
    *
    * @param domain the domain instance
    */
-  static GrailsDomainClass getDomainClass(domain) {
+  static PersistentEntity getPersistentEntity(domain) {
     if (domain && Holders.grailsApplication.isDomainClass(domain.class)) {
-      Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.class.name) as GrailsDomainClass
+      Holders.applicationContext.getBean('grailsDomainClassMappingContext').getPersistentEntity(domain.class.name)
     } else {
       null
     }
+  }
+
+  static List<Association> getAssosiations(PersistentEntity entity) {
+    PersistentEntity currentEntity = entity
+    List<Association> associations = new ArrayList<>()
+    while (currentEntity != null) {
+      associations.addAll(currentEntity.getAssociations().findAll { it.associatedEntity != null })
+      currentEntity = currentEntity.getParentEntity()
+    }
+    return associations
   }
 
   /**

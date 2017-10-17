@@ -22,9 +22,9 @@ package test
 /**
  * Test Audit Logging with handlersOnly auditing.
  */
-import grails.test.mixin.integration.Integration
-import grails.transaction.*
-import spock.lang.*
+import grails.testing.mixin.integration.Integration
+import grails.transaction.Rollback
+import spock.lang.Specification
 
 @Integration
 @Rollback

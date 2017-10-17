@@ -18,13 +18,13 @@
 */
 package test
 
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
+import grails.transaction.Rollback
 
 
 /**
  * Test Audit Logging with handlersOnly auditing.
  */
-import grails.transaction.Rollback
 import spock.lang.Issue
 import spock.lang.Specification
 
