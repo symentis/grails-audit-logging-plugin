@@ -1,15 +1,40 @@
 #!/bin/bash
 set -e
 
+export EXIT_STATUS=0
+
+echo "TRAVIS_TAG          : $TRAVIS_TAG"
+echo "TRAVIS_BRANCH       : $TRAVIS_BRANCH"
+echo "TRAVIS_PULL_REQUEST : $TRAVIS_PULL_REQUEST"
+
 rm -rf audit-logging/build
 rm -rf audit-test/build
 
-echo "*** Testing $TRAVIS_BRANCH"
-./gradlew clean check install --stacktrace
+echo "**********************"
+echo "Building audit-logging"
+echo "**********************"
 
-EXIT_STATUS=0
+./gradlew :audit-logging:clean || EXIT_STATUS=$?
+./gradlew :audit-logging:check || EXIT_STATUS=$?
 
-if [ $TRAVIS_PULL_REQUEST == 'true' ]; then
+if [[ $EXIT_STATUS -ne 0 ]]; then
+    echo "Check failed"
+    exit $EXIT_STATUS
+fi
+
+echo "*******************"
+echo "Building audit-test"
+echo "*******************"
+
+./gradlew :audit-test:clean || EXIT_STATUS=$?
+./gradlew :audit-test:check || EXIT_STATUS=$?
+
+if [[ $EXIT_STATUS -ne 0 ]]; then
+    echo "Integration tests failed"
+    exit $EXIT_STATUS
+fi
+
+if [ "${TRAVIS_PULL_REQUEST}" == 'true' ]; then
   echo "*** Stopping further execution, as this is a PR."
   exit $EXIT_STATUS
 fi
