@@ -8,8 +8,9 @@ The Grails Audit Logging plugin for Grails 3.x adds generic event based Audit Lo
  * For Grails 2.x documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
- * Grails 3.x: (master branch)
- * Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
+* Grails > 3.3: (master branch)
+* Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
+* Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
 ### Grails 3.2 limitations
 If you use Grails 3.2 up to version 3.2.9, you possibly receive a circular dependency exception caused by a bug in gorm-data-mapper. E.g. this can happen if you use the audit-logging plugin and the database-migration plugin and try to perform dbm-update. See [grails-database-migration#127](https://github.com/grails-plugins/grails-database-migration/issues/127) for details. Either use GORM > 6.0.9 when released, or disable the auditLogging plugin before performing runCommands.
