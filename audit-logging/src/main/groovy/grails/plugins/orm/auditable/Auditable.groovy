@@ -10,7 +10,7 @@ import javax.persistence.Transient
  * Domain classes should implement this trait to provide auditing support
  */
 @CompileStatic
-trait Auditable extends GormEntity {
+trait Auditable<D> extends GormEntity<D> {
     /**
      * Befault anything that implements this trait is auditable. This can be overriden to make a
      * runtime decision on whether to audit this entity.
