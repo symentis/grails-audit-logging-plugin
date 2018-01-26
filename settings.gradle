@@ -1,1 +1,4 @@
-include 'audit-logging', 'audit-test'
+rootProject.name = 'grails-audit-logging'
+
+include 'audit-logging'
+include 'audit-test'
