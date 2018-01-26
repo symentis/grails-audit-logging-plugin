@@ -22,8 +22,6 @@ import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.gorm.timestamp.DefaultTimestampProvider
-import org.grails.datastore.gorm.timestamp.TimestampProvider
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
@@ -43,13 +41,13 @@ import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
 @Slf4j
 @CompileStatic
 class AuditLogListener extends AbstractPersistenceEventListener {
-    GrailsApplication grailsApplication
+    private GrailsApplication grailsApplication
+    private Integer truncateLength
 
-    // TODO - is this a bean, can it just be loaded at runtime?
-    private TimestampProvider timestampProvider = new DefaultTimestampProvider()
-
-    AuditLogListener(Datastore datastore) {
+    AuditLogListener(Datastore datastore, GrailsApplication grailsApplication) {
         super(datastore)
+        this.grailsApplication = grailsApplication
+        this.truncateLength = determineTruncateLength()
     }
 
     @Override
@@ -160,8 +158,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
 
         // By default, we don't log verbose properties
-        Map newMap = [:]
-        Map oldMap = [:]
+        Map<String, Object> newMap = [:]
+        Map<String, Object> oldMap = [:]
 
         // If verbose, resolve properties
         if (!AuditLogListenerState.getAuditLogNonVerbose() && domain.logVerbose?.contains(auditEventType)) {
@@ -205,14 +203,14 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             // This handles insert, delete, and update with any property level logging enabled
             if (newMap) {
                 newMap.each { String propertyName, Object newVal ->
-                    String newValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.logPropertyToString(propertyName, newVal))
+                    String newValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, newVal), truncateLength)
                     String oldValueAsString = null
 
                     // This indicates a change
                     if (oldMap) {
                         Object oldVal = oldMap[propertyName]
                         if (newVal != oldVal) {
-                            oldValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.logPropertyToString(propertyName, oldVal))
+                            oldValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, oldVal), truncateLength)
                         }
                     }
 

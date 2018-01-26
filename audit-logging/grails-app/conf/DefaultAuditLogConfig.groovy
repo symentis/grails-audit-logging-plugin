@@ -13,24 +13,16 @@
  * limitations under the License.
  */
 
-import grails.plugins.orm.auditable.AuditLogListenerUtil
-
 // Default Plugin configuration
 defaultAuditLog {
-  verbose = true
-  defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
-  logFullClassName = true
-  transactional = false
-  defaultMask = ['password']
-  logIds = true
-  defaultActor = 'SYS'
-  auditDomainClassName = null
-  stampEnabled = true
-  stampTimestamp = true
-  nonVerboseDelete = false
-  logFullClassName = false
-  sessionAttribute = ""
-  actorKey = ""
-  actorClosure = AuditLogListenerUtil.actorDefaultGetter
-  propertyMask = "**********"
+    auditDomainClassName = null
+    verbose = true
+    failOnError = false
+    logIds = true
+    defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
+    logFullClassName = false
+    propertyMask = "**********"
+
+    stampEnabled = true
+    stampTimestamp = true
 }

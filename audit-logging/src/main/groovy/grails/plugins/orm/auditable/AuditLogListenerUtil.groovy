@@ -18,10 +18,13 @@
 */
 package grails.plugins.orm.auditable
 
+import grails.gorm.validation.ConstrainedProperty
+import grails.gorm.validation.PersistentEntityValidator
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.ToMany
@@ -53,11 +56,13 @@ class AuditLogListenerUtil {
         if (!auditLogClassName) {
             throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
         }
-        PersistentEntity persistentEntity = getPersistentEntity(auditLogClassName)
-        if (!persistentEntity) {
-            throw new IllegalArgumentException("The specified user domain class '$auditLogClassName' is not a domain class")
+
+        Class domainClass = Class.forName(auditLogClassName)
+        if (!GormEntity.isAssignableFrom(domainClass)) {
+            throw new IllegalArgumentException("The specified audit domain class $auditLogClassName is not a GORM entity")
         }
-        persistentEntity.javaClass
+
+        domainClass as Class<GormEntity>
     }
 
     /**
@@ -96,7 +101,7 @@ class AuditLogListenerUtil {
      * @param value the value of the property
      * @return
      */
-    static String conditionallyMaskAndTruncate(Auditable domain, String propertyName, String value) {
+    static String conditionallyMaskAndTruncate(Auditable domain, String propertyName, String value, Integer maxLength) {
         if (!value) {
             return null
         }
@@ -104,79 +109,40 @@ class AuditLogListenerUtil {
         value = value.trim()
 
         if (domain.logMaskProperties && domain.logMaskProperties.contains(propertyName)) {
-            return propertyName
+            return AuditLoggingConfigUtils.auditConfig.getProperty("propertyMask") ?: '********'
         }
-        if (domain.logMaxLength && value.length() > domain.logMaxLength) {
-            return value.substring(0, domain.logMaxLength)
+        if (maxLength && value.length() > maxLength) {
+            return value.substring(0, maxLength)
         }
 
         value
     }
 
     /**
-     * The original getActor method transplanted to the utility class as
-     * a closure. The closure takes two arguments one a RequestAttributes object
-     * the other is an HttpSession object.
-     *
-     * These are strongly typed here for the purpose of documentation.
+     * Determine the truncateLength based on the configured truncateLength and the actual auditDomainClass maxSize constraint for newValue.
      */
-    /*
-    static Closure actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-        def actor = request?.remoteUser
-
-        if (!actor && request.userPrincipal) {
-            actor = request.userPrincipal.getName()
+    static Integer determineTruncateLength() {
+        String confAuditDomainClassName = AuditLoggingConfigUtils.auditConfig.getProperty('auditDomainClassName')
+        if (!confAuditDomainClassName) {
+            throw new IllegalArgumentException("Please configure auditLog.auditDomainClassName in Config.groovy")
         }
 
-        if (!actor && delegate.sessionAttribute) {
-            log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
-            actor = session?.getAttribute(delegate.sessionAttribute)
-            log.trace "session.getAttribute('${delegate.sessionAttribute}') returned '${actor}'"
+        MappingContext mappingContext = Holders.grailsApplication.mappingContext
+        PersistentEntity auditPersistentEntity = mappingContext.getPersistentEntity(confAuditDomainClassName)
+        if (!auditPersistentEntity) {
+            throw new IllegalArgumentException("The configured audit logging domain class '$confAuditDomainClassName' is not a domain class")
         }
 
-        if (!actor && delegate.actorKey) {
-            log.debug "configured with actorKey ${actorKey} resolve using request attributes "
-            actor = resolve(attr, delegate.actorKey, delegate.log)
-            log.trace "resolve on ${delegate.actorKey} returned '${actor}'"
-        }
-        return actor
+        // Get the property constraints
+        PersistentEntityValidator entityValidator = mappingContext.getEntityValidator(auditPersistentEntity) as PersistentEntityValidator
+        Map<String, ConstrainedProperty> constrainedProperties = (entityValidator?.constrainedProperties ?: [:]) as Map<String, ConstrainedProperty>
+
+        // The configured length is the min size of oldValue, newValue, or configured truncateLength
+        Integer oldValueMaxSize = constrainedProperties['oldValue'].maxSize ?: 255
+        Integer newValueMaxSize = constrainedProperties['newValue'].maxSize ?: 255
+        Integer maxSize = Math.min(oldValueMaxSize, newValueMaxSize)
+        Integer configuredTruncateLength = (AuditLoggingConfigUtils.auditConfig.getProperty('truncateLength') ?: Integer.MAX_VALUE) as Integer
+
+        Math.min(maxSize, configuredTruncateLength)
     }
-    */
-
-    /**
-     * Attempt to resolve the attribute from the RequestAttributes object passed
-     * to it. This did not always work for people since on some designs
-     * users are not *always* logged in to the system.
-     *
-     * It was originally assumed that if you *were* generating events then you
-     * were logged in so the problem of null session.user did not come up in testing.
-     */
-    /*
-    static resolve(attr, str, log) {
-        def tokens = str?.split("\\.")
-        def res = attr
-        log.trace "resolving recursively ${str} from request attributes..."
-        tokens.each {
-            log.trace "\t\t ${it}"
-            try {
-                if (res) {
-                    res = res."${it}"
-                }
-            }
-            catch (MissingPropertyException ignored) {
-                log.debug """\
-AuditLogListener:
-
-You attempted to configure a request attribute named '${str}' and
-${AuditLogListenerUtil.class} attempted to dynamically resolve this from
-the servlet context session attributes but failed!
-
-Last attribute resolved class ${res?.getClass()} value ${res}
-"""
-                res = null
-            }
-        }
-        return res?.toString() ?: null
-    }
-    */
 }

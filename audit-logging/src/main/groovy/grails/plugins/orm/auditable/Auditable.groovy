@@ -11,10 +11,8 @@ import javax.persistence.Transient
  */
 @CompileStatic
 trait Auditable extends GormEntity {
-    static final Integer MAX_LENGTH = 255
-
     /**
-     * @return by default anything that implements this trait is auditable. This can be overriden to make a
+     * Befault anything that implements this trait is auditable. This can be overriden to make a
      * runtime decision on whether to audit this entity.
      */
     @Transient
@@ -22,6 +20,9 @@ trait Auditable extends GormEntity {
         true
     }
 
+    /**
+     * Enable logging of associated id changes in the format: "[id:<objId>]objDetails".
+     */
     @Transient
     boolean isLogAssociatedIds() {
         AuditLoggingConfigUtils.auditConfig.getProperty('logIds') as boolean
@@ -53,7 +54,7 @@ trait Auditable extends GormEntity {
      */
     @Transient
     String getLogEntityId() {
-        ident() as String
+        convertLoggedPropertyToString("id", ident())
     }
 
     /**
@@ -69,7 +70,7 @@ trait Auditable extends GormEntity {
      */
     @Transient
     Set<String> getLogExcluded() {
-        ['version', 'lastUpdated', 'dateCreated'] as Set<String>
+        (AuditLoggingConfigUtils.auditConfig.getProperty('defaultIgnore') ?: ['version', 'lastUpdated', 'dateCreated']) as Set<String>
     }
 
     /**
@@ -77,7 +78,7 @@ trait Auditable extends GormEntity {
      */
     @Transient
     Set<String> getLogIncluded() {
-        Collections.EMPTY_SET
+        null
     }
 
     /**
@@ -97,14 +98,6 @@ trait Auditable extends GormEntity {
     }
 
     /**
-     * @return default maximum length for
-     */
-    @Transient
-    Integer getLogMaxLength() {
-        MAX_LENGTH
-    }
-
-    /**
      * @return return the current username if available or SYS by default
      */
     @Transient
@@ -112,41 +105,22 @@ trait Auditable extends GormEntity {
         'SYS'
     }
 
-    /*
-    private String appendWithId(obj, str) {
-        // If this is a domain object, use the standard entity id which
-        // allows the domain class to determine what property to use
-        def objId = null
-        if (obj && grailsApplication.isDomainClass(obj.class)) {
-            objId = getEntityId(obj)
-        } else if (obj?.respondsTo("getId")) {
-            objId = obj.id
-        }
-
-        // If we have an object id, use it otherwise just fallback to toString()
-        if (objId) {
-            str ? "$str, [id:${objId}]$obj" : "[id:${objId}]$obj"
-        } else {
-            str ? "$str,$obj" : "$obj"
-        }
-    }
-    */
-
     /**
-     * Override to control property formatting, by default just invoke toString
+     * Domain classes can override to apply special formatting on a per-property basis
      *
      * @param propertyName
      * @param value
      * @return
      */
-    String logPropertyToString(String propertyName, Object value) {
+    String convertLoggedPropertyToString(String propertyName, Object value) {
         if (value instanceof Enum) {
             return ((Enum)value).name()
         }
 
-        // TODO - Implement for collection
-        if (value instanceof Collection) {
-            return value = '[...]'
+        if (logAssociatedIds && value instanceof Collection) {
+            return ((Collection)value).collect {
+                it instanceof GormEntity ? "[id:${((GormEntity)it).ident()}]$it" : it as String
+            }.join(", ")
         }
 
         value ? value.toString() : null
