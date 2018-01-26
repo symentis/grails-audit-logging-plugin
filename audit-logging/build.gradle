@@ -58,6 +58,7 @@ dependencies {
     provided "org.springframework.boot:spring-boot-starter-actuator"
     provided "org.springframework.boot:spring-boot-starter-tomcat"
     provided "org.grails:grails-web-boot"
+    provided "org.grails:grails-core"
 
     provided "org.grails:grails-dependencies"
     provided "org.grails:grails-datastore-gorm"

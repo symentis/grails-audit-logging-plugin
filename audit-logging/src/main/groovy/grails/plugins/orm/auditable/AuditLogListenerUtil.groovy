@@ -18,216 +18,153 @@
 */
 package grails.plugins.orm.auditable
 
-import grails.util.GrailsClassUtils
 import grails.util.Holders
-import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
-import org.grails.datastore.mapping.engine.event.EventType
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.types.Association
-import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
-import org.grails.web.servlet.mvc.GrailsWebRequest
-
-import javax.servlet.http.HttpSession
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.ToMany
 
 /**
  * Provides AuditLogListener utilities that
  * can be used as either templates for your own extensions to
  * the plugin or as default utilities.
  */
+@Slf4j
+@CompileStatic
 class AuditLogListenerUtil {
-  /**
-   * Returns true for auditable entities, false otherwise.
-   *
-   * Domain classes can use the 'isAuditable' attribute to provide a closure
-   * that will be called in order to determine instance level auditability. For example,
-   * a domain class may only be audited after it becomes Final and not while Pending.
-   */
-  static boolean isAuditableEntity(domain, String eventName) {
-    // Null or false is not auditable
-    def auditable = getAuditable(domain)
-    if (!auditable) {
-      return false
+    /**
+     * @param domain the domain instance
+     * @return configured AuditLogEvent instance
+     */
+    static GormEntity createAuditLogDomainInstance(Map params) {
+        Class<GormEntity> clazz = getAuditDomainClass()
+        clazz.newInstance(params)
     }
 
-    // If we have a map, see if we have an instance-level closure to check
-    if (auditable instanceof Map) {
-      def map = auditable as Map
-      if (map?.containsKey('isAuditable')) {
-        return map.isAuditable.call(eventName, domain)
-      }
-    }
-
-    // Anything that get's this far is auditable
-    return true
-  }
-
-  static isStampable(AbstractPersistenceEvent event) {
-    boolean stampable = isStampable(event.getEventType())
-    if (stampable) {
-      stampable = GrailsClassUtils.getStaticPropertyValue(event.entityObject.class,'_stampable')      
-//      def cpf = ClassPropertyFetcher.forClass(domain.class)
-//      stampable = cpf.getPropertyValue('stampable')
-    }
-    stampable
-  }
-
-  static isStampable(EventType eventType) {
-    eventType == EventType.PreUpdate || eventType == EventType.PreInsert
-  }
-
-  /**
-   * The static auditable attribute for the given domain class or null if none exists
-   */
-  static getAuditable(domain) {
-    def cpf = ClassPropertyFetcher.forClass(domain.class)
-    cpf.getPropertyValue('auditable')
-  }
-
-  /**
-   * If auditable is defined as a Map, return it otherwise return null
-   */
-  static Map getAuditableMap(domain) {
-    def auditable = getAuditable(domain)
-    auditable && auditable instanceof Map ? auditable as Map : null
-  }
-
-  /**
-   * Get the Id to display for this entity when logging. Domain classes can override the property
-   * used by supplying a [entityId] attribute in the auditable Map.
-   *
-   * @param event
-   * @return String key
-   */
-  static String getEntityId(domain) {
-    // If we have a display key, allow override of what shows as the entity id
-    Map auditableMap = getAuditableMap(domain)
-    if (auditableMap?.containsKey('entityId')) {
-      def entityId = auditableMap.entityId
-
-      if (entityId instanceof Closure) {
-        return entityId.call(domain) as String
-      } else if (entityId instanceof Collection) {
-        return entityId.collect { getIdProperty(domain, it) }.join("|")
-      } else if (entityId instanceof String) {
-        return getIdProperty(domain, entityId)
-      }
-    }
-
-    // Use the identifier property if this is a domain class or just 'id' if not
-    def identifier = getPersistentEntity(domain)?.identity?.name ?: 'id'
-    domain."${identifier}" as String
-  }
-
-  private static String getIdProperty(domain, property) {
-    def val = domain."${property}"
-    if (val instanceof Enum) {
-      return val.name()
-    }
-    if (getPersistentEntity(val)) {
-      return getEntityId(val)
-    }
-    val as String
-  }
-
-  /**
-   * Return Instance of the configured AuditLogEvent Grails Domain Class.
-   *
-   * @param domain the domain instance
-   */
-  static def getAuditLogDomainInstance(params) {
-    Class<?> dc = getAuditDomainClass()
-    dc.newInstance(params)
-  }
-
-  /**
-   * Return the configured AuditLogEvent Grails Domain Class.
-   *
-   * @param domain the domain instance
-   */
-  static Class<?> getAuditDomainClass() {
-    def conf = AuditLoggingConfigUtils.auditConfig
-    String auditLogClassName = conf.auditDomainClassName
-    if (auditLogClassName == null){
-      throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
-    }
-    def dc = Holders.applicationContext.getBean('grailsDomainClassMappingContext').getPersistentEntity(auditLogClassName)
-    if (!dc) {
-      throw new IllegalArgumentException("The specified user domain class '$auditLogClassName' is not a domain class")
-    }
-    dc.javaClass
-  }
-
-  /**
-   * Return the grails domain class for the given domain object.
-   *
-   * @param domain the domain instance
-   */
-  static PersistentEntity getPersistentEntity(domain) {
-    if (domain && Holders.grailsApplication.isDomainClass(domain.class)) {
-      Holders.applicationContext.getBean('grailsDomainClassMappingContext').getPersistentEntity(domain.class.name)
-    } else {
-      null
-    }
-  }
-
-  static List<Association> getAssosiations(PersistentEntity entity) {
-    PersistentEntity currentEntity = entity
-    List<Association> associations = new ArrayList<>()
-    while (currentEntity != null) {
-      associations.addAll(currentEntity.getAssociations().findAll { it.associatedEntity != null })
-      currentEntity = currentEntity.getParentEntity()
-    }
-    return associations
-  }
-
-  /**
-   * The original getActor method transplanted to the utility class as
-   * a closure. The closure takes two arguments one a RequestAttributes object
-   * the other is an HttpSession object.
-   *
-   * These are strongly typed here for the purpose of documentation.
-   */
-  static Closure actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
-    def actor = request?.remoteUser
-
-    if (!actor && request.userPrincipal) {
-      actor = request.userPrincipal.getName()
-    }
-
-    if (!actor && delegate.sessionAttribute) {
-      log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
-      actor = session?.getAttribute(delegate.sessionAttribute)
-      log.trace "session.getAttribute('${delegate.sessionAttribute}') returned '${actor}'"
-    }
-
-    if (!actor && delegate.actorKey) {
-      log.debug "configured with actorKey ${actorKey} resolve using request attributes "
-      actor = resolve(attr, delegate.actorKey, delegate.log)
-      log.trace "resolve on ${delegate.actorKey} returned '${actor}'"
-    }
-    return actor
-  }
-
-  /**
-   * Attempt to resolve the attribute from the RequestAttributes object passed
-   * to it. This did not always work for people since on some designs
-   * users are not *always* logged in to the system.
-   *
-   * It was originally assumed that if you *were* generating events then you
-   * were logged in so the problem of null session.user did not come up in testing.
-   */
-  static resolve(attr, str, log) {
-    def tokens = str?.split("\\.")
-    def res = attr
-    log.trace "resolving recursively ${str} from request attributes..."
-    tokens.each {
-      log.trace "\t\t ${it}"
-      try {
-        if (res) {
-          res = res."${it}"
+    /**
+     *
+     * @param domain the domain instance
+     * @return configured AuditLogEvent class
+     */
+    static Class<GormEntity> getAuditDomainClass() {
+        String auditLogClassName = AuditLoggingConfigUtils.auditConfig.getProperty('auditDomainClassName') as String
+        if (!auditLogClassName) {
+            throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
         }
-      } catch (MissingPropertyException ignored) {
-        log.debug """\
+        PersistentEntity persistentEntity = getPersistentEntity(auditLogClassName)
+        if (!persistentEntity) {
+            throw new IllegalArgumentException("The specified user domain class '$auditLogClassName' is not a domain class")
+        }
+        persistentEntity.javaClass
+    }
+
+    /**
+     * Get the persistent value for the given domain.property. This method includes
+     * some special case handling for hasMany properties, which don't follow normal rules.
+     */
+    static Object getPersistentValue(Auditable domain, String propertyName) {
+        PersistentEntity entity = getPersistentEntity(domain.class.name)
+        PersistentProperty property = entity.getPropertyByName(propertyName)
+        property instanceof ToMany ? "N/A" : domain.getPersistentValue(propertyName)
+    }
+
+    /**
+     * Helper method to make a map of the current property values
+     *
+     * @param propertyNames
+     * @param domain
+     * @return
+     */
+    static Map<String, Object> makeMap(Set<String> propertyNames, Auditable domain) {
+        propertyNames.collectEntries { [it, domain.metaClass.getProperty(domain, it)] }
+    }
+
+    /**
+     * Return the grails domain class for the given domain object.
+     *
+     * @param domain the domain instance
+     */
+    static PersistentEntity getPersistentEntity(domain) {
+        Holders.grailsApplication.mappingContext.getPersistentEntity(domain.getClass().name)
+    }
+
+    /**
+     * @param domain the auditable domain object
+     * @param propertyName property name
+     * @param value the value of the property
+     * @return
+     */
+    static String conditionallyMaskAndTruncate(Auditable domain, String propertyName, String value) {
+        if (!value) {
+            return null
+        }
+        // Always trim any space
+        value = value.trim()
+
+        if (domain.logMaskProperties && domain.logMaskProperties.contains(propertyName)) {
+            return propertyName
+        }
+        if (domain.logMaxLength && value.length() > domain.logMaxLength) {
+            return value.substring(0, domain.logMaxLength)
+        }
+
+        value
+    }
+
+    /**
+     * The original getActor method transplanted to the utility class as
+     * a closure. The closure takes two arguments one a RequestAttributes object
+     * the other is an HttpSession object.
+     *
+     * These are strongly typed here for the purpose of documentation.
+     */
+    /*
+    static Closure actorDefaultGetter = { GrailsWebRequest request, HttpSession session ->
+        def actor = request?.remoteUser
+
+        if (!actor && request.userPrincipal) {
+            actor = request.userPrincipal.getName()
+        }
+
+        if (!actor && delegate.sessionAttribute) {
+            log.debug "configured with session attribute ${delegate.sessionAttribute} attempting to resolve"
+            actor = session?.getAttribute(delegate.sessionAttribute)
+            log.trace "session.getAttribute('${delegate.sessionAttribute}') returned '${actor}'"
+        }
+
+        if (!actor && delegate.actorKey) {
+            log.debug "configured with actorKey ${actorKey} resolve using request attributes "
+            actor = resolve(attr, delegate.actorKey, delegate.log)
+            log.trace "resolve on ${delegate.actorKey} returned '${actor}'"
+        }
+        return actor
+    }
+    */
+
+    /**
+     * Attempt to resolve the attribute from the RequestAttributes object passed
+     * to it. This did not always work for people since on some designs
+     * users are not *always* logged in to the system.
+     *
+     * It was originally assumed that if you *were* generating events then you
+     * were logged in so the problem of null session.user did not come up in testing.
+     */
+    /*
+    static resolve(attr, str, log) {
+        def tokens = str?.split("\\.")
+        def res = attr
+        log.trace "resolving recursively ${str} from request attributes..."
+        tokens.each {
+            log.trace "\t\t ${it}"
+            try {
+                if (res) {
+                    res = res."${it}"
+                }
+            }
+            catch (MissingPropertyException ignored) {
+                log.debug """\
 AuditLogListener:
 
 You attempted to configure a request attribute named '${str}' and
@@ -236,9 +173,10 @@ the servlet context session attributes but failed!
 
 Last attribute resolved class ${res?.getClass()} value ${res}
 """
-        res = null
-      }
+                res = null
+            }
+        }
+        return res?.toString() ?: null
     }
-    return res?.toString() ?: null
-  }
+    */
 }

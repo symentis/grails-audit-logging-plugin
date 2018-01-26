@@ -45,30 +45,31 @@ import org.springframework.context.ApplicationContext
  *
  */
 @Slf4j
+@SuppressWarnings("GroovyUnusedDeclaration")
 class AuditLoggingGrailsPlugin extends Plugin {
-
     def grailsVersion = '3.0.0 > *'
 
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
-    def description = """ Automatically log change events for domain objects.
-The Audit Logging plugin additionally adds an instance hook to domain objects that allows you to hang Audit events off of them.
-The events include onSave, onChange, and onDelete.
-When called, the event handlers have access to oldObj and newObj definitions that will allow you to take action on what has changed.
+    def description = """ 
+        Automatically log change events for domain objects.
+        The Audit Logging plugin additionally adds an instance hook to domain objects that allows you to hang Audit events off of them.
+        The events include onSave, onChange, and onDelete.
+        When called, the event handlers have access to oldObj and newObj definitions that will allow you to take action on what has changed.
     """
 
     String documentation = 'http://grails.org/plugin/audit-logging'
     String license = 'APACHE'
     String organization = [name: "symentis GmbH", url: "http://www.symentis.com/"]
+
     def developers = [
         [ name: 'Robert Oschwald', email: 'roos@symentis.com' ],
         [ name: 'Elmar Kretzer', email: 'elkr@symentis.com' ],
         [ name: 'Aaron Long', email: 'longwa@gmail.com' ]
     ]
+
     def issueManagement = [system: 'GitHub', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
-
-    def dependsOn = [:]
     def loadAfter = ['core', 'dataSource']
 
     // Register generic GORM listener
@@ -80,10 +81,10 @@ When called, the event handlers have access to oldObj and newObj definitions tha
         boolean stampAlways = config.stampAlways
         boolean stampTimestamp = config.stampTimestamp
         
-        String stampCreatedByProperty       = config.stampCreatedByProperty || config.stampCreatedBy
-        String stampLastUpdatedByProperty   = config.stampLastUpdatedByProperty || config.stampLastUpdatedBy
-        String stampDateCreatedProperty     = config.stampDateCreatedProperty
-        String stampLastUpdatedProperty     = config.stampLastUpdatedProperty
+//        String stampCreatedByProperty       = config.stampCreatedByProperty || config.stampCreatedBy
+//        String stampLastUpdatedByProperty   = config.stampLastUpdatedByProperty || config.stampLastUpdatedBy
+//        String stampDateCreatedProperty     = config.stampDateCreatedProperty
+//        String stampLastUpdatedProperty     = config.stampLastUpdatedProperty
         
         boolean verbose = config.verbose
         boolean nonVerboseDelete = config.nonVerboseDelete
@@ -105,25 +106,25 @@ When called, the event handlers have access to oldObj and newObj definitions tha
 
                 def listener = new AuditLogListener(datastore)
                 listener.grailsApplication = application
-                listener.stampEnabled = stampEnabled
-                listener.stampAlways = stampAlways
-                listener.stampTimestamp = stampTimestamp
+//                listener.stampEnabled = stampEnabled
+//                listener.stampAlways = stampAlways
+//                listener.stampTimestamp = stampTimestamp
                 
-                listener.verbose = verbose
-                listener.usingHibernate = isHibernateDataStore
-                listener.nonVerboseDelete = nonVerboseDelete
-                listener.logFullClassName = logFullClassName
-                listener.transactional = transactional
-                listener.sessionAttribute = sessionAttribute
-                listener.actorKey = actorKey
-                listener.truncateLength = determineTruncateLength(applicationContext)
-                listener.actorClosure = actorClosure
-                listener.defaultIgnoreList = config.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
-                listener.defaultMaskList = config.defaultMask?.asImmutable() ?: ['password'].asImmutable()
-                listener.propertyMask = propertyMask
-                if (config.replacementPatterns && config.replacementPatterns instanceof Map)
-                    listener.replacementPatterns = config.replacementPatterns.toFlatConfig() // #116
-                listener.logIds = logIds
+//                listener.verbose = verbose
+//                listener.usingHibernate = isHibernateDataStore
+//                listener.nonVerboseDelete = nonVerboseDelete
+//                listener.logFullClassName = logFullClassName
+//                listener.transactional = transactional
+//                listener.sessionAttribute = sessionAttribute
+//                listener.actorKey = actorKey
+//                listener.truncateLength = determineTruncateLength(applicationContext)
+//                listener.actorClosure = actorClosure
+//                listener.defaultIgnoreList = config.defaultIgnore?.asImmutable() ?: ['version', 'lastUpdated'].asImmutable()
+//                listener.defaultMaskList = config.defaultMask?.asImmutable() ?: ['password'].asImmutable()
+//                listener.propertyMask = propertyMask
+//                if (config.replacementPatterns && config.replacementPatterns instanceof Map)
+//                    listener.replacementPatterns = config.replacementPatterns.toFlatConfig() // #116
+//                listener.logIds = logIds
                 applicationContext.addApplicationListener(listener)
             }
         }
