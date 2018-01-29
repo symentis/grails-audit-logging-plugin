@@ -15,6 +15,7 @@ class Book implements Auditable {
     String getLogEntityId() {
         title
     }
+
     static constraints = {
         published nullable: true
     }

@@ -18,11 +18,13 @@
 */
 package test
 
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Rollback
 import grails.plugins.orm.auditable.AuditLogListener
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -30,13 +32,14 @@ import spock.lang.Specification
 @Rollback
 @Slf4j
 class AuditTruncateSpec extends Specification {
-    def grailsApplication
+    @Autowired
+    GrailsApplication grailsApplication
 
     @Shared
     def defaultIgnoreList
 
     void setup() {
-        defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
+        defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
     }
 
     void "No_Truncate"() {

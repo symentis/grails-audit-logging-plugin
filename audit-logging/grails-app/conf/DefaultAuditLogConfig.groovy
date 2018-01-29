@@ -16,11 +16,13 @@
 // Default Plugin configuration
 defaultAuditLog {
     auditDomainClassName = null
+
     verbose = true
     failOnError = false
     logIds = true
-    defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
     logFullClassName = true
+    excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
+
     propertyMask = "**********"
 
     stampEnabled = true

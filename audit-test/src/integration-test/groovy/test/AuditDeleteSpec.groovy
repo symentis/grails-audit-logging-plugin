@@ -18,222 +18,190 @@
 */
 package test
 
+import grails.gorm.transactions.Rollback
+import grails.plugins.orm.auditable.AuditLogContext
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
-import grails.test.mixin.integration.Integration
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import spock.lang.Shared
 import spock.lang.Specification
 
 @Integration
 @Rollback
 class AuditDeleteSpec extends Specification {
+    @Shared
+    def defaultIgnoreList
 
-  @Shared
-  def defaultIgnoreList
-
-  void setup() {
-    defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.defaultIgnore?.asImmutable() ?: []
-  }
-
-  void setupData() {
-    Author.auditable = true
-
-    def author = new Author(name:"Aaron", age:37, famous:true)
-    author.addToBooks(new Book(title:'Hunger Games', description:'Blah', pages:400))
-    author.addToBooks(new Book(title:'Catching Fire', description:'Blah', pages:500))
-    author.save(flush:true, failOnError:true)
-
-    def publisher = new Publisher(code:'ABC123', name:'Random House', active:true)
-    publisher.save(flush:true, failOnError:true)
-
-    // Remove all logging of the inserts, we are focused on deletes here
-    AuditTrail.withNewSession {
-      AuditTrail.where { id != null }.deleteAll()
-      assert AuditTrail.count() == 0
+    void setup() {
+        defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
     }
 
-    author.handlerCalled = ""
-  }
+    void setupData() {
+        AuditLogContext.withoutAuditLog {
+            def author = new Author(name: "Aaron", age: 37, famous: true)
+            author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
+            author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
+            author.save(flush: true, failOnError: true)
 
-  void "Test delete logging"() {
-    given:
-    setupData()
-    def author = Author.findByName("Aaron")
-    assert author
+            def publisher = new Publisher(code: 'ABC123', name: 'Random House', active: true)
+            publisher.save(flush: true, failOnError: true)
+        }
 
-    when:
-    author.delete(flush:true, failOnError:true)
-
-    then: "audit logging is created"
-    def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
-
-    events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
-
-    def first = events.find { it.propertyName == 'age' }
-    first.oldValue == "37"
-    first.newValue == null
-    first.eventName == 'DELETE'
-
-    and: 'all books are deleted'
-    def b1Events = AuditTrail.withCriteria { eq('className', 'test.Book'); eq('persistedObjectId', 'Hunger Games') }
-    b1Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
-
-    def b2Events = AuditTrail.withCriteria { eq('className', 'test.Book'); eq('persistedObjectId', 'Catching Fire') }
-    b2Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
-  }
-
-  void "Test conditional delete logging"() {
-    given:
-    setupData()
-    def publisher = Publisher.findByName("Random House")
-
-    when:
-    publisher.active = activeFlag
-    publisher.delete(flush:true, failOnError:true)
-
-    then:
-    !Publisher.get(publisher.id)
-
-    and:
-    def events = AuditTrail.withCriteria { eq('className', 'test.Publisher') }
-    events.size() == resultCount
-
-    where: "publisher active flag determines logging"
-    activeFlag << [false, true]
-    resultCount << [0, 3]
-  }
-
-  void "Test handler is called"() {
-    given:
-    setupData()
-    def author = Author.findByName("Aaron")
-
-    when:
-    author.delete(flush:true, failOnError:true)
-
-    then: "verbose audit logging is created"
-    def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
-    events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
-
-    and:
-    author.handlerCalled == "onDelete"
-  }
-
-  void "Test only handler is called"() {
-    given:
-    setupData()
-    def author = Author.findByName("Aaron")
-    Author.auditable = [handlersOnly:true]
-
-    when:
-    author.delete(flush:true, failOnError:true)
-
-    then: "nothing logged"
-    def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
-    events.size() == 0
-
-    and:
-    author.handlerCalled == "onDelete"
-  }
-
-  void "Test only delete event is logged"() {
-    given: "create resolution"
-    def resolution = new Resolution()
-    resolution.name = "One for all"
-    resolution.save(flush:true, failOnError:true)
-    when: "updateing resolution"
-    resolution.name = "One for all and all for one"
-    resolution.save(flush:true, failOnError:true)
-    then: "delete resolution"
-    resolution.delete(flush:true, failOnError:true)
-    def events = AuditTrail.withCriteria { eq('className', 'test.Resolution') }
-    events.size() == 1
-    and:
-    events.get(0).eventName == "DELETE"
-  }
-
-  void "Test globally ignored properties"() {
-    given:
-    setupData()
-    def author = Author.findByName("Aaron")
-
-    when:
-    author.delete(flush: true, failOnError: true)
-
-    then: "ignored properties not logged"
-
-    def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
-
-    events.size() == 7
-    ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
-      assert events.find {it.propertyName == name}, "${name} was not logged"
-    }
-    ['version', 'lastUpdated', 'lastUpdatedBy'].each { name ->
-      assert !events.find {it.propertyName == name}, "${name} was logged"
+        // Remove all logging of the inserts, we are focused on deletes here
+        AuditTrail.withNewSession {
+            AuditTrail.where { id != null }.deleteAll()
+            assert AuditTrail.count() == 0
+        }
     }
 
-  }
+    void "Test default delete logging"() {
+        given:
+        setupData()
+        def author = Author.findByName("Aaron")
+        assert author
 
-  void "Test locally ignored properties"() {
-    given:
-    setupData()
-    Author.auditable = [ignore: ['famous', 'age', 'dateCreated']]
-    def author = Author.findByName("Aaron")
+        when:
+        author.delete(flush: true, failOnError: true)
 
-    when:
-    author.delete(flush: true, failOnError: true)
+        then: "audit logging is created"
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
-    then: "ignored properties not logged"
-    def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+        events.size() == author.getAuditablePropertyNames().size()
 
-    events.size() == 6
-    ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy'].each { name ->
-      assert events.find {it.propertyName == name}, "${name} was not logged"
+        def first = events.find { it.propertyName == 'age' }
+        first.oldValue == "37"
+        first.newValue == null
+        first.eventName == 'DELETE'
+
+        and: 'all books are deleted'
+        def b1Events = AuditTrail.withCriteria { eq('className', 'test.Book'); eq('persistedObjectId', 'Hunger Games') }
+        b1Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
+
+        def b2Events = AuditTrail.withCriteria {
+            eq('className', 'test.Book'); eq('persistedObjectId', 'Catching Fire')
+        }
+        b2Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
     }
-    ['famous', 'age', 'dateCreated'].each { name ->
-      assert !events.find {it.propertyName == name}, "${name} was logged"
+
+    void "Test conditional delete logging"() {
+        given:
+        setupData()
+        def publisher = Publisher.findByName("Random House")
+
+        when:
+        publisher.active = activeFlag
+        publisher.delete(flush: true, failOnError: true)
+
+        then:
+        !Publisher.get(publisher.id)
+
+        and:
+        def events = AuditTrail.withCriteria { eq('className', 'test.Publisher') }
+        events.size() == resultCount
+
+        where: "publisher active flag determines logging"
+        activeFlag << [false, true]
+        resultCount << [0, 3]
     }
-  }
 
-  void "Test auditableProperties"() {
-    given:
-    setupData()
-    Author.auditable = [auditableProperties: ['famous', 'age', 'dateCreated']]
-    def author = Author.findByName("Aaron")
+    void "Test only delete events are logged"() {
+        def resolution = new Resolution()
+        resolution.name = "One for all"
+        resolution.save(flush: true, failOnError: true)
 
-    when:
-    author.delete(flush: true, failOnError: true)
+        when: "updating resolution"
+        resolution.name = "One for all and all for one"
+        resolution.save(flush: true, failOnError: true)
 
-    then: "only properties in auditableProperties are logged"
-    def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+        then: "delete resolution"
+        resolution.delete(flush: true, failOnError: true)
 
-    events.size() == 3
-    ['famous', 'age', 'dateCreated'].each { name ->
-      assert events.find {it.propertyName == name}, "${name} was not logged"
+        def events = AuditTrail.withCriteria { eq('className', 'test.Resolution') }
+        events.size() == 1
+        and:
+        events.get(0).eventName == "DELETE"
     }
-  }
 
-  void "Test auditableProperties overrides ignore list"() {
-    given:
-    setupData()
-    Author.auditable = [
-      auditableProperties: ['famous', 'age', 'dateCreated'],
-      ignore: ['famous', 'age']
-    ]
-    def author = Author.findByName("Aaron")
+    void "Test defaultExcluded properties"() {
+        given:
+        setupData()
+        def author = Author.findByName("Aaron")
 
-    when:
-    author.delete(flush: true, failOnError: true)
+        when:
+        author.delete(flush: true, failOnError: true)
 
-    then: "only properties in auditableProperties are logged"
-    def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+        then: "ignored properties not logged"
 
-    events.size() == 3
-    ['famous', 'age', 'dateCreated'].each { name ->
-      assert events.find {it.propertyName == name}, "${name} was not logged"
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+
+        events.size() == 7
+        ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
+            assert events.find { it.propertyName == name }, "${name} was not logged"
+        }
+        ['version', 'lastUpdated', 'lastUpdatedBy'].each { name ->
+            assert !events.find { it.propertyName == name }, "${name} was logged"
+        }
+
     }
-  }
 
+    void "Test context blacklist"() {
+        given:
+        setupData()
+        def author = Author.findByName("Aaron")
+
+        when:
+        AuditLogContext.withConfig(excluded: ['famous', 'age', 'dateCreated']) {
+            author.delete(flush: true, failOnError: true)
+        }
+
+        then: "ignored properties not logged"
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+
+        events.size() == 7
+        ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy', 'version'].each { name ->
+            assert events.find { it.propertyName == name }, "${name} was not logged"
+        }
+        ['famous', 'age', 'dateCreated'].each { name ->
+            assert !events.find { it.propertyName == name }, "${name} was logged"
+        }
+    }
+
+    void "Test context whitelist"() {
+        given:
+        setupData()
+        def author = Author.findByName("Aaron")
+
+        when:
+        AuditLogContext.withConfig(included: ['famous', 'age', 'dateCreated']) {
+            author.delete(flush: true, failOnError: true)
+        }
+
+        then: "only properties in given are logged"
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+        events.size() == 3
+
+        ['famous', 'age', 'dateCreated'].each { name ->
+            assert events.find { it.propertyName == name }, "${name} was not logged"
+        }
+    }
+
+    void "Test whitelist overrides blacklist"() {
+        given:
+        setupData()
+
+        def author = Author.findByName("Aaron")
+
+        when:
+        AuditLogContext.withConfig(included: ['famous', 'age', 'dateCreated'], excluded: ['famous', 'age']) {
+            author.delete(flush: true, failOnError: true)
+        }
+
+        then: "only properties in whitelist are logged"
+        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+
+        events.size() == 3
+        ['famous', 'age', 'dateCreated'].each { name ->
+            assert events.find { it.propertyName == name }, "${name} was not logged"
+        }
+    }
 }
 

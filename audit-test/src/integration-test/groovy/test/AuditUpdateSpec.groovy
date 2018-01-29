@@ -18,33 +18,34 @@
 */
 package test
 
+import grails.gorm.transactions.Rollback
+import grails.plugins.orm.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration
-import grails.transaction.*
-import spock.lang.*
+import spock.lang.Specification
 
 @Integration
 @Rollback
 class AuditUpdateSpec extends Specification {
 
     void setupData() {
-        def author = new Author(name: "Aaron", age: 37, famous: true)
-        author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
-        author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
-        author.save(flush: true, failOnError: true)
+        AuditLogContext.withoutAuditLog {
+            def author = new Author(name: "Aaron", age: 37, famous: true)
+            author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
+            author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
+            author.save(flush: true, failOnError: true)
 
-        def publisher = new Publisher(code: 'ABC123', name: 'Random House', active: true)
-        publisher.save(flush: true, failOnError: true)
+            def publisher = new Publisher(code: 'ABC123', name: 'Random House', active: true)
+            publisher.save(flush: true, failOnError: true)
 
-        def heliport = new Heliport(code: 'EGLW', name: 'Battersea Heliport')
-        heliport.save(flush: true, failOnError: true)
+            def heliport = new Heliport(code: 'EGLW', name: 'Battersea Heliport')
+            heliport.save(flush: true, failOnError: true)
 
-        // Remove all logging of the inserts, we are focused on updates here
-        AuditTrail.withNewSession {
-            AuditTrail.where { id != null }.deleteAll()
-            assert AuditTrail.count() == 0
+            // Remove all logging of the inserts, we are focused on updates here
+            AuditTrail.withNewSession {
+                AuditTrail.where { id != null }.deleteAll()
+                assert AuditTrail.count() == 0
+            }
         }
-
-        author.handlerCalled = ""
     }
 
     void "Test persistedObjectVersion in update logging"() {
@@ -210,17 +211,18 @@ class AuditUpdateSpec extends Specification {
         events.size() == 0
     }
 
-    void "Test locally ignored properties"() {
+    void "Test excluded properties via context"() {
         given:
         setupData()
-        Author.metaClass.getLogExcluded = { [ignore: ['name', 'famous', 'lastUpdated']] }
         def author = Author.findByName("Aaron")
 
         when:
-        author.age = 50
-        author.famous = false
-        author.name = 'Bob'
-        author.save(flush: true, failOnError: true)
+        AuditLogContext.withConfig(excluded: ['name', 'famous', 'lastUpdate']) {
+            author.age = 50
+            author.famous = false
+            author.name = 'Bob'
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "ignored properties not logged"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
@@ -231,85 +233,49 @@ class AuditUpdateSpec extends Specification {
         first.persistedObjectVersion == author.version - 1
     }
 
-    void "Test auditableProperties"() {
+    void "Test included properties via context"() {
         given:
         setupData()
-        Author.auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
         def author = Author.findByName("Aaron")
 
         when:
-        author.age = 50
-        author.famous = false
-        author.name = 'Bob'
-        author.save(flush: true, failOnError: true)
+        AuditLogContext.withConfig(included: ['name', 'famous']) {
+            author.age = 50
+            author.famous = false
+            author.name = 'Bob'
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "only properties in auditableProperties are logged"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
-        events.size() == 3
+        events.size() == 2
 
-        ['name', 'famous', 'lastUpdated'].each { name ->
+        ['name', 'famous'].each { name ->
             assert events.find {it.propertyName == name}, "${name} was not logged"
         }
     }
 
-    void "Test auditableProperties overrides ignore list"() {
+    void "Test included properties overrides excluded"() {
         given:
         setupData()
-        Author.auditable = [
-          auditableProperties: ['name', 'famous', 'lastUpdated'],
-          ignore: ['name', 'famous']
-        ]
         def author = Author.findByName("Aaron")
 
         when:
-        author.age = 50
-        author.famous = false
-        author.name = 'Bob'
-        author.save(flush: true, failOnError: true)
+        AuditLogContext.withConfig(included: ['name', 'famous', 'lastUpdated'], excluded: ['name', 'famous']) {
+            author.age = 50
+            author.famous = false
+            author.name = 'Bob'
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "only properties in auditableProperties are logged"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
-        events.size() == 3
+        events.size() == 2
 
-        ['name', 'famous', 'lastUpdated'].each { name ->
+        ['name', 'famous'].each { name ->
             assert events.find {it.propertyName == name}, "${name} was not logged"
         }
-    }
-
-    void "Test handler is called"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
-        when:
-        author.famous = false
-        author.save(flush: true, failOnError: true)
-
-        then: "verbose audit logging is created"
-        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
-        events.size() == 1
-
-        and:
-        author.handlerCalled == "onChange"
-    }
-
-    void "Test only handler is called"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-        Author.auditable = [handlersOnly: true]
-
-        when:
-        author.famous = false
-        author.save(flush: true, failOnError: true)
-
-        then: "nothing logged"
-        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
-        events.size() == 0
-
-        and:
-        author.handlerCalled == "onChange"
     }
 }

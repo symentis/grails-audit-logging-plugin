@@ -3,6 +3,7 @@ package grails.plugins.orm.auditable
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.model.PersistentEntity
 
 import javax.persistence.Transient
 
@@ -12,12 +13,11 @@ import javax.persistence.Transient
 @CompileStatic
 trait Auditable<D> extends GormEntity<D> {
     /**
-     * Befault anything that implements this trait is auditable. This can be overriden to make a
-     * runtime decision on whether to audit this entity.
+     * If false, this entity will not be logged
      */
     @Transient
     boolean isAuditLogEnabled(AuditEventType eventType) {
-        true
+        !AuditLogContext.context.disabled
     }
 
     /**
@@ -25,16 +25,19 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     boolean isLogAssociatedIds() {
-        AuditLoggingConfigUtils.auditConfig.getProperty('logIds') as boolean
+        AuditLogContext.context.logIds as boolean
     }
 
     /**
      * @return set of event types for which to log verbosely
      */
     @Transient
-    Set<AuditEventType> getLogVerbose() {
-        if (AuditLoggingConfigUtils.auditConfig.getProperty('verbose')) {
+    Set<AuditEventType> getLogVerboseEvents() {
+        if (AuditLogContext.context.verbose) {
             AuditEventType.values() as Set<AuditEventType>
+        }
+        else if (AuditLogContext.context.verboseEvents) {
+            AuditLogContext.context.verboseEvents as Set<AuditEventType>
         }
         else {
             Collections.EMPTY_SET
@@ -46,16 +49,7 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     String getLogClassName() {
-        AuditLoggingConfigUtils.auditConfig.getProperty('logFullClassName') ?
-            getClass().name : GrailsNameUtils.getShortName(getClass())
-    }
-
-    /**
-     * @return returns the id of the object by default, can override to return a natural key
-     */
-    @Transient
-    String getLogEntityId() {
-        convertLoggedPropertyToString("id", ident())
+        AuditLogContext.context.logFullClassName ? getClass().name : GrailsNameUtils.getShortName(getClass())
     }
 
     /**
@@ -67,19 +61,19 @@ trait Auditable<D> extends GormEntity<D> {
     }
 
     /**
-     * @return excluded attributes, this will override anything specifically included
+     * @return blacklist properties that should not be logged including those in context or by default.
      */
     @Transient
     Set<String> getLogExcluded() {
-        (AuditLoggingConfigUtils.auditConfig.getProperty('defaultIgnore') ?: ['version', 'lastUpdated', 'lastUpdatedBy']) as Set<String>
+        (AuditLogContext.context.excluded ?: Collections.EMPTY_SET) as Set<String>
     }
 
     /**
-     * @return attributes included in logging minus any that are specifically excluded, null for all attributes
+     * @return whitelist properties that should be logged. If null, all attributes are logged. This overrides any excludes.
      */
     @Transient
     Set<String> getLogIncluded() {
-        null
+        AuditLogContext.context.included as Set<String>
     }
 
     /**
@@ -87,7 +81,7 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     Set<String> getLogMaskProperties() {
-        ['password'] as Set<String>
+        (AuditLogContext.context.mask ?: Collections.EMPTY_SET) as Set<String>
     }
 
     /**
@@ -95,7 +89,7 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     Set<AuditEventType> getLogIgnoreEvents() {
-        Collections.EMPTY_SET
+        (AuditLogContext.context.ignoreEvents ?: Collections.EMPTY_SET) as Set<AuditEventType>
     }
 
     /**
@@ -103,7 +97,46 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     String getLogCurrentUserName() {
-        'SYS'
+        AuditLogContext.context.defaultActor ?: 'SYS'
+    }
+
+    /**
+     * @return auditable property names for this domain class resolving any includes and excludes
+     */
+    @Transient
+    Set<String> getAuditablePropertyNames() {
+        PersistentEntity entity = getClass().invokeMethod("getGormPersistentEntity", null) as PersistentEntity
+
+        // Start with all persistent properties
+        Set<String> persistentProperties = entity.getPersistentProperties()*.name as Set<String>
+        Set<String> loggedProperties = persistentProperties
+
+        // If given a whitelist, only log the properties specifically in that list
+        if (logIncluded != null) {
+            loggedProperties = logIncluded as Set<String>
+        }
+        else if(logExcluded) {
+            loggedProperties -= logExcluded
+        }
+
+        // Intersect with the persistent properties to filter to just properties on this domain
+        loggedProperties.intersect(persistentProperties as Iterable) as Set<String>
+    }
+
+    /**
+     * @return return any dirty properties that are flagged as auditable
+     */
+    @Transient
+    Set<String> getAuditableDirtyPropertyNames() {
+        auditablePropertyNames.intersect(listDirtyPropertyNames() as Set<String>) as Set<String>
+    }
+
+    /**
+     * @return returns the id of the object by default, can override to return a natural key
+     */
+    @Transient
+    String getLogEntityId() {
+        convertLoggedPropertyToString("id", ident())
     }
 
     /**
@@ -120,7 +153,15 @@ trait Auditable<D> extends GormEntity<D> {
 
         if (logAssociatedIds && value instanceof Collection) {
             return ((Collection)value).collect {
-                it instanceof GormEntity ? "[id:${((GormEntity)it).ident()}]$it" : it as String
+                if (it instanceof Auditable) {
+                    "[id:${((Auditable)it).logEntityId}]$it"
+                }
+                else if (it instanceof GormEntity) {
+                    "[id:${((GormEntity)it).ident()}]$it"
+                }
+                else {
+                    it as String
+                }
             }.join(", ")
         }
 

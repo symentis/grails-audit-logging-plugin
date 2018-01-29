@@ -18,8 +18,9 @@
 */
 package test
 
+import grails.gorm.transactions.Rollback
+import grails.plugins.orm.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import spock.lang.Specification
 
 @Integration
@@ -27,28 +28,26 @@ import spock.lang.Specification
 class AuditUpdateCollectionSpec extends Specification {
 
     void setupData() {
-        Author.auditable = true
+        AuditLogContext.withoutAuditLog {
+            def author = new Author(name: "Aaron", age: 37, famous: true)
+            author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
+            author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
+            author.addToBooks(new Book(title: 'Mocking Jay', description: 'Blah', pages: 600))
+            author.save(flush: true, failOnError: true)
 
-        def author = new Author(name: "Aaron", age: 37, famous: true)
-        author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
-        author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
-        author.addToBooks(new Book(title: 'Mocking Jay', description: 'Blah', pages: 600))
-        author.save(flush: true, failOnError: true)
-
-        // Remove all logging of the inserts, we are focused on updates here
-        AuditTrail.withNewSession {
-            AuditTrail.where { id != null }.deleteAll()
-            assert AuditTrail.count() == 0
+            // Remove all logging of the inserts, we are focused on updates here
+            AuditTrail.withNewSession {
+                AuditTrail.where { id != null }.deleteAll()
+                assert AuditTrail.count() == 0
+            }
         }
-
-        author.handlerCalled = ""
     }
 
     void "Test update property on an instance saved via cascade"() {
         given:
         setupData()
         def author = Author.findByName("Aaron")
-        def book = author.books.asList().first() // do not use first() directly on books, as this tests needs to run on Grails 2.x, too
+        def book = author.books.first()
 
         when:
         book.description = "Woo"
@@ -127,7 +126,8 @@ class AuditUpdateCollectionSpec extends Specification {
         def author = Author.findByName("Aaron")
 
         when:
-        author.books.clear()
+        // Calling author.books.clear() doesn't seem to flag the Author dirty, seems like could be a bug
+        author.books = []
         author.save(flush: true, failOnError: true)
 
         then:

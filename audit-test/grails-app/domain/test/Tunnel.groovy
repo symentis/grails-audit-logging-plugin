@@ -1,8 +1,8 @@
 package test
 
-class Tunnel {
-    static auditable = true
+import grails.plugins.orm.auditable.Auditable
 
+class Tunnel implements Auditable {
     String name
     String description
 

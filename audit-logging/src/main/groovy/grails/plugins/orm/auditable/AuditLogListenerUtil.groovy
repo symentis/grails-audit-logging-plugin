@@ -102,14 +102,15 @@ class AuditLogListenerUtil {
      * @return
      */
     static String conditionallyMaskAndTruncate(Auditable domain, String propertyName, String value, Integer maxLength) {
-        if (!value) {
+        if (value == null) {
             return null
         }
+
         // Always trim any space
         value = value.trim()
 
         if (domain.logMaskProperties && domain.logMaskProperties.contains(propertyName)) {
-            return AuditLoggingConfigUtils.auditConfig.getProperty("propertyMask") ?: '********'
+            return AuditLogContext.context.propertyMask as String ?: '********'
         }
         if (maxLength && value.length() > maxLength) {
             return value.substring(0, maxLength)

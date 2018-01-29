@@ -1,11 +1,19 @@
 package test
 
-class Review {
+import grails.plugins.orm.auditable.Auditable
+
+class Review implements Auditable {
     String name
     Book book
 
-    // Use a domain class as entityId, will recursively get the entityId from book
-    static auditable = [entityId: ['name', 'book']]
+    /**
+     * Override entity id to use a nested entityId from another domain object
+     * @return
+     */
+    @Override
+    String getLogEntityId() {
+        "${name}|${book.logEntityId}"
+    }
 
     static constraints = {
     }

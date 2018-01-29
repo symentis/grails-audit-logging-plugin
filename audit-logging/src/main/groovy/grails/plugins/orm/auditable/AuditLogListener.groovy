@@ -29,7 +29,6 @@ import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PostInsertEvent
 import org.grails.datastore.mapping.engine.event.PreDeleteEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
-import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.context.ApplicationEvent
 
 import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
@@ -60,13 +59,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             return
         }
 
-        // Logging is globally disabled
-        if (AuditLoggingConfigUtils.auditConfig.getProperty("disabled")) {
-            return
-        }
-
-        // Logging is disabled for this transaction (technically this thread)
-        if (AuditLogListenerState.getAuditLogDisabled()) {
+        // Logging is disabled
+        if (AuditLogContext.context.disabled) {
             return
         }
 
@@ -89,7 +83,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
         }
         catch (Exception e) {
-            if (AuditLoggingConfigUtils.auditConfig.getProperty('failOnError')) {
+            if (AuditLogContext.context.failOnError) {
                 throw e
             }
             else {
@@ -106,29 +100,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
 
     /**
-     * @param domain the domain instance
-     * @return set of propert names eligible for logging
-     */
-    protected Set<String> resolveLoggedProperties(Auditable domain) {
-        PersistentEntity entity = grailsApplication.mappingContext.getPersistentEntity(domain.class.name)
-
-        // Start with all persistent properties
-        Set<String> loggedProperties = entity.getPersistentProperties()*.name as Set<String>
-
-        // Intersect with any that are specifically whitelisted
-        if (domain.logIncluded) {
-            loggedProperties = loggedProperties.intersect(domain.logIncluded as Iterable) as Set<String>
-        }
-
-        // Finally exclude anything specifically excluded
-        if (domain.logExcluded) {
-            loggedProperties -= domain.logExcluded
-        }
-
-        loggedProperties
-    }
-
-    /**
      * We must use the preDelete event if we want to capture what the old object was like.
      */
     protected void handleInsertAndDelete(Auditable domain, AuditEventType auditEventType) {
@@ -138,17 +109,22 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
         Map<String, Object> map = [:]
 
-        // If verbose logging, resolve properties
+        // If verbose logging, resolve all properties (dirty doesn't really matter here)
         boolean verbose = isVerboseEnabled(domain, auditEventType)
         if (verbose) {
-            Set<String> loggedProperties = resolveLoggedProperties(domain)
+            Set<String> loggedProperties = domain.getAuditablePropertyNames()
             if (loggedProperties) {
                 map = makeMap(loggedProperties, domain)
             }
         }
 
         if (map || !verbose) {
-            logChanges(domain, map, null, auditEventType)
+            if (auditEventType == AuditEventType.DELETE) {
+                logChanges(domain, [:], map, auditEventType)
+            }
+            else {
+                logChanges(domain, map, [:], auditEventType)
+            }
         }
     }
 
@@ -156,7 +132,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * Look at persistent and transient state for the object and log differences
      */
     protected void handleUpdate(Auditable domain, AuditEventType auditEventType) {
-        if (domain.logIgnoreEvents.contains("onChange")) {
+        if (domain.logIgnoreEvents?.contains(auditEventType)) {
             return
         }
 
@@ -167,22 +143,16 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         // If verbose, resolve properties
         boolean verbose = isVerboseEnabled(domain, auditEventType)
         if (verbose) {
-            Set<String> dirtyProperties = domain.getDirtyPropertyNames() as Set<String>
-            Set<String> loggedProperties = resolveLoggedProperties(domain)
+            Set<String> dirtyProperties = domain.getAuditableDirtyPropertyNames()
 
             // Needs to be dirty properties and properties to log, otherwise it won't be verbose
-            if (dirtyProperties && loggedProperties) {
+            if (dirtyProperties) {
 
-                // Intersect the two to get the final set of properties that we care about
-                loggedProperties = loggedProperties.intersect(dirtyProperties as Iterable)
-                if (loggedProperties) {
+                // Get the prior values for everything that is dirty
+                oldMap = dirtyProperties.collectEntries { String property -> [property, getPersistentValue(domain, property)] }
 
-                    // Get the prior values for everything that is dirty
-                    oldMap = loggedProperties.collectEntries { String property -> [property, getPersistentValue(domain, property)] }
-
-                    // Get the current values for everything that is dirty
-                    newMap = makeMap(loggedProperties, domain)
-                }
+                // Get the current values for everything that is dirty
+                newMap = makeMap(dirtyProperties, domain)
             }
         }
 
@@ -207,17 +177,20 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
 
             // This handles insert, delete, and update with any property level logging enabled
-            if (newMap) {
-                newMap.each { String propertyName, Object newVal ->
-                    String newValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, newVal), truncateLength)
+            if (newMap || oldMap) {
+                Set<String> allPropertyNames = (newMap.keySet() + oldMap.keySet())
+                allPropertyNames.each { String propertyName ->
+                    String newValueAsString = null
                     String oldValueAsString = null
 
                     // This indicates a change
-                    if (oldMap) {
-                        Object oldVal = oldMap[propertyName]
-                        if (newVal != oldVal) {
-                            oldValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, oldVal), truncateLength)
-                        }
+                    Object newVal = newMap[propertyName]
+                    if (newVal != null) {
+                        newValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, newVal), truncateLength)
+                    }
+                    Object oldVal = oldMap[propertyName]
+                    if (newVal != oldVal) {
+                        oldValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, oldVal), truncateLength)
                     }
 
                     // Create a new entity for each property
@@ -253,32 +226,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     }
 
     protected boolean isVerboseEnabled(Auditable domain, AuditEventType eventType) {
-        !AuditLogListenerState.getAuditLogNonVerbose() && domain.logVerbose?.contains(eventType)
-    }
-
-    /**
-     * Disable verbose audit logging for anything within this block
-     */
-    static withoutVerboseAuditLog(Closure c) {
-        AuditLogListenerState.auditLogNonVerbose = true
-        try {
-            c.call()
-        }
-        finally {
-            AuditLogListenerState.clearAuditLogNonVerbose()
-        }
-    }
-
-    /**
-     * Disable audit logging for this block
-     */
-    static withoutAuditLog(Closure c) {
-        AuditLogListenerState.auditLogDisabled = true
-        try {
-            c.call()
-        }
-        finally {
-            AuditLogListenerState.clearAuditLogDisabled()
-        }
+        AuditLogContext.context.verbose || domain.logVerboseEvents?.contains(eventType)
     }
 }

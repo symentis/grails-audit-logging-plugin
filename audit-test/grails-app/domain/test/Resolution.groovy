@@ -1,10 +1,16 @@
 package test
 
-class Resolution {
+import grails.plugins.orm.auditable.AuditEventType
+import grails.plugins.orm.auditable.Auditable
+
+class Resolution implements Auditable {
 
 	String name
 
-	static auditable = [ignoreEvents:["onChange","onSave"]]
+	@Override
+	Set<AuditEventType> getLogIgnoreEvents() {
+        [AuditEventType.UPDATE, AuditEventType.INSERT]
+	}
 
 	static constraints = {
 	}
