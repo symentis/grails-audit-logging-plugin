@@ -18,7 +18,6 @@
 */
 package test
 
-import grails.test.mixin.integration.Integration
 import grails.testing.mixin.integration.Integration
 import grails.transaction.*
 import spock.lang.*
@@ -28,8 +27,6 @@ import spock.lang.*
 class AuditUpdateSpec extends Specification {
 
     void setupData() {
-        Author.auditable = true
-
         def author = new Author(name: "Aaron", age: 37, famous: true)
         author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
         author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
@@ -216,7 +213,7 @@ class AuditUpdateSpec extends Specification {
     void "Test locally ignored properties"() {
         given:
         setupData()
-        Author.auditable = [ignore: ['name', 'famous', 'lastUpdated']]
+        Author.metaClass.getLogExcluded = { [ignore: ['name', 'famous', 'lastUpdated']] }
         def author = Author.findByName("Aaron")
 
         when:

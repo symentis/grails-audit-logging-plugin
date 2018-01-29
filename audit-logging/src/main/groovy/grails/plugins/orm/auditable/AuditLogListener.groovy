@@ -61,7 +61,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
 
         // Logging is globally disabled
-        if (!AuditLoggingConfigUtils.auditConfig.getProperty("enabled")) {
+        if (AuditLoggingConfigUtils.auditConfig.getProperty("disabled")) {
             return
         }
 
@@ -139,14 +139,17 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         Map<String, Object> map = [:]
 
         // If verbose logging, resolve properties
-        if (!AuditLogListenerState.getAuditLogNonVerbose() && domain.logVerbose?.contains(auditEventType)) {
+        boolean verbose = isVerboseEnabled(domain, auditEventType)
+        if (verbose) {
             Set<String> loggedProperties = resolveLoggedProperties(domain)
             if (loggedProperties) {
                 map = makeMap(loggedProperties, domain)
             }
         }
 
-        logChanges(domain, map, null, auditEventType)
+        if (map || !verbose) {
+            logChanges(domain, map, null, auditEventType)
+        }
     }
 
     /**
@@ -162,7 +165,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         Map<String, Object> oldMap = [:]
 
         // If verbose, resolve properties
-        if (!AuditLogListenerState.getAuditLogNonVerbose() && domain.logVerbose?.contains(auditEventType)) {
+        boolean verbose = isVerboseEnabled(domain, auditEventType)
+        if (verbose) {
             Set<String> dirtyProperties = domain.getDirtyPropertyNames() as Set<String>
             Set<String> loggedProperties = resolveLoggedProperties(domain)
 
@@ -182,7 +186,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
         }
 
-        logChanges(domain, newMap, oldMap, auditEventType)
+        if (newMap || oldMap || !verbose) {
+            logChanges(domain, newMap, oldMap, auditEventType)
+        }
     }
 
     /**
@@ -197,7 +203,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         log.debug("Audit logging event {} and domain {}", eventType, domain.getClass().name)
 
         // Wrap all of the logging in a single session to prevent flushing for each insert
-        getAuditDomainClass().invokeMethod("withNewSession") {
+        getAuditDomainClass().invokeMethod("withNewSession") { Object session ->
             Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
 
             // This handles insert, delete, and update with any property level logging enabled
@@ -232,6 +238,9 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     audit.save(failOnError: true)
                 }
             }
+
+            // Flush the session once after all the audit insert(s)
+            session.invokeMethod("flush", null)
         }
     }
 
@@ -241,6 +250,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             persistedObjectVersion = domain.metaClass.getProperty(domain, "version")
         }
         persistedObjectVersion as Long
+    }
+
+    protected boolean isVerboseEnabled(Auditable domain, AuditEventType eventType) {
+        !AuditLogListenerState.getAuditLogNonVerbose() && domain.logVerbose?.contains(eventType)
     }
 
     /**

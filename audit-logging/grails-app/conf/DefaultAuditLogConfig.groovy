@@ -19,8 +19,8 @@ defaultAuditLog {
     verbose = true
     failOnError = false
     logIds = true
-    defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy'] as Set<String>
-    logFullClassName = false
+    defaultIgnore = ['version', 'lastUpdated', 'lastUpdatedBy']
+    logFullClassName = true
     propertyMask = "**********"
 
     stampEnabled = true

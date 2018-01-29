@@ -1,6 +1,8 @@
 package test
 
-class Book {
+import grails.plugins.orm.auditable.Auditable
+
+class Book implements Auditable {
     String title
     String description
     Date published
@@ -9,9 +11,10 @@ class Book {
     static hasMany = [reviews: Review]
     static belongsTo = [author: Author]
 
-    // Show title instead of id
-    static auditable = [entityId: 'title']
-
+    @Override
+    String getLogEntityId() {
+        title
+    }
     static constraints = {
         published nullable: true
     }

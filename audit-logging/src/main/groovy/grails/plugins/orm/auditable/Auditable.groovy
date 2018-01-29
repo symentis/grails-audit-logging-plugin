@@ -46,7 +46,8 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     String getLogClassName() {
-        GrailsNameUtils.getShortName(getClass())
+        AuditLoggingConfigUtils.auditConfig.getProperty('logFullClassName') ?
+            getClass().name : GrailsNameUtils.getShortName(getClass())
     }
 
     /**
@@ -70,7 +71,7 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     Set<String> getLogExcluded() {
-        (AuditLoggingConfigUtils.auditConfig.getProperty('defaultIgnore') ?: ['version', 'lastUpdated', 'dateCreated']) as Set<String>
+        (AuditLoggingConfigUtils.auditConfig.getProperty('defaultIgnore') ?: ['version', 'lastUpdated', 'lastUpdatedBy']) as Set<String>
     }
 
     /**
@@ -123,7 +124,7 @@ trait Auditable<D> extends GormEntity<D> {
             }.join(", ")
         }
 
-        value ? value.toString() : null
+        value != null ? value.toString() : null
     }
 
     /**

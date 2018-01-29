@@ -26,8 +26,6 @@ package test
 class AuditTrail implements Serializable {
   private static final long serialVersionUID = 1L
 
-  static auditable = false
-
   String id
   Date dateCreated
   Date lastUpdated

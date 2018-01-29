@@ -1,10 +1,10 @@
 package test
 
-class Heliport {
+import grails.plugins.orm.auditable.Auditable
+
+class Heliport implements Auditable {
     String code
     String name
-
-    static auditable = [ignore:[]]
 
     static mapping = {
         version false

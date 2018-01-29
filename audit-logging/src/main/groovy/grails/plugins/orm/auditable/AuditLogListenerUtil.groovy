@@ -70,7 +70,7 @@ class AuditLogListenerUtil {
      * some special case handling for hasMany properties, which don't follow normal rules.
      */
     static Object getPersistentValue(Auditable domain, String propertyName) {
-        PersistentEntity entity = getPersistentEntity(domain.class.name)
+        PersistentEntity entity = getPersistentEntity(domain)
         PersistentProperty property = entity.getPropertyByName(propertyName)
         property instanceof ToMany ? "N/A" : domain.getPersistentValue(propertyName)
     }

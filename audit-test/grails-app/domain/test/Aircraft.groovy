@@ -1,13 +1,13 @@
 package test
 
-class Aircraft {
+import grails.plugins.orm.auditable.Auditable
+
+class Aircraft implements Auditable {
     String type
     String description
 
     Map handlersMap = [:], handlersOldMap = [:]
     static transients = ['handlersMap', 'handlersOldMap']
-
-    static auditable = [handlersOnly : true]
 
     static mapping = {
         id name: 'type', generator: 'assigned'

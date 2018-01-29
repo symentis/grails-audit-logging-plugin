@@ -1,6 +1,8 @@
 package test
 
-class Author {
+import grails.plugins.orm.auditable.Auditable
+
+class Author implements Auditable {
     String name
     Long age
     Boolean famous = false
@@ -17,8 +19,6 @@ class Author {
     static transients = ['handlerCalled']
 
     static hasMany = [books: Book]
-
-    static auditable = true
 
     static constraints = {
         lastUpdatedBy nullable: true
