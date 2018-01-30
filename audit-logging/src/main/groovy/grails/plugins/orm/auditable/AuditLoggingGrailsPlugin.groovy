@@ -73,11 +73,16 @@ class AuditLoggingGrailsPlugin extends Plugin {
         ConfigObject config = AuditLoggingConfigUtils.auditConfig
 
         // Allow a collection of ignored data store names
-        Set<String> excludedDataStores = (config.getProperty("excludedDatastores") ?: []) as Set<String>
+        Set<String> excludedDataStores = (config.getProperty("excludedDataSources") ?: []) as Set<String>
 
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
-            if (!config.disabled && !excludedDataStores.contains(key)) {
+            String dataSourceName = datastore.metaClass.getProperty(datastore, 'dataSourceName')
+
+            if (!config.disabled && !excludedDataStores.contains(dataSourceName)) {
                 applicationContext.addApplicationListener(new AuditLogListener(datastore, grailsApplication))
+            }
+            if (config.stampEnabled && !excludedDataStores.contains(dataSourceName)) {
+                applicationContext.addApplicationListener(new StampListener(datastore, grailsApplication))
             }
         }
     }
