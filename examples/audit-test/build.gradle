@@ -16,7 +16,6 @@ buildscript {
 version file("$rootDir/version.txt").text.trim()
 group "audit.test"
 
-apply plugin: "org.springframework.boot"
 apply plugin: "war"
 apply plugin: "asset-pipeline"
 apply plugin: 'eclipse'
@@ -39,9 +38,13 @@ repositories {
     maven { url "https://repo.grails.org/grails/core" }
 }
 
-dependencies {
-    compile project(":audit-logging")
+grails {
+    plugins {
+        compile project(":audit-logging")
+    }
+}
 
+dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.grails:grails-core"

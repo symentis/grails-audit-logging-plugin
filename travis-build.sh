@@ -7,8 +7,7 @@ echo "TRAVIS_TAG          : $TRAVIS_TAG"
 echo "TRAVIS_BRANCH       : $TRAVIS_BRANCH"
 echo "TRAVIS_PULL_REQUEST : $TRAVIS_PULL_REQUEST"
 
-./gradlew clean || EXIT_STATUS=$?
-./gradlew check || EXIT_STATUS=$?
+./gradlew clean check || EXIT_STATUS=$?
 
 if [[ $EXIT_STATUS -ne 0 ]]; then
     echo "Check failed"
@@ -50,7 +49,6 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' ]]; then
   # prepare index.html
   mv ../docs/index.html ../docs/plugin.html
   mv ../docs/ghpages.html ../docs/index.html
-
 
   # If there is a tag present then this becomes the latest
   if [[ -n $TRAVIS_TAG ]]; then
