@@ -19,8 +19,11 @@
 package grails.plugins.orm.auditable
 
 import grails.plugins.Plugin
-import groovy.util.logging.Slf4j
+import grails.plugins.orm.auditable.resolvers.DefaultAuditRequestResolver
+import grails.plugins.orm.auditable.resolvers.SpringSecurityRequestResolver
 import org.grails.datastore.mapping.core.Datastore
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
+import groovy.util.logging.Slf4j
 
 /**
  * @author Robert Oschwald
@@ -65,7 +68,7 @@ class AuditLoggingGrailsPlugin extends Plugin {
 
     def issueManagement = [system: 'GitHub', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
     def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
-    def loadAfter = ['core', 'dataSource']
+    def loadAfter = ['core', 'dataSource', 'springSecurityCore']
 
     // Register generic GORM listener
     @Override
@@ -86,6 +89,22 @@ class AuditLoggingGrailsPlugin extends Plugin {
             }
         }
     }
+
+    @Override
+    Closure doWithSpring() {{->
+        try {
+            if (applicationContext.getBean("springSecurityService")) {
+                log.debug("Audit logging detected spring security, using spring security request resolver")
+                auditRequestResolver(SpringSecurityRequestResolver) {
+                    springSecurityService = ref('springSecurityService')
+                }
+            }
+        }
+        catch(NoSuchBeanDefinitionException ignored) {
+            log.debug("Audit logging using default request resolver")
+            auditRequestResolver(DefaultAuditRequestResolver)
+        }
+    }}
 
     @Override
     void onConfigChange(Map<String, Object> event) {

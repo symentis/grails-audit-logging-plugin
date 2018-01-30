@@ -27,66 +27,58 @@ import org.springframework.core.env.PropertySource
 @Slf4j
 class ReflectionUtils {
 
-	// set at startup
-	static GrailsApplication application
+    // set at startup
+    static GrailsApplication application
 
-	private ReflectionUtils() {
-		// static only
-	}
+    private ReflectionUtils() {
+        // static only
+    }
 
-	static Object getConfigProperty(String name, config = AuditLoggingConfigUtils.auditConfig) {
-		def value = config
-		name.split('\\.').each { String part -> value = value."$part" }
-		value
-	}
+    static Object getConfigProperty(String name, config = AuditLoggingConfigUtils.auditConfig) {
+        def value = config
+        name.split('\\.').each { String part -> value = value."$part" }
+        value
+    }
 
-	static void setConfigProperty(String name, value) {
-		def config = AuditLoggingConfigUtils.auditConfig
+    static void setConfigProperty(String name, value) {
+        def config = AuditLoggingConfigUtils.auditConfig
 
-		List parts = name.split('\\.')
-		name = parts.remove(parts.size() - 1)
+        List parts = name.split('\\.')
+        name = parts.remove(parts.size() - 1)
 
-		parts.each { String part -> config = config."$part" }
+        parts.each { String part -> config = config."$part" }
 
-		config."$name" = value
-	}
+        config."$name" = value
+    }
 
-	static List asList(Object o) {
-		o ? o as List : []
-	}
+    static List asList(Object o) {
+        o ? o as List : []
+    }
 
-	static ConfigObject getAuditConfig() {
-		def grailsConfig = getApplication().config
-		if (grailsConfig.auditLog) {
-			log.error "Your auditLog configuration settings use the old prefix 'auditLog' but must now use 'grails.plugin.auditLog'"
-		}
-		grailsConfig.grails.plugin.auditLog
-	}
+    static ConfigObject getAuditConfig() {
+        def grailsConfig = getApplication().config
+        if (grailsConfig.auditLog) {
+            log.error "Your auditLog configuration settings use the old prefix 'auditLog' but must now use 'grails.plugin.auditLog'"
+        }
+        grailsConfig.grails.plugin.auditLog
+    }
 
-	static void setAuditConfig(ConfigObject c) {
-		ConfigObject config = new ConfigObject()
-    config.grails.plugin.auditLog = c
+    static void setAuditConfig(ConfigObject c) {
+        ConfigObject config = new ConfigObject()
+        config.grails.plugin.auditLog = c
 
-		PropertySource propertySource = new MapPropertySource('AuditConfig', [:] << config)
-		def propertySources = application.mainContext.environment.propertySources
-		propertySources.addFirst propertySource
+        PropertySource propertySource = new MapPropertySource('AuditConfig', [:] << config)
+        def propertySources = application.mainContext.environment.propertySources
+        propertySources.addFirst propertySource
 
-    getApplication().config = new PropertySourcesConfig(propertySources)
-	}
+        getApplication().config = new PropertySourcesConfig(propertySources)
+    }
 
-	static String getGrailsServerURL() {
-		getApplication().config.grails.serverURL ?: null
-	}
-
-	private static lookupPropertyValue(o, String name) {
-		o."${getConfigProperty(name)}"
-	}
-
-	private static GrailsApplication getApplication() {
-		if (!application) {
-			application = Holders.grailsApplication
-		}
-		application
-	}
+    private static GrailsApplication getApplication() {
+        if (!application) {
+            application = Holders.grailsApplication
+        }
+        application
+    }
 
 }

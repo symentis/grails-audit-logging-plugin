@@ -50,9 +50,16 @@ dependencies {
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.grails:grails-core"
     compile "org.grails:grails-datastore-gorm"
+    compile "org.grails:grails-web-boot"
+
     console "org.grails:grails-console"
+
     provided "org.grails:grails-plugin-services"
     provided "org.grails:grails-plugin-domain-class"
+
+    provided "javax.servlet:javax.servlet-api:3.1.0"
+    provided "org.grails.plugins:spring-security-core:3.2.0"
+
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-plugin-testing"
 }

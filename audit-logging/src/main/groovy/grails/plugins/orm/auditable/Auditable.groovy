@@ -1,6 +1,8 @@
 package grails.plugins.orm.auditable
 
+import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.util.GrailsNameUtils
+import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -57,7 +59,7 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     String getLogURI() {
-        null
+        Holders.applicationContext.getBean(AuditRequestResolver)?.currentURI
     }
 
     /**
@@ -97,7 +99,7 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     String getLogCurrentUserName() {
-        AuditLogContext.context.defaultActor ?: 'SYS'
+        Holders.applicationContext.getBean(AuditRequestResolver)?.currentActor ?: 'N/A'
     }
 
     /**

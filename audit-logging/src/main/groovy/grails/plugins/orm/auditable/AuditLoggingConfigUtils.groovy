@@ -32,14 +32,6 @@ class AuditLoggingConfigUtils {
     private AuditLoggingConfigUtils() {}
 
     /**
-     * Set at startup by plugin.
-     * @param app the application
-     */
-    static void setApplication(GrailsApplication app) {
-        application = app
-    }
-
-    /**
      * Parse and load the auditLog configuration.
      * @return the configuration
      */
