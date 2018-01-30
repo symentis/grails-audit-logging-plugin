@@ -19,6 +19,7 @@
 package grails.plugins.orm.auditable
 
 import grails.plugins.Plugin
+import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.plugins.orm.auditable.resolvers.DefaultAuditRequestResolver
 import grails.plugins.orm.auditable.resolvers.SpringSecurityRequestResolver
 import org.grails.datastore.mapping.core.Datastore

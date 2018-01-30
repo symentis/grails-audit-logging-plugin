@@ -19,6 +19,8 @@
 package grails.plugins.orm.auditable
 
 import grails.core.GrailsApplication
+import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
+import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.core.Datastore
@@ -60,11 +62,15 @@ class StampListener extends AbstractPersistenceEventListener {
             Stampable domain = event.entityObject as Stampable
             log.trace("Stamping object {}", event.entityObject.class.name)
 
+            // Lookup the request resolver here to ensure that applications have a chance
+            // to override this bean to provide different strategies
+            AuditRequestResolver requestResolver = Holders.applicationContext.getBean(AuditRequestResolver)
+
             if (domain.ident() == null) {
-                handleInsert(domain)
+                handleInsert(domain, requestResolver)
             }
             else {
-                handleUpdate(domain)
+                handleUpdate(domain, requestResolver)
             }
         }
         catch (Exception e) {
@@ -85,7 +91,7 @@ class StampListener extends AbstractPersistenceEventListener {
     /**
      * Stamp inserts
      */
-    protected void handleInsert(Stampable domain) {
+    protected void handleInsert(Stampable domain, AuditRequestResolver requestResolver) {
         Date createDate = new Date()
 
         // This may be autoTimestamped but it doesn't hurt us to set them here
@@ -93,15 +99,16 @@ class StampListener extends AbstractPersistenceEventListener {
         domain.lastUpdated = createDate
 
         // Set actors
-        domain.createdBy = 'SYS'
-        domain.lastUpdatedBy = 'SYS'
+        String currentActor = requestResolver.currentActor
+        domain.createdBy = currentActor
+        domain.lastUpdatedBy = currentActor
     }
 
     /**
      * Stamp updates
      */
-    protected void handleUpdate(Stampable domain) {
+    protected void handleUpdate(Stampable domain, AuditRequestResolver requestResolver) {
         domain.lastUpdated = new Date()
-        domain.lastUpdatedBy = 'SYS'
+        domain.lastUpdatedBy = requestResolver.currentActor
     }
 }
