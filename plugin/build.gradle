@@ -21,15 +21,15 @@ plugins {
 version file("$rootDir/version.txt").text.trim()
 group "org.grails.plugins"
 
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"org.grails.grails-plugin"
-apply plugin:"org.grails.grails-plugin-publish"
-apply plugin:"org.asciidoctor.convert"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "org.grails.grails-plugin"
+apply plugin: "org.grails.grails-plugin-publish"
+apply plugin: "org.asciidoctor.convert"
 
 // Used for publishing to central repository, remove if not needed
-//apply from: 'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
-//apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
+// apply from: 'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
+// apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
 
 ext {
     grailsVersion = project.grailsVersion
@@ -63,6 +63,8 @@ dependencies {
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-plugin-testing"
 }
+
+bootRepackage.enabled = false
 
 // Needed for org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6
 // See https://github.com/asciidoctor/asciidoctorj/issues/415
@@ -111,20 +113,20 @@ asciidoctor {
     outputDir new File(buildDir, 'docs')
     backends 'html5', 'pdf', 'epub3'
     attributes 'experimental': 'true',
-            'source-highlighter': 'coderay',
-            'compat-mode': 'true',
-            toc: 'left',
-            icons: 'font',
-            setanchors: 'true',
-            idprefix: '',
-            idseparator: '-',
-            toc2: '',
-            numbered: '',
-            version: project.version,
-            groupId: project.group,
-            artifactId: project.name,
-            revnumber: project.version,
-            revdate: buildDate()
+        'source-highlighter': 'coderay',
+        'compat-mode': 'true',
+        toc: 'left',
+        icons: 'font',
+        setanchors: 'true',
+        idprefix: '',
+        idseparator: '-',
+        toc2: '',
+        numbered: '',
+        version: project.version,
+        groupId: project.group,
+        artifactId: project.name,
+        revnumber: project.version,
+        revdate: buildDate()
 }
 
 task docs(dependsOn: 'asciidoctor') {
