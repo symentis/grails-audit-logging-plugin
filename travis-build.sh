@@ -7,30 +7,11 @@ echo "TRAVIS_TAG          : $TRAVIS_TAG"
 echo "TRAVIS_BRANCH       : $TRAVIS_BRANCH"
 echo "TRAVIS_PULL_REQUEST : $TRAVIS_PULL_REQUEST"
 
-rm -rf audit-logging/build
-rm -rf audit-test/build
-
-echo "**********************"
-echo "Building audit-logging"
-echo "**********************"
-
-./gradlew :audit-logging:clean || EXIT_STATUS=$?
-./gradlew :audit-logging:check || EXIT_STATUS=$?
+./gradlew clean || EXIT_STATUS=$?
+./gradlew check || EXIT_STATUS=$?
 
 if [[ $EXIT_STATUS -ne 0 ]]; then
     echo "Check failed"
-    exit $EXIT_STATUS
-fi
-
-echo "*******************"
-echo "Building audit-test"
-echo "*******************"
-
-./gradlew :audit-test:clean || EXIT_STATUS=$?
-./gradlew :audit-test:check || EXIT_STATUS=$?
-
-if [[ $EXIT_STATUS -ne 0 ]]; then
-    echo "Integration tests failed"
     exit $EXIT_STATUS
 fi
 
@@ -62,7 +43,7 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' ]]; then
 
   echo " "
   echo "*** Updating gh-pages branch **"
-  cd audit-logging/build
+  cd plugin/build
   git clone https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git -b gh-pages gh-pages --single-branch > /dev/null
   cd gh-pages
 
