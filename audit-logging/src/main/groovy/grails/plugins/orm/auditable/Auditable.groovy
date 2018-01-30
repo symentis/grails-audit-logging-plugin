@@ -127,6 +127,7 @@ trait Auditable<D> extends GormEntity<D> {
      * @return return any dirty properties that are flagged as auditable
      */
     @Transient
+    @SuppressWarnings("GroovyAssignabilityCheck")
     Set<String> getAuditableDirtyPropertyNames() {
         auditablePropertyNames.intersect(listDirtyPropertyNames() as Set<String>) as Set<String>
     }
@@ -150,22 +151,19 @@ trait Auditable<D> extends GormEntity<D> {
         if (value instanceof Enum) {
             return ((Enum)value).name()
         }
-
+        if (value instanceof Auditable) {
+            return "[id:${((Auditable)value).logEntityId}]$value"
+        }
+        if (value instanceof GormEntity) {
+            return "[id:${((GormEntity)value).ident()}]$value"
+        }
         if (logAssociatedIds && value instanceof Collection) {
             return ((Collection)value).collect {
-                if (it instanceof Auditable) {
-                    "[id:${((Auditable)it).logEntityId}]$it"
-                }
-                else if (it instanceof GormEntity) {
-                    "[id:${((GormEntity)it).ident()}]$it"
-                }
-                else {
-                    it as String
-                }
+                convertLoggedPropertyToString(propertyName, it)
             }.join(", ")
         }
 
-        value != null ? value.toString() : null
+        value?.toString()
     }
 
     /**
