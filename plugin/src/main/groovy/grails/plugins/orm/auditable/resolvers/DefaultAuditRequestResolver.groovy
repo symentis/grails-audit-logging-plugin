@@ -9,7 +9,7 @@ class DefaultAuditRequestResolver implements AuditRequestResolver {
     @Override
     String getCurrentActor() {
         GrailsWebRequest request = GrailsWebRequest.lookup()
-        request?.userPrincipal?.name ?: AuditLogContext.context.defaultActor ?: 'N/A'
+        request?.remoteUser ?: request?.userPrincipal?.name ?: AuditLogContext.context.defaultActor ?: 'N/A'
     }
 
     @Override

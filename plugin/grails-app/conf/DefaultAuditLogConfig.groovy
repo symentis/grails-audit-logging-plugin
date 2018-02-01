@@ -17,14 +17,17 @@
 defaultAuditLog {
     auditDomainClassName = null
 
+    disabled = false
     verbose = true
     failOnError = false
     logIds = true
     logFullClassName = true
     excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
-
+    included = null
+    mask = ['password']
     propertyMask = "**********"
+    defaultActor = 'SYS'
 
+    // Enable support for Stampable
     stampEnabled = true
-    stampTimestamp = true
 }
