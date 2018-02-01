@@ -14,7 +14,7 @@ class Author implements Auditable {
     static hasMany = [books: Book]
 }
 ----
-This will enable auditing for the domain using your customer configuration in `grails.plugin.auditLog` merged with the defaults from `DefaultAuditLogConfig.groovy`.
+This will enable auditing for the domain using your configuration in `grails.plugin.auditLog` merged with the defaults from `DefaultAuditLogConfig.groovy` (in the plugin jar).
 
 === Context Overrides
 There are many scenarios where you want to use a default configuration for most operations, but need to explicitly override for certain scenarios.
@@ -136,7 +136,7 @@ The default resolver uses the `principal` in the active GrailsWebRequest to reso
 
 If a bean named `springSecurityService` is available, the second resolver is registered which uses the `currentUser()` method to resolve the user context.
 
-These two resolvers should suffice for most users, however, you can always implement and override the `auditRequestResolver` bean with your own implementation of:
+For other authentication strategies, you can implement and override the `auditRequestResolver` bean with your own implementation of:
 [source,groovy]
 ----
 interface AuditRequestResolver {
@@ -160,7 +160,8 @@ beans = {
     }
 }
 ----
-or use the `@Component('auditRequestResolver')` annotation.
+
+Below are a few examples for other common security frameworks. 
 
 ===== Acegi Plugin
 [source,groovy]
