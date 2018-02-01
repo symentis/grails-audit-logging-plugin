@@ -19,8 +19,7 @@ if [ "${TRAVIS_PULL_REQUEST}" == 'true' ]; then
   exit $EXIT_STATUS
 fi
 
-if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' ]]; then
-
+if [[ ( -n "$TRAVIS_TAG" ) || ( "$TRAVIS_BRANCH" == "master" && -z "$TRAVIS_PULL_REQUEST" ) ]]; then
   echo "*** Publishing archives for branch $TRAVIS_BRANCH"
 
   if [[ -n $TRAVIS_TAG ]]; then
