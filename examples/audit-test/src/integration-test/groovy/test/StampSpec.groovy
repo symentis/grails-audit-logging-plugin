@@ -26,14 +26,13 @@ class StampSpec extends Specification {
         bb.registerBeans(grailsApplication.mainContext)
 
         when:
-        train.save(flush: true)
+        train.save(flush: true, failOnError: true)
 
         then:
         train.createdBy == 'Aaron'
         train.lastUpdatedBy == 'Aaron'
         train.dateCreated
         train.lastUpdated
-        train.dateCreated == train.lastUpdated
 
         when:
         train.number = "20"
@@ -55,7 +54,6 @@ class StampSpec extends Specification {
         train.lastUpdatedBy == 'SYS'
         train.dateCreated
         train.lastUpdated
-        train.dateCreated == train.lastUpdated
 
         when:
         train.number = "20"

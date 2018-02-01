@@ -7,8 +7,4 @@ class Train implements Stampable {
 	
     static constraints = {
     }
-
-    static mapping = {
-        autoTimestamp false
-    }
 }

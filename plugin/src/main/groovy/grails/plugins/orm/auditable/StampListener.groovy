@@ -20,13 +20,14 @@ package grails.plugins.orm.auditable
 
 import grails.core.GrailsApplication
 import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
-import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
-import org.grails.datastore.mapping.engine.event.ValidationEvent
+import org.grails.datastore.mapping.engine.event.EventType
+import org.grails.datastore.mapping.engine.event.PreInsertEvent
+import org.grails.datastore.mapping.engine.event.PreUpdateEvent
 import org.springframework.context.ApplicationEvent
 
 /**
@@ -64,13 +65,15 @@ class StampListener extends AbstractPersistenceEventListener {
 
             // Lookup the request resolver here to ensure that applications have a chance
             // to override this bean to provide different strategies
-            AuditRequestResolver requestResolver = Holders.applicationContext.getBean(AuditRequestResolver)
+            AuditRequestResolver requestResolver = grailsApplication.mainContext.getBean(AuditRequestResolver)
 
-            if (domain.ident() == null) {
-                handleInsert(domain, requestResolver)
-            }
-            else {
-                handleUpdate(domain, requestResolver)
+            switch(event.eventType) {
+                case EventType.PreInsert:
+                    handleInsert(domain, requestResolver)
+                    break
+                case EventType.PreUpdate:
+                    handleUpdate(domain, requestResolver)
+                    break
             }
         }
         catch (Exception e) {
@@ -85,20 +88,14 @@ class StampListener extends AbstractPersistenceEventListener {
 
     @Override
     boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
-        eventType.isAssignableFrom(ValidationEvent)
+        eventType.isAssignableFrom(PreInsertEvent) || eventType.isAssignableFrom(PreUpdateEvent)
     }
 
     /**
      * Stamp inserts
      */
     protected void handleInsert(Stampable domain, AuditRequestResolver requestResolver) {
-        Date createDate = new Date()
-
-        // This may be autoTimestamped but it doesn't hurt us to set them here
-        domain.dateCreated = createDate
-        domain.lastUpdated = createDate
-
-        // Set actors
+        // Set actors, Grails will take care of setting the dates
         String currentActor = requestResolver.currentActor
         domain.createdBy = currentActor
         domain.lastUpdatedBy = currentActor
@@ -108,7 +105,6 @@ class StampListener extends AbstractPersistenceEventListener {
      * Stamp updates
      */
     protected void handleUpdate(Stampable domain, AuditRequestResolver requestResolver) {
-        domain.lastUpdated = new Date()
         domain.lastUpdatedBy = requestResolver.currentActor
     }
 }

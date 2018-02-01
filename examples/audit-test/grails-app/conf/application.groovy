@@ -4,6 +4,7 @@ grails {
             verbose = true
             excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
             logFullClassName = true
+            failOnError = true
             mask = ['ssn']
             logIds = true
             defaultActor = 'SYS'
