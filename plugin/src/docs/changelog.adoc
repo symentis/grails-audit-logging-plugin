@@ -1,4 +1,9 @@
 == Change Log
+* 3.0.0
+** Major rewrite of plugin to be trait based
+** Removed support for handler callbacks
+** Consolidated and cleaned up configuration
+** Added AuditLogContext to allow configuration overrides at the block level
 * 2.0.6
 ** Fix #142 Re-introduced truncateLength support (and changed config parameter from 'TRUNCATE_LENGTH' to 'truncateLength')
 ** Fixed verbose param default description in documentation (Thanks to Matthew Moss)

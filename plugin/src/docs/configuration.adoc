@@ -14,474 +14,192 @@ If you use the old configuration key, the plugin will log a notice.
 | *Property* | *Default Value* | *Meaning*
 
 |grails.plugin.auditLog.auditDomainClassName
-|use "grails audit-quickstart" to create one
-|Mandatory Domain Class Name for the AuditTrail Domain class. Mandatory.
+|*(Requred)* Use `grails audit-quickstart` to create
+|Domain Class Name for the Audit Domain class.
+
+|grails.plugin.auditLog.disabled
+|`false`
+|If set to true, audit logging is completely disabled (no listeners are registered).
 
 |grails.plugin.auditLog.verbose
 |`true`
 |Column by column change logging in insert and delete events is enabled by default. You can disable it if you are not interested in value changes.
 
-|grails.plugin.auditLog.logIds
+|grails.plugin.auditLog.verboseEvents
+|`[INSERT, UPDATE, DELETE]`
+|Set of `AuditEventType` enums. Enables verbose logging on a per-event type basis. If `verbose = true`, all event types are logged verbosely.
+
+|grails.plugin.auditLog.ignoreEvents
+|`[]`
+|Set of `AuditEventType` enums that can be used to disable logging on a per-event type basis. For example, setting `[AuditEventType.DELETE]` would disable audit logging for all DELETE events only.
+
+|grails.plugin.auditLog.failOnError
 |`false`
-|If set to true, object-ids of associated objects are logged
+|If the save of the Audit domain fails, enabling this will cause the failure to be thrown out of the listener potentially failing the entire transaction.
 
-|grails.plugin.auditLog.disabled
-|false
-|If set to true, audit logging is disabled, but the eventHandlers are still triggered. Note: You can set "auditLog.disabled" in  DataSource configurations you do not want to have the AuditLogListener registered in. This could be useful if you have multiple DataSource definitions, but want to audit only a few of them.
-
-|grails.plugin.auditLog.nonVerboseDelete
-|false
-|Log deletes non-verbosely if verbose = true
+|grails.plugin.auditLog.logIds
+|`true`
+|If set to true, object-ids of associated objects are logged.
 
 |grails.plugin.auditLog.logFullClassName
-|false
-|Log the entity including the package name
+|`true`
+|Log the full entity name including the package name
+
+|grails.plugin.auditLog.defaultActor
+|`'SYS'`
+|The default actor (user) to log if no user context can be found using the configured `AuditRequestResolver` implementation (see below).
+
+|grails.plugin.auditLog.excluded
+|`['version', 'lastUpdated', 'lastUpdatedBy']`
+|These properties are not logged and will not trigger verbose logging when changed.
+
+|grails.plugin.auditLog.included
+|`null` (all persistent properties)
+|This is a global whitelist of properties to log and will override anything in the excluded list. A null value indicates that all persistent properties not in the `excluded` list specifically should be logged.
+
+|grails.plugin.auditLog.mask
+|`['password']`
+|Any property with this name will be masked using the `propertyMask` attribute (below).
+
+|grails.plugin.auditLog.propertyMask
+|`pass:[**********]`
+|String to use when masking properties.
 
 |grails.plugin.auditLog.truncateLength
-|255
-|Configure the truncation length of newValue detail information. Must me <= field size of oldMap and newMap in your Auditing domain class. If you define the truncate length larger than your AuditTrail classes newValue maxSize constraint, the field size of newValue is used instead. If you do not define truncateLength, the written data in newValue is truncated at the field size boundary.
+|`maxSize` of `newValue`/`oldValue`
+|Allow overriding the maximum length allowed in the `oldValue` and `newValue` fields before truncating. This property defaults to the max size allowed by the `constraint`, so it's best to just control it that way.
 
 |grails.plugin.auditLog.stampEnabled
-|false
-|Add stamping fields to all auditable domain classes using AST transformation (dateCreated, lastUpdated, createdBy, lastUpdatedBy)
-
-|grails.plugin.auditLog.stampAlways
-|false
-|always stamp Domain Classes regardless of @Stamp or "static stampable = true"
-
-|grails.plugin.auditLog.stampCreatedBy
-|createdBy
-|Field name for stamping support
-
-|grails.plugin.auditLog.stampLastUpdatedBy
-|lastUpdatedBy
-|Field name for lastUpdateBy field.
-
-|actorClosure
-|`null`
-|Closure to get the principal. Details see below.
-
+|`true`
+|Enable stamping support for entities with the `Stampable` trait (dateCreated, lastUpdated, createdBy, lastUpdatedBy).
 |====================
+NOTE: You can view the above defaults in the `DefaultAuditLogConfig.groovy`
 
-=== Auditing Current User Information (actorClosure)
+=== Verbose mode
+When enabled, per-property logging is enabled for all operations.
 
-With version >= 0.5, additional configuration can be specified in the application.groovy file of the project to help log the
-authenticated user for various security systems.
-For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor
-name (the person performing the action which triggered the event, e.g. the username) add these lines to application.groovy:
+    grails.plugin.auditLog.verbose = true
 
-[source,groovy]
-----
-grails {
-  plugin {
-   auditLog {
-     actorClosure = { request, session ->
-      session.user?.username
-     }
-   }
-  }
-}
+You can enable verbose logging for specific event types using:
 
-----
+    grails.plugin.auditLog.verboseEvents = [AuditLogEvent.UPDATE]
 
 [WARNING]
 ====
-It is currently not possible to define the actorClosure as a property like
-
-[source,groovy]
-----
-grails.plugin.auditLog.actorClosure = {...}
-----
-
+Verbose logging will insert 1 row of data per property of your domain object for insert and delete operations. This can result in a large amount of additional data, sometimes far more than the actual operation itself. Consider disabling verbose mode for bulk operations using the `AuditLogContext.withoutVerboseAuditLog { }` closure.
 ====
 
-==== Spring Security Core Plugin 1.1.2 or higher
-
-If you save data from an unprotected URL (configAttribute:IS_AUTHENTICATED_ANONYMOUSLY), the principal is a String-object
-not a Principal-object. To cope with this behaviour you should use the following Closure definition in application.groovy:
-
+=== Logging of Associated Ids
+You can log the object-ids of associated objects. Logging will be performed in the format: "[id:<objId>]objDetails".
 [source,groovy]
 ----
-import org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils
-----
-
-[source,groovy]
-----
-grails {
-  plugin {
-     auditLog {
-        actorClosure = { request, session ->
-          if (request.applicationContext.springSecurityService.principal instanceof groovy.lang.String){
-           return request.applicationContext.springSecurityService.principal
-          }
-          def username = request.applicationContext.springSecurityService.principal?.username
-          if (SpringSecurityUtils.isSwitched()){
-           username = SpringSecurityUtils.switchedUserOriginalUsername+" AS "+username
-          }
-          return username
-        }
-     }
-  }
-}
-----
-
-==== Spring Security Core 1.0.1 Plugin
-
-Based off of Jorge Aguilera's example, the Spring Security Plugin uses the SpringSecurityService.
-[source,groovy]
-----
-grails {
-  plugin {
-    auditLog {
-      actorClosure = { request, session ->
-       request.applicationContext.springSecurityService.principal?.username
-      }
-    }
-  }
-}
-----
-
-==== Acegi Plugin
-
-Thanks to Jorge Aguilera for his example on how to integrate with the Acegi plugin:
-
-[source,groovy]
-----
-grails {
-  plugin {
-    auditLog {
-      actorClosure = { request, session ->
-       return request.applicationContext.authenticateService.principal()?.username
-      }
-    }
-  }
-}
-----
-
-==== CAS Authentication
-
-For example if you are using a system such as CAS you can specify the CAS user attribute using a special configuration
-property to get the CAS user name. In application.groovy  add the following lines:
-
-[source,groovy]
-----
-import edu.yale.its.tp.cas.client.filter.CASFilter
-----
-
-[source,groovy]
-----
-grails {
-  plugin {
-    auditLog {
-     actorClosure = { request, session ->
-       session?.getAttribute(CASFilter.CAS_FILTER_USER)
-     }
-    }
-  }
-}
-----
-
-… and the audit_log table will have a record of which user and what controller triggered the event.
-
-==== Shiro Plugin
-
-With Shiro, add the following lines to use the currently logged in user's username:
-
-[source,groovy]
-----
-grails {
-  plugin {
-    auditLog {
-     actorClosure = { request, session ->
-       org.apache.shiro.SecurityUtils.getSubject()?.getPrincipal()
-     }
-    }
-  }
-}
-----
-
-==== Other security systems
-
-If you are using a custom authentication system in your controller that puts the user data into the session you can set
-up the actorClosure to work with your security system instead.
-
-=== Property Ignore List
-
-It's possible to configure which properties get ignored by auditing. The default ignore field list is:
-[source,groovy]
-----
-['version','lastUpdated'].
-----
-
-If you want to provide your own ignore list specify the ignore list like this in domain classes:
-
-[source,groovy]
-----
-static auditable = [ignore:['version','lastUpdated','myField']]
-----
-
-If instead you want to trigger on version and lastUpdated changes you may specify an empty ignore list:
-
-[source,groovy]
-----
-static auditable = [ignore:[]]
-----
-
-===  Whitelist properties to audit (since 2.0.6)
-Since version 2.0.6, instead of blacklisting which properties to ignore, you can also define a list of properties to audit (whitelist) per Domain class.
-The 'auditableProperties' setting has precedence over 'ignore'. Thanks to Paul Taylor for this feature.
-
-[source,groovy]
-----
-static auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
-----
-
-=== Verbose mode
-
-You can enable verbose mode. If enabled, column by column change logging in insert and delete events is enabled.
-Old- and new values are stored in detailed to the audit logging table. Enable verbose logging with:
-
-[source,groovy]
-----
-
- verbose = true
-
+grails.plugin.auditLog.logIds = true
 ----
 
 This setting is enabled by default.
 
-[WARNING]
-====
-When enabling verbose audit logging, you may get errors if you explicitly flush the session. In this case, do not enable
-verbose logging. Starting with version 1.0.1 of the plugin, additional closures are available to disable logging or
-verbose mode in a code block.
-====
+=== Property Value Masking
+You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are not stored into the audit log table if verbose mode is enabled. Instead, a mask of "**********" will be logged. 
 
-=== Logging of associated objectIds (since 0.5.5)
-
-You can log the object-ids of associated objects. Logging will be performed in the format: "[id:<objId>]objDetails".
-You can enable id-logging with
-
-[source,groovy]
-----
-
- logIds = true
-
-----
-
-This setting is disabled by default.
-
-=== Property value masking (since 0.5.5)
-
-You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are
-not stored into the audit log table if verbose mode is enabled. Instead, a mask of "**********" will be logged.
 By default, "password" properties are masked. You can mask property fields in domain classes like this:
 
 [source,groovy]
 ----
-static auditable = [mask:'password','otherField']
+@Override
+Set<String> getLogMask() {
+    ['password', 'otherField']
+}
 ----
 
-
-=== Verbose log truncation length
-
+=== Verbose Log Truncation Length
 If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
 columns (Default is 255). Configure the truncateLength in application.groovy:
 
 [source,groovy]
 ----
-
- truncateLength = 400 // don't forget to ensure "oldValue" and "newValue" fields are large enough!
-
+truncateLength = 400
 ----
 
 [WARNING]
 ====
-When you set truncateLength to a value > 255 you must ensure that oldValue and newValue fields in your audit-log domain class
-are large enough. Example setting with the same maxSize constraints as the former "largeValueColumnTypes" setting:
+When you set truncateLength to a value > 255 you must ensure that oldValue and newValue fields in your audit-log domain class are large enough. Example setting with the same maxSize constraints as the former "largeValueColumnTypes" setting:
 
 [source,groovy]
 ----
 static constraints = {
-  // for large column support (as in < 1.0.6 plugin versions)
-  oldValue(nullable: true, maxSize: 65534)
-  newValue(nullable: true, maxSize: 65534)
+    // For large column support (as in < 1.0.6 plugin versions)
+    oldValue(nullable: true, maxSize: 65534)
+    newValue(nullable: true, maxSize: 65534)
 }
 ----
-
-When you forgot to set the constraints in your AuditLog class while setting truncateLength > 255,
+When you forget to set the constraints in your AuditLog class while setting truncateLength > 255,
 a truncation warning may occur and only partial information is logged.
 ====
 
-
-=== Transactional AuditLog events
-
-In application.groovy, you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
-and commit transactions around audit log save events.
-If set to false (the default), the AuditLog may be persisted without a transaction wrapping its call to save.
-This setting should not be changed from defaults lightly as it can cause problems in integration testing.
+=== Disable All Auditing
+You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable auditing to not slow down the bootstrap process or if you want to audit log by Enviroment.
 
 [source,groovy]
 ----
-
- transactional = true
-
+grails.plugin.auditLog.disabled = true
 ----
-
-You are only likely to want to change the defaults if you are working with a transactional database in test and production.
-
-
-=== Disable auditing by config (since 0.5.5.3)
-
-You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted
-to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable
-auditing to not slow down the bootstrap process or if you want to audit log by Enviroment. With version >= 1.0.0 of the
-plugin, you can disable auditing on a per-datasource base as well Currently, disabling the plugin on a per-datasource base
-does not work. See GPAUDITLOGGING-68
-
-[source,groovy]
-----
-
- disabled = true
-
-----
-
-Disabling in DataSource.groovy is currently not possible.
 
 This setting is "false" by default (auditing is enabled).
 
-=== nonVerboseDelete logging (since 1.0.1)
-
-If verbose logging is enabled (see above), you can log deletes in a non-verbose manner. This means, only the delete event
-is logged, but not the properties the deleted object hold prior the deletion.
+=== Log Full Class Name
+By default, only the entity class name is logged. If you want to log the entity full name (including the package name), you can enable full logging. Thanks to tcrossland for this feature.
 
 [source,groovy]
 ----
-
- nonVerboseDelete = true
-
+grails.plugin.auditLog.logFullClassName = true
 ----
 
-This setting is "false" by default (verbosity of deletes depend on the verbose setting).
+This setting is "true" by default (full name is logged).
 
-=== log full domain class name (since 1.0.3)
 
-By default, only the entity class name is logged. If you want to log the entity full name (including the package name),
-you can enable full logging. Thanks to tcrossland for this feature.
-
+=== Ignoring Specific Events
+To ignore certain events on a per-domain base, override the `getLogIgnoreEvents()` method:
 [source,groovy]
 ----
-
- logFullClassName = true
-
-----
-
-This setting is "false" by default (entity name is logged).
-
-=== getAuditLogUri closure (since 1.0.4)
-
-By default, the "uri" field is filled with the request uri which caused the action.
-You can define a closure "getAuditLogUri" on a per-domain object base to define what should be written to the AuditLog
-"uri" field.
-
-[source,groovy]
-----
-class User {
-  static auditable = true
-  static belongsTo = [Client]
-
-  def getAuditLogUri = {
-    clientId as String
-  }
+@Override
+Set<AuditEventType> getLogIgnoreEvents() {
+    [AuditEventType.INSERT]
 }
 ----
-
-You need to take special care how you obtain the "uri" data in the getAuditLogUri closure.
-It is recommended to not perform costly calls.
-
-=== Domain class stamping support (since 1.0.4)
-
-Since version 1.0.4, it is possible to enable domain class stamping support.
-With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get
-the fields dateCreated, lastUpdated, createdBy, lastUpdatedBy using an AST transformation.
-You can create your own StampASTTransformation implementation for your specific needs.
-The createdBy and lastUpdatedBy fieldnames can be declared in application.groovy.
-These fields will be filled with the result of the actor closure on the event PreInsert, PreUpdate and PreDelete.
-Thanks to tkvw for this feature.
-
+You can also ignore them either globally with:
 [source,groovy]
 ----
-stampEnabled = true // enable stamping support
-stampAlways = false // always stamp domain classes, regardless of @Stamp or static stampable = true existence
-stampCreatedBy = 'createdBy' // fieldname
-stampLastUpdatedBy = 'lastUpdatedBy' // fieldname
+grails.plugin.auditLog.ignoreEvents = [AuditEventType.INSERT]
 ----
-
-=== Domain class stamping configuration (since 2.0.5)
-
-Since version 2.0.5, it is possible to specify the field configuration on a per domain-class base in the @Stamp annotation.
-With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdated fieldnames per domain class.
-
-Adding @Stamp to the entity disables the default Grails autoStamping by adding "autoTimestamp false" to the mapping (this can't be configured).
-
-Example:
+Or for a specific logging context by using:
 [source,groovy]
 ----
- @Stamp(
-     createdBy = @StampInfo(fieldname="originalWho", type=Date.class),
-     dateCreated = @StampInfo(fieldname="originalWhen", type=Date.class),
-     lastUpdatedBy = @StampInfo(fieldname="lastWho", nullable = true),
-     lastUpdated = @StampInfo(fieldname="lastWhen", nullable = true)
-     )
+AuditLogContext.withConfig(ignoreEvents = [AuditEventType.INSERT]) {
+    //
+    // Anything here will only log UPDATE and DELETE events
+    // 
+}
 ----
+=== Runtime Overrides
+See the <<index#context-overrides,Context Overrides>> for help using `AuditLogContext` to override configuration for a block. 
 
-=== Ignoring certain events (since 1.0.5 / 2.0.0)
-
-Since version 1.0.5, it is possible to ignore certain events on a per-domain base.
-
-[source,groovy]
-----
-static auditable = [ignoreEvents:["onChange","onSave"]]
-----
-
-=== Domain Name replacements (since 2.0.1) ===
-With the replacementPatterns Map, it is possible to rewrite domain names, e.g. to remove dedicated package names:
-
-[source,groovy]
-----
-replacementPatterns = ["local.example.xyz.User":"UserDomain"]
-----
-
-=== Example configuration
-
-Example application.groovy configuration with various settings as described above:
+=== Example Configuration
+Example `application.groovy` configuration with various settings as described above:
 
 [source,groovy]
 ----
 // AuditLog Plugin config
 grails {
-  plugin {
-    auditLog {
-     auditDomainClassName = 'my.example.project.MyAuditTrail'
-     verbose = true // verbosely log all changed values to db
-     logIds = true  // log db-ids of associated objects.
-     truncateLength = 1000
-     cacheDisabled = true  // only for 1.x. Disable caching of AuditDomainClass.
-     replacementPatterns = ["local.example.xyz.":""] // replace with empty string.
-     actorClosure = { request, session ->
-        // SpringSecurity Core 1.1.2
-        if (request.applicationContext.springSecurityService.principal instanceof groovy.lang.String){
-           return request.applicationContext.springSecurityService.principal
+    plugin {
+        auditLog {
+            auditDomainClassName = 'my.example.project.MyAuditTrail'
+            verbose = true 
+            failOnError = true
+            excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
+            mask = ['password']
+            logIds = true  
+            stampEnabled = true
         }
-        def username = request.applicationContext.springSecurityService.principal?.username
-        if (SpringSecurityUtils.isSwitched()){
-           username = SpringSecurityUtils.switchedUserOriginalUsername+" AS "+username
-        }
-        return username
-     }
-     stampEnabled = true
-     stampAlways = true
     }
-  }
 }
 ----

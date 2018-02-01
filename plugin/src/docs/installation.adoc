@@ -1,39 +1,34 @@
 == Installation
-
+=== Dependencies
 Add to your build.gradle project dependencies block:
 
 [source,groovy]
-[subs="attributes"]
 ----
-/** Project dependencies **/
 dependencies {
-   ...
-   compile 'org.grails.plugins:audit-logging:{project-version}'
+   compile 'org.grails.plugins:audit-logging:{version}'
 }
 ----
+Then run the following to refresh gradle dependencies: 
 
-Run
-
-....
-    grails compile
-....
-
-or another script that triggers dependency resolution.
+[source,gradle]
+----
+gradle classes
+----
 
 NOTE: After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
 
-=== Create your Domain Artifact using audit-quickstart
+=== Create Audit Domain Artifact
 
-....
     grails audit-quickstart <your.package.name> <YourAuditLogEventClassName>
-....
 
-example:
+For example:
 
-....
     grails audit-quickstart org.myaudit.example AuditTrail
-....
 
-Afterwards, set your needed mapping and constraint settings accordinghly in the created Domain Artifact.
+This will create the Audit Domain class as well as configure:
 
+    grails.plugin.auditLog.auditDomainClassName = 'org.myaudit.example.AuditTrail'
+    
+Once created, you should open the generated file to adjust the `mappings` and `constraints` to suit your needs.
 
+WARNING: Be sure to respect the existing nullability constraints or the plugin may not work correctly
