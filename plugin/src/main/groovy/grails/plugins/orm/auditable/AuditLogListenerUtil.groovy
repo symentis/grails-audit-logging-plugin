@@ -82,7 +82,7 @@ class AuditLogListenerUtil {
      * @param domain
      * @return
      */
-    static Map<String, Object> makeMap(Set<String> propertyNames, Auditable domain) {
+    static Map<String, Object> makeMap(Collection<String> propertyNames, Auditable domain) {
         propertyNames.collectEntries { [it, domain.metaClass.getProperty(domain, it)] }
     }
 

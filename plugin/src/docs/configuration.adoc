@@ -106,7 +106,7 @@ By default, "password" properties are masked. You can mask property fields in do
 [source,groovy]
 ----
 @Override
-Set<String> getLogMask() {
+Collection<String> getLogMask() {
     ['password', 'otherField']
 }
 ----
@@ -162,7 +162,7 @@ To ignore certain events on a per-domain base, override the `getLogIgnoreEvents(
 [source,groovy]
 ----
 @Override
-Set<AuditEventType> getLogIgnoreEvents() {
+Collection<AuditEventType> getLogIgnoreEvents() {
     [AuditEventType.INSERT]
 }
 ----

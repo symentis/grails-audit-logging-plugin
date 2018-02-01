@@ -112,7 +112,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         // If verbose logging, resolve all properties (dirty doesn't really matter here)
         boolean verbose = isVerboseEnabled(domain, auditEventType)
         if (verbose) {
-            Set<String> loggedProperties = domain.getAuditablePropertyNames()
+            Collection<String> loggedProperties = domain.getAuditablePropertyNames()
             if (loggedProperties) {
                 map = makeMap(loggedProperties, domain)
             }
@@ -143,7 +143,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         // If verbose, resolve properties
         boolean verbose = isVerboseEnabled(domain, auditEventType)
         if (verbose) {
-            Set<String> dirtyProperties = domain.getAuditableDirtyPropertyNames()
+            Collection<String> dirtyProperties = domain.getAuditableDirtyPropertyNames()
 
             // Needs to be dirty properties and properties to log, otherwise it won't be verbose
             if (dirtyProperties) {

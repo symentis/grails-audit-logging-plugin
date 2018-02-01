@@ -20,7 +20,7 @@ For the second example above, you simply override the appropriate method on the 
 [source,groovy]
 ----
 @Override
-Set<String> getLogIncluded() {
+Collection<String> getLogIncluded() {
     ['name', 'famous', 'lastUpdated']
 }
 ----
@@ -34,23 +34,23 @@ To support unifying the configuration, trait, and context usage, some of the con
 | Prior Name | New Name | New Type
 | auditableProperties
 | included
-| Set<String>
+| Collection<String>
 
 | defaultIgnore
 | excluded
-| Set<String>
+| Collection<String>
 
 | ignore
 | excluded
-| Set<String>
+| Collection<String>
 
 | defaultMask
 | mask
-| Set<String>
+| Collection<String>
 
 | nonVerboseDelete
 | verboseEvents
-| Set<AuditEventType> 
+| Collection<AuditEventType>
 
 | transactional
 | *Removed*

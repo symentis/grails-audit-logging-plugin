@@ -8,7 +8,7 @@ class Resolution implements Auditable {
 	String name
 
 	@Override
-	Set<AuditEventType> getLogIgnoreEvents() {
+	Collection<AuditEventType> getLogIgnoreEvents() {
         [AuditEventType.UPDATE, AuditEventType.INSERT]
 	}
 

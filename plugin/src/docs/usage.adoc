@@ -68,7 +68,7 @@ Another example is to override which properties get ignored for a specific entit
 [source,groovy]
 ----
 @Override
-Set<String> getLogExcluded() {
+Collection<String> getLogExcluded() {
     ['myField', 'version']
 }
 ----
@@ -77,7 +77,7 @@ Control the specific whitelist of attributes logged:
 [source,groovy]
 ----
 @Override
-Set<String> getLogIncluded() {
+Collection<String> getLogIncluded() {
     ['whiteListField1', 'whiteListField2']
 }
 ----
