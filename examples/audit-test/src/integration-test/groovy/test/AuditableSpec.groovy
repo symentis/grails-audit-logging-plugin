@@ -8,6 +8,7 @@ import grails.plugins.orm.auditable.Auditable
 import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.spring.BeanBuilder
 import grails.testing.mixin.integration.Integration
+import org.springframework.test.annotation.DirtiesContext
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -148,21 +149,6 @@ class AuditableSpec extends Specification {
         false | [AuditEventType.UPDATE] as Set<AuditEventType>
     }
 
-    void "uses the registered audit resolver bean"() {
-        given:
-        BeanBuilder bb = new BeanBuilder()
-        bb.beans { auditRequestResolver(TestAuditRequestResolver) }
-        bb.registerBeans(grailsApplication.mainContext)
-
-        when:
-        String uri = entity.getLogURI()
-        String actor = entity.getLogCurrentUserName()
-
-        then:
-        uri == "http://foo.com"
-        actor == "Aaron"
-    }
-
     void "auditable property names omit excluded properties"() {
         given:
         Author author = new Author(name: 'Aaron', age: 41, famous: false)
@@ -195,6 +181,22 @@ class AuditableSpec extends Specification {
 
         then:
         props == ["name"] as Set<String>
+    }
+
+    @DirtiesContext
+    void "uses the registered audit resolver bean"() {
+        given:
+        BeanBuilder bb = new BeanBuilder()
+        bb.beans { auditRequestResolver(TestAuditRequestResolver) }
+        bb.registerBeans(grailsApplication.mainContext)
+
+        when:
+        String uri = entity.getLogURI()
+        String actor = entity.getLogCurrentUserName()
+
+        then:
+        uri == "http://foo.com"
+        actor == "Aaron"
     }
 }
 
