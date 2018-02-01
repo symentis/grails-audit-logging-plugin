@@ -35,7 +35,7 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     Collection<AuditEventType> getLogVerboseEvents() {
-        if (AuditLogContext.context.verbose) {
+        if (AuditLogContext.context.verbose && !AuditLogContext.context.verboseEvents) {
             AuditEventType.values() as Set<AuditEventType>
         }
         else if (AuditLogContext.context.verboseEvents) {
@@ -52,14 +52,6 @@ trait Auditable<D> extends GormEntity<D> {
     @Transient
     String getLogClassName() {
         AuditLogContext.context.logFullClassName ? getClass().name : GrailsNameUtils.getShortName(getClass())
-    }
-
-    /**
-     * @return return the URI for audit logging, by default this is null
-     */
-    @Transient
-    String getLogURI() {
-        Holders.applicationContext.getBean(AuditRequestResolver)?.currentURI
     }
 
     /**
@@ -95,10 +87,20 @@ trait Auditable<D> extends GormEntity<D> {
     }
 
     /**
+     * @return return the URI for audit logging, by default this is null
+     */
+    @Transient
+    String getLogURI() {
+        // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
+        Holders.applicationContext.getBean(AuditRequestResolver)?.currentURI
+    }
+
+    /**
      * @return return the current username if available or SYS by default
      */
     @Transient
     String getLogCurrentUserName() {
+        // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
         Holders.applicationContext.getBean(AuditRequestResolver)?.currentActor ?: 'N/A'
     }
 
@@ -158,10 +160,15 @@ trait Auditable<D> extends GormEntity<D> {
         if (value instanceof GormEntity) {
             return "[id:${((GormEntity)value).ident()}]$value"
         }
-        if (logAssociatedIds && value instanceof Collection) {
-            return ((Collection)value).collect {
-                convertLoggedPropertyToString(propertyName, it)
-            }.join(", ")
+        if (value instanceof Collection) {
+            if (logAssociatedIds) {
+                return ((Collection)value).collect {
+                    convertLoggedPropertyToString(propertyName, it)
+                }.join(", ")
+            }
+            else {
+                return "N/A"
+            }
         }
 
         value?.toString()
