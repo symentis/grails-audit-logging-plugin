@@ -1,4 +1,4 @@
-# Grails Audit Logging Plugin - Grails 3.3.x
+# Grails Audit Logging Plugin
 
 The Audit Logging plugin for Grails adds generic event based Audit Logging to a Grails project and also adds support to domain models for hooking into the GORM events system.
 
@@ -12,20 +12,15 @@ For older Grails versions, see [Supported Grails Versions](#supported-grails-ver
  * For Grails 2.x documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
- * Grails > 3.3: (master branch) 
+ * Grails   3.3.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master) 
  * Grails   3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
  * Grails   2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
-### Grails 3.2 limitations
-If you use Grails 3.2 up to version 3.2.9, you possibly receive a circular dependency exception caused by a bug in gorm-data-mapper. E.g. this can happen if you use the audit-logging plugin and the database-migration plugin and try to perform dbm-update. See [grails-database-migration#127](https://github.com/grails-plugins/grails-database-migration/issues/127) for details. Either use GORM > 6.0.9 when released, or disable the auditLogging plugin before performing runCommands.
-
 ## audit-quickstart
-Versions 1.1.0 (Grails 2.x) and 2.0.0 (Grails 3.x) are the first versions with audit-quickstart command support.
-
-Therefore, you need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version(s) and later. 
+You need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version(s) and later. 
 See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
   
-With this, you get a AuditLog domain class in your project which is fully under your control. 
+With this, you get an auditlog domain class in your project which is fully under your control. 
 The domain name is registered in your application.groovy with key "grails.plugins.auditLog.auditDomainClassName".
   
 Example:
