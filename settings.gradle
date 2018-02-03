@@ -1,1 +1,6 @@
-include 'audit-logging', 'audit-test'
+rootProject.name = 'grails-audit-logging'
+
+include 'plugin'
+include 'examples/audit-test'
+
+findProject(":plugin").name = "audit-logging"

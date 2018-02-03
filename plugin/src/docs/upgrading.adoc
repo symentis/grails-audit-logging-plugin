@@ -1,0 +1,131 @@
+== Upgrading
+
+=== Domain Classes
+Prior versions of the plugin used a static property syntax to enable and customize logging:
+[source,groovy]
+----
+// Legacy enable/disable
+static auditable = true
+
+// Legacy whitelist
+static auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
+----
+
+Starting with version 3.0.0, the plugin uses an `Auditable` trait as both a marker as well as a way to configure and override auditing behavior.
+
+For the first example, just adding `implements Auditable` will enable the default behavior.
+
+For the second example above, you simply override the appropriate method on the `Auditable` trait, in this case the method is `getLogIncluded()`:
+
+[source,groovy]
+----
+@Override
+Collection<String> getLogIncluded() {
+    ['name', 'famous', 'lastUpdated']
+}
+----
+NOTE: The getter methods on `Auditable` all follow the `getLog*()` format to minimize collisions with user methods. Typically they are `getLog<Configuration Name>()` followed by whatever the configurable value (included, excluded, mask) with a few exceptions.
+
+=== Configuration Changes
+To support unifying the configuration, trait, and context usage, some of the configuration properties have been renamed. The following table should help to map old values and types to the new ones:
+
+[width="100%",options="header,footer"]
+|====================
+| Prior Name | New Name | New Type
+| auditableProperties
+| included
+| Collection<String>
+
+| defaultIgnore
+| excluded
+| Collection<String>
+
+| ignore
+| excluded
+| Collection<String>
+
+| defaultMask
+| mask
+| Collection<String>
+
+| nonVerboseDelete
+| verboseEvents
+| Collection<AuditEventType>
+
+| transactional
+| *Removed*
+| Inherits existing transactionality
+
+| actorClosure
+| *Removed*
+| Use AuditRequestResolver
+
+| actorKey
+| *Removed*
+| Use AuditRequestResolver
+
+| sessionAttribute
+| *Removed*
+| Use AuditRequestResolver
+
+| stampAlways
+| *Removed*
+| Use a `TraitInjector` with `Stampable`
+|====================
+
+=== Transactional Behavior
+Previously, the audit logging plugin had a `transactional` flag that indicated whether to include the audit log saves in a transaction. However, the audit logging plugin should really just participate (or not) in existing transactions and not make any attempts to control transactionality at that grain. For most usage, you want your Audit domain instances to be atomically created in the same transaction as the changes that are triggering them. If there's no existing transaction for the changes, it's not clear why there __should__ be a transaction just for the audit events or vice versa.
+
+The Audit instances are still saved in a new session within any existing transaction.
+
+=== Handlers Removed
+The handler callbacks such as `onChange`, `onSave`, etc. have been removed starting with version 3.0.0.
+
+This behavior is already provided by Grails using the `before*` and `after*` callback methods. 
+
+For example, you could do something like:
+[source,groovy]
+----
+def beforeInsert() {
+    def dirtyAudit = getAuditableDirtyPropertyNames()
+    
+    // Do something special if certain properties are dirty, etc.
+}
+----
+Obviously, the `handlersOnly` configuration is also no longer relevant.
+
+=== Actor Closure
+The actor closure has been replaced with a more formalized `AuditRequestResolver` strategy for resolving actor and URI information.
+
+By default, the plugin uses the `DefaultAuditRequestResolver`, which gets Principal information from the current Grails web request context. This is essentially the same as the prior default actor closure.
+
+If your application uses Spring Security, the plugin will register an instance of the `SpringSecurityRequestResolver` which will use the `springSecurityService` to resolve the current principal.
+
+For other security frameworks, you can implement the `AuditRequestResolver` interface and register a bean named `auditRequestResolver` to override the resolver provided by the plugin.
+
+=== Stampable Trait
+The `@Stamp` annotation was removed in favor of a `Stampable` trait. This keeps the usage more in line with the direction of Grails in general as well as simplifying the implementation and usage.
+
+However, there are some limitations to implementing this as a trait:
+
+* Property names are `dateCreated, lastUpdated, createdBy, lastUpdatedBy` and are not configurable
+* If you want to customized the constraints, you must do so in your domain class
+* The values are technically populated on the `ValidationEvent` since they are non-nullable and must be populated prior to the default property validation.
+
+The `stampAlways` has been removed. If you want to mark *all* of your domain objects as stampable, you could define the following `TraitInjector`:
+
+[source,groovy]
+----
+@CompileStatic
+class StampableTraitInjector implements TraitInjector {
+    @Override
+    Class getTrait() {
+        Stampable
+    }
+
+    @Override
+    String[] getArtefactTypes() {
+        ['Domain'] as String[]
+    }
+}
+----

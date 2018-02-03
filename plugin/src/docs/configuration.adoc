@@ -1,0 +1,205 @@
+== Configuration
+
+The plugin configuration can be specified in the application.groovy file.
+It supports Environments blocks for environment-specific configuration.
+
+[WARNING]
+====
+Since version 2.0.0, the configuration key has changed from "auditLog" to "grails.plugins.auditLog".
+If you use the old configuration key, the plugin will log a notice.
+====
+
+[cols="30,30,40"]
+|====================
+| *Property* | *Default Value* | *Meaning*
+
+|grails.plugin.auditLog.auditDomainClassName
+|*(Requred)* Use `grails audit-quickstart` to create
+|Domain Class Name for the Audit Domain class.
+
+|grails.plugin.auditLog.disabled
+|`false`
+|If set to true, audit logging is completely disabled (no listeners are registered).
+
+|grails.plugin.auditLog.verbose
+|`true`
+|Column by column change logging in insert and delete events is enabled by default. You can disable it if you are not interested in value changes.
+
+|grails.plugin.auditLog.verboseEvents
+|`[INSERT, UPDATE, DELETE]`
+|Set of `AuditEventType` enums. Enables verbose logging on a per-event type basis. If `verbose = true`, all event types are logged verbosely.
+
+|grails.plugin.auditLog.ignoreEvents
+|`[]`
+|Set of `AuditEventType` enums that can be used to disable logging on a per-event type basis. For example, setting `[AuditEventType.DELETE]` would disable audit logging for all DELETE events only.
+
+|grails.plugin.auditLog.failOnError
+|`false`
+|If the save of the Audit domain fails, enabling this will cause the failure to be thrown out of the listener potentially failing the entire transaction.
+
+|grails.plugin.auditLog.logIds
+|`true`
+|If set to true, object-ids of associated objects are logged.
+
+|grails.plugin.auditLog.logFullClassName
+|`true`
+|Log the full entity name including the package name
+
+|grails.plugin.auditLog.defaultActor
+|`'SYS'`
+|The default actor (user) to log if no user context can be found using the configured `AuditRequestResolver` implementation (see below).
+
+|grails.plugin.auditLog.excluded
+|`['version', 'lastUpdated', 'lastUpdatedBy']`
+|These properties are not logged and will not trigger verbose logging when changed.
+
+|grails.plugin.auditLog.included
+|`null` (all persistent properties)
+|This is a global whitelist of properties to log and will override anything in the excluded list. A null value indicates that all persistent properties not in the `excluded` list specifically should be logged.
+
+|grails.plugin.auditLog.mask
+|`['password']`
+|Any property with this name will be masked using the `propertyMask` attribute (below).
+
+|grails.plugin.auditLog.propertyMask
+|`pass:[**********]`
+|String to use when masking properties.
+
+|grails.plugin.auditLog.truncateLength
+|`maxSize` of `newValue`/`oldValue`
+|Allow overriding the maximum length allowed in the `oldValue` and `newValue` fields before truncating. This property defaults to the max size allowed by the `constraint`, so it's best to just control it that way.
+
+|grails.plugin.auditLog.stampEnabled
+|`true`
+|Enable stamping support for entities with the `Stampable` trait (dateCreated, lastUpdated, createdBy, lastUpdatedBy).
+|====================
+NOTE: You can view the above defaults in the `DefaultAuditLogConfig.groovy`
+
+=== Verbose mode
+When enabled, per-property logging is enabled for all operations.
+
+    grails.plugin.auditLog.verbose = true
+
+You can enable verbose logging for specific event types using:
+
+    grails.plugin.auditLog.verboseEvents = [AuditLogEvent.UPDATE]
+
+[WARNING]
+====
+Verbose logging will insert 1 row of data per property of your domain object for insert and delete operations. This can result in a large amount of additional data, sometimes far more than the actual operation itself. Consider disabling verbose mode for bulk operations using the `AuditLogContext.withoutVerboseAuditLog { }` closure.
+====
+
+=== Logging of Associated Ids
+You can log the object-ids of associated objects. Logging will be performed in the format: "[id:<objId>]objDetails".
+[source,groovy]
+----
+grails.plugin.auditLog.logIds = true
+----
+
+This setting is enabled by default.
+
+=== Property Value Masking
+You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are not stored into the audit log table if verbose mode is enabled. Instead, a mask of "**********" will be logged. 
+
+By default, "password" properties are masked. You can mask property fields in domain classes like this:
+
+[source,groovy]
+----
+@Override
+Collection<String> getLogMask() {
+    ['password', 'otherField']
+}
+----
+
+=== Verbose Log Truncation Length
+If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
+columns (Default is 255). Configure the truncateLength in application.groovy:
+
+[source,groovy]
+----
+truncateLength = 400
+----
+
+[WARNING]
+====
+When you set truncateLength to a value > 255 you must ensure that oldValue and newValue fields in your audit-log domain class are large enough. Example setting with the same maxSize constraints as the former "largeValueColumnTypes" setting:
+
+[source,groovy]
+----
+static constraints = {
+    // For large column support (as in < 1.0.6 plugin versions)
+    oldValue(nullable: true, maxSize: 65534)
+    newValue(nullable: true, maxSize: 65534)
+}
+----
+When you forget to set the constraints in your AuditLog class while setting truncateLength > 255,
+a truncation warning may occur and only partial information is logged.
+====
+
+=== Disable All Auditing
+You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable auditing to not slow down the bootstrap process or if you want to audit log by Enviroment.
+
+[source,groovy]
+----
+grails.plugin.auditLog.disabled = true
+----
+
+This setting is "false" by default (auditing is enabled).
+
+=== Log Full Class Name
+By default, only the entity class name is logged. If you want to log the entity full name (including the package name), you can enable full logging. Thanks to tcrossland for this feature.
+
+[source,groovy]
+----
+grails.plugin.auditLog.logFullClassName = true
+----
+
+This setting is "true" by default (full name is logged).
+
+
+=== Ignoring Specific Events
+To ignore certain events on a per-domain base, override the `getLogIgnoreEvents()` method:
+[source,groovy]
+----
+@Override
+Collection<AuditEventType> getLogIgnoreEvents() {
+    [AuditEventType.INSERT]
+}
+----
+You can also ignore them either globally with:
+[source,groovy]
+----
+grails.plugin.auditLog.ignoreEvents = [AuditEventType.INSERT]
+----
+Or for a specific logging context by using:
+[source,groovy]
+----
+AuditLogContext.withConfig(ignoreEvents = [AuditEventType.INSERT]) {
+    //
+    // Anything here will only log UPDATE and DELETE events
+    // 
+}
+----
+=== Runtime Overrides
+See the <<index#context-overrides,Context Overrides>> for help using `AuditLogContext` to override configuration for a block. 
+
+=== Example Configuration
+Example `application.groovy` configuration with various settings as described above:
+
+[source,groovy]
+----
+// AuditLog Plugin config
+grails {
+    plugin {
+        auditLog {
+            auditDomainClassName = 'my.example.project.MyAuditTrail'
+            verbose = true 
+            failOnError = true
+            excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
+            mask = ['password']
+            logIds = true  
+            stampEnabled = true
+        }
+    }
+}
+----

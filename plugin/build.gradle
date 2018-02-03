@@ -1,0 +1,152 @@
+import java.text.SimpleDateFormat
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+        jcenter()
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+        classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.4"
+}
+
+version file("$rootDir/version.txt").text.trim()
+group "org.grails.plugins"
+
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "org.grails.grails-plugin"
+apply plugin: "org.grails.grails-plugin-publish"
+apply plugin: "org.asciidoctor.convert"
+
+// Used for publishing to central repository, remove if not needed
+// apply from: 'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
+// apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
+
+ext {
+    grailsVersion = project.grailsVersion
+    gradleWrapperVersion = project.gradleWrapperVersion
+}
+
+//sourceCompatibility = 1.7
+//targetCompatibility = 1.7
+
+repositories {
+    mavenLocal()
+    maven { url "https://repo.grails.org/grails/core" }
+}
+
+dependencies {
+    profile "org.grails.profiles:plugin"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    compile "org.springframework.boot:spring-boot-autoconfigure"
+    compile "org.grails:grails-core"
+    compile "org.grails:grails-datastore-gorm"
+    compile "org.grails:grails-web-boot"
+
+    console "org.grails:grails-console"
+
+    provided "org.grails:grails-plugin-services"
+    provided "org.grails:grails-plugin-domain-class"
+
+    provided "javax.servlet:javax.servlet-api:3.1.0"
+    provided "org.grails.plugins:spring-security-core:3.2.0"
+
+    testCompile "org.grails:grails-gorm-testing-support"
+    testCompile "org.grails:grails-plugin-testing"
+}
+
+bootRepackage.enabled = false
+
+// Needed for org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6
+// See https://github.com/asciidoctor/asciidoctorj/issues/415
+asciidoctorj {
+    version = '1.5.4'
+}
+
+String buildDate() {
+    def df = new SimpleDateFormat("yyyy-MM-dd")
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(new Date())
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = gradleWrapperVersion
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['maven']
+    publish = true
+    pkg {
+        repo = 'plugins'
+        userOrg = '' // If you want to publish to an organization
+        name = "$project.name"
+        websiteUrl = "https://robertoschwald.github.io/grails-${project.name}-plugin"
+        issueTrackerUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin/issues"
+        vcsUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin"
+        licenses = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            desc = 'Grails Audit-Logging Plugin for Grails 3.x '
+            attributes = ['grails-plugin': "$project.group:$project.name"]
+        }
+    }
+}
+
+asciidoctor {
+    separateOutputDirs = false
+    sourceDir = file('src/docs')
+    sources {
+        include 'index.adoc'
+    }
+    outputDir new File(buildDir, 'docs')
+    backends 'html5', 'pdf', 'epub3'
+    attributes 'experimental': 'true',
+        'source-highlighter': 'coderay',
+        'compat-mode': 'true',
+        toc: 'left',
+        icons: 'font',
+        setanchors: 'true',
+        idprefix: '',
+        idseparator: '-',
+        toc2: '',
+        numbered: '',
+        version: project.version,
+        groupId: project.group,
+        artifactId: project.name,
+        revnumber: project.version,
+        revdate: buildDate()
+}
+
+task docs(dependsOn: 'asciidoctor') {
+    doLast {
+        File dir = new File(buildDir, 'docs')
+        dir.mkdirs()
+
+        ['pdf', 'epub'].each { String ext ->
+            File f = new File(dir, 'index.' + ext)
+            if (f.exists()) {
+                f.renameTo new File(dir, project.name + '-' + project.version + '.' + ext)
+            }
+        }
+
+        new File(buildDir, 'docs/ghpages.html') << file('src/docs/templates/index.tmpl').text.replaceAll("@VERSION@", project.version).replaceAll("@DOCDATE@", buildDate())
+
+        copy {
+            from 'src/docs'
+            into new File(buildDir, 'docs').path
+            include '**/*.png'
+        }
+    }
+}
