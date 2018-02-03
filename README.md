@@ -8,7 +8,7 @@ The Grails Audit Logging plugin for Grails 3 adds generic event based Audit Logg
  * For Grails 2.x documentation, see [Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
-* Grails > 3.3: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master)
+* Grails 3.3.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master)
 * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
 * Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
