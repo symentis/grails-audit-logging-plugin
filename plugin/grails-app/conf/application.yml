@@ -1,5 +1,5 @@
 grails:
-    profile: plugin
+    profile: web-plugin
     codegen:
         defaultPackage: audit.logging
     mime:
