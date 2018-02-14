@@ -5,6 +5,7 @@ import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.datastore.mapping.model.PersistentEntity
 
 import javax.persistence.Transient
@@ -13,13 +14,13 @@ import javax.persistence.Transient
  * Domain classes should implement this trait to provide auditing support
  */
 @CompileStatic
-trait Auditable<D> extends GormEntity<D> {
+trait Auditable {
     /**
      * If false, this entity will not be logged
      */
     @Transient
-    boolean isAuditLogEnabled(AuditEventType eventType) {
-        !AuditLogContext.context.disabled
+    boolean isAuditable(AuditEventType eventType) {
+        true
     }
 
     /**
@@ -132,7 +133,11 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     Collection<String> getAuditableDirtyPropertyNames() {
-        auditablePropertyNames.intersect(listDirtyPropertyNames()) as Set<String>
+        Collection<String> dirtyProperties = Collections.EMPTY_LIST
+        if (this instanceof GormEntity) {
+            dirtyProperties = ((DirtyCheckable)this).listDirtyPropertyNames()
+        }
+        auditablePropertyNames.intersect(dirtyProperties) as Set<String>
     }
 
     /**
@@ -140,7 +145,14 @@ trait Auditable<D> extends GormEntity<D> {
      */
     @Transient
     String getLogEntityId() {
-        convertLoggedPropertyToString("id", ident())
+        if (this instanceof GormEntity) {
+            return convertLoggedPropertyToString("id", ((GormEntity)this).ident())
+        }
+        if (this.respondsTo("getId")) {
+            return convertLoggedPropertyToString("id", this.invokeMethod("getId", null))
+        }
+
+        throw new IllegalStateException("Could not determine the Id for ${getClass().name}, override getLogEntityId() to specify")
     }
 
     /**

@@ -15,7 +15,7 @@ class Publisher implements Auditable {
     }
 
     @Override
-    boolean isAuditLogEnabled(AuditEventType eventType) {
+    boolean isAuditable(AuditEventType eventType) {
         active
     }
 

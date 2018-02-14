@@ -8,6 +8,7 @@ import grails.plugins.orm.auditable.Auditable
 import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.spring.BeanBuilder
 import grails.testing.mixin.integration.Integration
+import org.grails.datastore.gorm.GormEntity
 import org.springframework.test.annotation.DirtiesContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -21,15 +22,6 @@ class AuditableSpec extends Specification {
 
     void setup() {
         entity = new TestEntity(property: 'foo')
-    }
-
-    void "audit logging is disabled when disabled flag set"(Boolean flag, result) {
-        expect:
-        AuditLogContext.withConfig(disabled: flag) { entity.isAuditLogEnabled() } == result
-        where:
-        flag  | result
-        true  | false
-        false | true
     }
 
     void "excluded properties are respected"() {
@@ -201,7 +193,7 @@ class AuditableSpec extends Specification {
 }
 
 @SuppressWarnings("GroovyUnusedDeclaration")
-class TestEntity implements Auditable {
+class TestEntity implements Auditable, GormEntity<TestEntity> {
     String property
     String otherProperty
     String anotherProperty

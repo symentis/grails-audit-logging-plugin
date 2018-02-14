@@ -45,7 +45,7 @@ repositories {
 }
 
 dependencies {
-    profile "org.grails.profiles:plugin"
+    profile "org.grails.profiles:web-plugin"
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.grails:grails-core"
