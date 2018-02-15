@@ -32,3 +32,32 @@ This will create the Audit Domain class as well as configure:
 Once created, you should open the generated file to adjust the `mappings` and `constraints` to suit your needs.
 
 WARNING: Be sure to respect the existing nullability constraints or the plugin may not work correctly
+
+=== Prepare your Domain classes for Auditing
+
+For every Domain class you want to be audited, implement the Auditable Trait.
+
+For example:
+
+```groovy
+
+import grails.plugins.orm.auditable.Auditable
+
+class MyDomain implements Auditable {
+    String whatever
+    ...
+}
+```
+
+
+If you additionally want to enable stamping, implement the Stampable Trait:
+
+```groovy
+
+import grails.plugins.orm.auditable.Auditable
+
+ class MyDomain implements Auditable, Stampable {
+     String whatever
+     ...
+ }
+ ```
