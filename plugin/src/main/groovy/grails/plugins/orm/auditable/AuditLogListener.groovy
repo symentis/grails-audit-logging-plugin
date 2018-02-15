@@ -68,7 +68,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             AuditEventType auditEventType = AuditEventType.forEventType(event.eventType)
             Auditable domain = event.entityObject as Auditable
 
-            if (domain.isAuditLogEnabled(auditEventType)) {
+            if (domain.isAuditable(auditEventType)) {
                 log.trace("Audit logging: Event {} for object {}", auditEventType, event.entityObject.class.name)
 
                 switch (event.eventType) {

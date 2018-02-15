@@ -72,7 +72,7 @@ class AuditLogListenerUtil {
     static Object getPersistentValue(Auditable domain, String propertyName) {
         PersistentEntity entity = getPersistentEntity(domain)
         PersistentProperty property = entity.getPropertyByName(propertyName)
-        property instanceof ToMany ? "N/A" : domain.getPersistentValue(propertyName)
+        property instanceof ToMany ? "N/A" : ((GormEntity)domain).getPersistentValue(propertyName)
     }
 
     /**

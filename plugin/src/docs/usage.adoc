@@ -59,7 +59,7 @@ To override auditing for a specific entity or based on runtime values, just over
 ----
 // Assuming this domain has a status attribute, disable auditing for anything not active, for example
 @Override
-boolean isAuditLogEnabled() {
+boolean isAuditable() {
     this.status == ACTIVE
 }
 ----
