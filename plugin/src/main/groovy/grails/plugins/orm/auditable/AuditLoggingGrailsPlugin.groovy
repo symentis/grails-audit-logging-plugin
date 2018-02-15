@@ -19,13 +19,11 @@
 package grails.plugins.orm.auditable
 
 import grails.plugins.Plugin
-import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.plugins.orm.auditable.resolvers.DefaultAuditRequestResolver
 import grails.plugins.orm.auditable.resolvers.SpringSecurityRequestResolver
+import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
-import groovy.util.logging.Slf4j
-
 /**
  * @author Robert Oschwald
  * @author Aaron Long
@@ -37,12 +35,8 @@ import groovy.util.logging.Slf4j
  * second is the AuditLogging post by Rob Monie at
  * http://www.hibernate.org/318.html
  *
- * Combined the two sources to create a Grails
- * Audit Logging plugin that will track individual
- * changes to columns.
- *
  * See Documentation:
- * http://grails.org/plugin/audit-logging
+ * https://github.com/robertoschwald/grails-audit-logging-plugin
  *
  */
 @Slf4j
@@ -53,12 +47,9 @@ class AuditLoggingGrailsPlugin extends Plugin {
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
     def description = """ 
-        Automatically log change events for domain objects.
-        The Audit Logging plugin additionally adds an instance hook to domain objects that allows you to hang Audit events off of them.
-        The events include onSave, onChange, and onDelete.
-        When called, the event handlers have access to oldObj and newObj definitions that will allow you to take action on what has changed.
+        Automatically log change events for domain objects. Optionally supports Stamping. This plugin is ORM agnostic.
     """
-    String documentation = 'http://grails.org/plugin/audit-logging'
+    String documentation = 'https://github.com/robertoschwald/grails-audit-logging-plugin'
     String license = 'APACHE'
 
     def developers = [
