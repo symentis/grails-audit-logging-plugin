@@ -1538,7 +1538,7 @@ To override auditing <span class="keyword">for</span> a specific entity or based
 ----
 <span class="comment">// Assuming this domain has a status attribute, disable auditing for anything not active, for example</span>
 <span class="annotation">@Override</span>
-<span class="type">boolean</span> isAuditLogEnabled() {
+<span class="type">boolean</span> isAuditable() {
     <span class="local-variable">this</span>.status == ACTIVE
 }
 ----
@@ -1765,7 +1765,7 @@ to the domain <span class="type">class</span>.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2018-02-15 21:11:20 +00:00
+Last updated 2018-02-15 21:11:48 +00:00
 </div>
 </div>
 </body>
