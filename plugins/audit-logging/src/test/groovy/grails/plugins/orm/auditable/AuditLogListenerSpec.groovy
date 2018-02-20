@@ -9,7 +9,7 @@ import spock.lang.Specification
 class AuditLogListenerSpec extends Specification implements DataTest {
 
     Class<?>[] getDomainClassesToMock() {
-        [AuditEvent,Person].toArray(Class)
+        [AuditLogEvent, Person, Train].toArray(Class)
     }
 
     @Shared
@@ -18,7 +18,7 @@ class AuditLogListenerSpec extends Specification implements DataTest {
     @Override
     Closure doWithConfig() {
         return { c ->
-            c.grails.plugin.auditLog.auditDomainClassName = 'grails.plugins.orm.auditable.AuditEvent'
+            c.grails.plugin.auditLog.auditDomainClassName = 'grails.plugins.orm.auditable.AuditLogEvent'
             c.grails.plugin.auditLog.defaultActor = 'SYS'
             c.grails.plugin.auditLog.verbose = true
             c.grails.plugin.auditLog.excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
@@ -45,10 +45,10 @@ class AuditLogListenerSpec extends Specification implements DataTest {
             )
             person.save(flush:true)
         expect: 'An auditevent for each property is created'
-            AuditEvent.count() == 2
+            AuditLogEvent.count() == 2
         when: 'Retrieve the audit event'
-            AuditEvent propertyOne = AuditEvent.findByPropertyName('propertyOne')
-            AuditEvent propertyTwo = AuditEvent.findByPropertyName('propertyTwo')
+            AuditLogEvent propertyOne = AuditLogEvent.findByPropertyName('propertyOne')
+            AuditLogEvent propertyTwo = AuditLogEvent.findByPropertyName('propertyTwo')
         then: 'Check the values set'
             propertyOne
             propertyTwo
@@ -67,7 +67,7 @@ class AuditLogListenerSpec extends Specification implements DataTest {
             propertyTwo.propertyName == 'propertyTwo'
             propertyTwo.newValue == 'bar'
     }
-    void 'when insert verbose store events for each property'() {
+    void 'should store a single event when verbose=false'() {
         given:
             AuditLogContext.withoutVerboseAuditLog {
                 Person person = new Person(
@@ -77,9 +77,9 @@ class AuditLogListenerSpec extends Specification implements DataTest {
                 person.save(flush:true)
             }
         expect: 'An auditevent is created'
-            AuditEvent.count() == 3
+            AuditLogEvent.count() == 1
         when: 'Retrieve the audit event'
-            AuditEvent insertEvent = AuditEvent.get(1)
+            AuditLogEvent insertEvent = AuditLogEvent.get(1)
         then: 'Check the values set'
             insertEvent.actor == 'SYS'
             insertEvent.uri == null
@@ -92,10 +92,72 @@ class AuditLogListenerSpec extends Specification implements DataTest {
             insertEvent.oldValue == null
             insertEvent.newValue == null
     }
+
+    void 'should store an event for each property update'() {
+        given:
+            Person person = new Person(
+                propertyOne:'foo',
+                propertyTwo:'bar'
+            )
+            person.save(flush:true)
+        expect: 'An auditevent is created'
+            AuditLogEvent.count() == 2
+        when: 'Retrieve the audit event'
+            person.propertyOne='bar'
+            person.propertyTwo='foo'
+            person.save(flush:true)
+            AuditLogEvent propertyOne = AuditLogEvent.findByPropertyNameAndIdGreaterThan('propertyOne',2)
+            AuditLogEvent propertyTwo = AuditLogEvent.findByPropertyNameAndIdGreaterThan('propertyTwo',2)
+        then: 'Check the values set'
+            propertyOne
+            propertyTwo
+            [propertyOne,propertyTwo].each{
+                it.actor == 'SYS'
+                it.uri == null
+                it.className == 'Person'
+                it.eventName == AuditEventType.INSERT.name()
+                it.persistedObjectId == '1'
+                it.persistedObjectVersion == 0
+                it.oldValue == null
+            }
+            propertyOne.propertyName == 'propertyOne'
+            propertyOne.newValue == 'bar'
+            propertyOne.oldValue == 'foo'
+            propertyTwo.propertyName == 'propertyTwo'
+            propertyTwo.newValue == 'foo'
+            propertyTwo.oldValue == 'bar'
+    }
+
+    void 'should only audit configured events'(){
+        given:
+            Train train = new Train(number:'1')
+            train.save(flush:true)
+        expect:
+            AuditLogEvent.count()==0
+        when:
+            train.number = "2"
+            train.save()
+        then:
+            AuditLogEvent.count()==0
+        when:
+            train.delete()
+        then:
+            AuditLogEvent.count()==1
+    }
 }
 
 @Entity
 class Person implements Auditable{
     String propertyOne
     String propertyTwo
+}
+
+@Entity
+class Train implements Auditable{
+    String number
+
+    @Override
+    Collection<AuditEventType> getLogIgnoreEvents() {
+        return [AuditEventType.INSERT,AuditEventType.UPDATE]
+    }
 }

@@ -1,6 +1,8 @@
 package grails.plugins.orm.auditable
 
+import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.util.GrailsNameUtils
+import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
@@ -54,6 +56,22 @@ trait Auditable {
     }
 
     /**
+     * @return blacklist properties that should not be logged including those in context or by default.
+     */
+    @Transient
+    Collection<String> getLogExcluded() {
+        (AuditLogContext.context.excluded ?: Collections.EMPTY_SET) as Set<String>
+    }
+
+    /**
+     * @return whitelist properties that should be logged. If null, all attributes are logged. This overrides any excludes.
+     */
+    @Transient
+    Collection<String> getLogIncluded() {
+        AuditLogContext.context.included as Set<String>
+    }
+
+    /**
      * @return set of properties to mask when logging
      */
     @Transient
@@ -70,6 +88,24 @@ trait Auditable {
     }
 
     /**
+     * @return return the URI for audit logging, by default this is null
+     */
+    @Transient
+    String getLogURI() {
+        // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
+        Holders.applicationContext.getBean(AuditRequestResolver)?.currentURI
+    }
+
+    /**
+     * @return return the current username if available or SYS by default
+     */
+    @Transient
+    String getLogCurrentUserName() {
+        // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
+        Holders.applicationContext.getBean(AuditRequestResolver)?.currentActor ?: 'N/A'
+    }
+
+    /**
      * @return auditable property names for this domain class resolving any includes and excludes
      */
     @Transient
@@ -80,13 +116,13 @@ trait Auditable {
         Set<String> persistentProperties = entity.getPersistentProperties()*.name as Set<String>
         Set<String> loggedProperties = persistentProperties
 
-//        // If given a whitelist, only log the properties specifically in that list
-//        if (logIncluded != null) {
-//            loggedProperties = logIncluded as Set<String>
-//        }
-//        else if(logExcluded) {
-//            loggedProperties -= logExcluded
-//        }
+        // If given a whitelist, only log the properties specifically in that list
+        if (logIncluded != null) {
+            loggedProperties = logIncluded as Set<String>
+        }
+        else if(logExcluded) {
+            loggedProperties -= logExcluded
+        }
 
         // Intersect with the persistent properties to filter to just properties on this domain
         loggedProperties.intersect(persistentProperties as Iterable) as Set<String>

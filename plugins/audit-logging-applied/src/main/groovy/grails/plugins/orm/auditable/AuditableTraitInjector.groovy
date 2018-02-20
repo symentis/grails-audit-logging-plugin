@@ -6,7 +6,7 @@ import org.codehaus.groovy.ast.ClassNode
 import org.grails.compiler.injection.GrailsASTUtils
 import org.grails.core.artefact.DomainClassArtefactHandler
 
-class AuditableAppliedTraitInjector implements TraitInjector, SupportsClassNode{
+class AuditableTraitInjector implements TraitInjector, SupportsClassNode{
     @Override
     boolean supports(ClassNode classNode) {
         return !GrailsASTUtils.hasAnnotation(classNode, ExcludeAuditLogging)

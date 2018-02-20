@@ -19,11 +19,8 @@
 package grails.plugins.orm.auditable
 
 import grails.core.GrailsApplication
-import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
-import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
@@ -32,7 +29,6 @@ import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PostInsertEvent
 import org.grails.datastore.mapping.engine.event.PreDeleteEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
-import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.context.ApplicationEvent
 
 import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
@@ -46,8 +42,6 @@ import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
 class AuditLogListener extends AbstractPersistenceEventListener {
     private GrailsApplication grailsApplication
     private Integer truncateLength
-    @Lazy
-    AuditRequestResolver requestResolver = { grailsApplication.mainContext.getBean(AuditRequestResolver) }()
 
     AuditLogListener(Datastore datastore, GrailsApplication grailsApplication) {
         super(datastore)
@@ -91,7 +85,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         catch (Exception e) {
             if (AuditLogContext.context.failOnError) {
                 throw e
-            } else {
+            }
+            else {
                 log.error("Error creating audit log for event ${event.eventType} and domain ${event.entityObject}", e)
             }
         }
@@ -103,28 +98,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             eventType.isAssignableFrom(PreUpdateEvent) ||
             eventType.isAssignableFrom(PreDeleteEvent)
     }
-
-    @Memoized
-    protected Collection<String> getAuditablePropertyNames(Class<?> domainClass) {
-        Audit audit = domainClass.getAnnotation(Audit)
-        Set<String> excluded = null
-        if (audit) {
-            if (audit.includes().length > 0) return Arrays.asList(audit.includes())
-            if (audit.excludes().length > 0) excluded = Arrays.asList(audit.excludes()).toSet()
-        }
-        Set<String> configExcluded = AuditLoggingConfigUtils.auditConfig.excluded as Set<String>
-        excluded = excluded ? configExcluded ? excluded + configExcluded : excluded : configExcluded
-
-        PersistentEntity persistentEntity = GormEnhancer.findStaticApi(domainClass)?.getGormPersistentEntity()
-        if (persistentEntity) {
-            Set<String> persistentProperties = persistentEntity.persistentProperties*.name as Set<String>
-            Set<String> loggedProperties = persistentProperties - excluded
-
-            return loggedProperties
-        }
-        return Arrays.asList([] as String[])
-    }
-
 
     /**
      * We must use the preDelete event if we want to capture what the old object was like.
@@ -139,7 +112,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         // If verbose logging, resolve all properties (dirty doesn't really matter here)
         boolean verbose = isVerboseEnabled(domain, auditEventType)
         if (verbose) {
-            Collection<String> loggedProperties = getAuditablePropertyNames(domain.class)
+            Collection<String> loggedProperties = domain.getAuditablePropertyNames()
             if (loggedProperties) {
                 map = makeMap(loggedProperties, domain)
             }
@@ -148,7 +121,8 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (map || !verbose) {
             if (auditEventType == AuditEventType.DELETE) {
                 logChanges(domain, [:], map, auditEventType)
-            } else {
+            }
+            else {
                 logChanges(domain, map, [:], auditEventType)
             }
         }
@@ -221,30 +195,18 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
                     // Create a new entity for each property
                     GormEntity audit = createAuditLogDomainInstance(
-                        actor: requestResolver?.currentActor ?: 'N/A',
-                        uri: requestResolver?.currentURI,
-                        className: domain.logClassName,
-                        eventName: eventType.name(),
-                        persistedObjectId: domain.logEntityId,
-                        persistedObjectVersion: persistedObjectVersion,
-                        propertyName: propertyName,
-                        oldValue: oldValueAsString,
-                        newValue: newValueAsString,
+                        actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
+                        persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
+                        propertyName: propertyName, oldValue: oldValueAsString, newValue: newValueAsString,
                     )
                     if (domain.beforeSaveLog(audit)) {
                         audit.save(failOnError: true)
                     }
                 }
-            } else {
+            }
+            else {
                 // Create a single entity for this event
-                GormEntity audit = createAuditLogDomainInstance(
-                    actor: requestResolver?.currentActor ?: 'N/A',
-                    uri: requestResolver?.currentURI,
-                    className: domain.logClassName,
-                    eventName: eventType.name(),
-                    persistedObjectId: domain.logEntityId,
-                    persistedObjectVersion: persistedObjectVersion
-                )
+                GormEntity audit = createAuditLogDomainInstance(actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(), persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion)
                 if (domain.beforeSaveLog(audit)) {
                     audit.save(failOnError: true)
                 }

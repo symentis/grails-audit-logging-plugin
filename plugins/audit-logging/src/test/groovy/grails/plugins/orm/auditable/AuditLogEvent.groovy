@@ -10,7 +10,7 @@ import groovy.transform.ToString
  */
 @ToString(includes = 'id,className,actor,propertyName,oldValue,newValue')
 @Entity
-class AuditEvent implements Serializable {
+class AuditLogEvent implements Serializable {
     private static final long serialVersionUID = 1L
 
     String id

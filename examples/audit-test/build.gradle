@@ -20,8 +20,8 @@ assets {
 grails {
     plugins {
         compile project(":audit-logging")
-        compile project(":audit-stamp-actor-applied")
-        compile project(":audit-stamp-timestamp-applied")
+        compile project(":audit-stamp-actor")
+        compile project(":audit-stamp-timestamp")
     }
 }
 
