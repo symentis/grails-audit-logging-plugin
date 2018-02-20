@@ -1,0 +1,6 @@
+grails:
+  plugin:
+    auditLog:
+      stampActor:
+        enabled: true
+        defaultActor: SYS

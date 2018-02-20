@@ -13,6 +13,22 @@ import spock.lang.Specification
 class StampSpec extends Specification {
     GrailsApplication grailsApplication
 
+    void 'Actor stamp is applied'(){
+        given:
+            def train = new Train(number:'10')
+        expect:
+            train.hasProperty('createdBy')
+            train.hasProperty('lastUpdatedBy')
+    }
+    void 'Actor timestamp is applied'(){
+        given:
+            def train = new Train(number:'10')
+        expect:
+            train.hasProperty('dateCreated')
+            train.hasProperty('lastUpdated')
+    }
+
+
     @DirtiesContext
     void 'Stamp inserted with custom request resolver'() {
         given:

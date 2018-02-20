@@ -1,0 +1,26 @@
+grails:
+  plugin:
+    auditLog:
+      disabled: false
+      failOnError: false
+      logIds: true
+      logFullClassName: true
+      events:
+        - INSERT
+        - UPDATE
+        - DELETE
+      verbose:
+        - INSERT
+        - UPDATE
+        - DELETE
+      excluded:
+        - version
+        - lastUpdated
+        - lastUpdatedBy
+      included: null
+      mask:
+        - password
+        - creditcard
+      propertyMask: "**********"
+      defaultActor: SYS
+      stampEnabled: true

@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+        jcenter()
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.14.2'
+        classpath "org.grails.plugins:hibernate5:${gormVersion - ".RELEASE"}"
+
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+        classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+    }
+}
+plugins {
+    id "com.jfrog.bintray" version "1.4"
+}
+
+allprojects{
+    version file("$rootDir/version.txt").text.trim()
+    group "org.grails.plugins"
+
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+
+}
+
+subprojects{
+    ext{
+        isPlugin = project.projectDir.parentFile.name == 'plugins'
+    }
+
+    if(project.isPlugin){
+        apply plugin: "org.grails.grails-plugin"
+        apply plugin: "org.grails.grails-plugin-publish"
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = project.gradleWrapperVersion
+}

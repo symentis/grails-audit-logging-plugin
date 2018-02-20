@@ -1,0 +1,4 @@
+dependencies {
+    compile project(":audit-logging")
+    compile 'org.grails.plugins:grails-java8:1.2.2'
+}

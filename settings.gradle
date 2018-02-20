@@ -1,6 +1,12 @@
 rootProject.name = 'grails-audit-logging'
 
-include 'plugin'
+include 'plugins/audit-logging'
+include 'plugins/audit-stamp-actor'
+include 'plugins/audit-stamp-timestamp'
+include 'plugins/audit-stamp-timestamp-java8'
 include 'examples/audit-test'
 
-findProject(":plugin").name = "audit-logging"
+findProject(":plugins/audit-logging").name = "audit-logging"
+findProject(":plugins/audit-stamp-actor").name = "audit-stamp-actor"
+findProject(":plugins/audit-stamp-timestamp").name = "audit-stamp-timestamp"
+findProject(":plugins/audit-stamp-timestamp-java8").name = "audit-stamp-timestamp-java8"

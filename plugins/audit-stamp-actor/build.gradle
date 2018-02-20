@@ -1,0 +1,25 @@
+dependencies {
+    compile project(":audit-logging")
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['maven']
+    publish = true
+    pkg {
+        repo = 'plugins'
+        userOrg = '' // If you want to publish to an organization
+        name = "$project.name"
+        websiteUrl = "https://robertoschwald.github.io/grails-${project.name}-plugin"
+        issueTrackerUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin/issues"
+        vcsUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin"
+        licenses = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            desc = 'Grails Audit-Logging Plugin for Grails 3.x '
+            attributes = ['grails-plugin': "$project.group:$project.name"]
+        }
+    }
+}
