@@ -1,8 +1,8 @@
 package test
 
-import grails.plugins.orm.auditable.Stampable
+import grails.plugins.orm.auditable.StampActor
 
-class Train implements Stampable {
+class Train implements StampActor {
 	String number
 	
     static constraints = {

@@ -1,8 +1,8 @@
 package test
 
-import grails.plugins.orm.auditable.Stampable
+import grails.plugins.orm.auditable.StampActor
 
-class Coach implements Stampable {
+class Coach implements StampActor {
 
     static constraints = {
     }
