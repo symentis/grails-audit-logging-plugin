@@ -1,1 +1,0 @@
-grails.compiler.traits.TraitInjector=grails.plugins.orm.auditable.StampCreatedTraitInjector,grails.plugins.orm.auditable.StampUpdatedTraitInjector
