@@ -23,11 +23,8 @@ import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
-import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
-import org.grails.datastore.mapping.engine.event.EventType
-import org.grails.datastore.mapping.engine.event.PreInsertEvent
-import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+import org.grails.datastore.mapping.engine.EntityAccess
+import org.grails.datastore.mapping.engine.event.*
 import org.springframework.context.ApplicationEvent
 
 /**
@@ -38,6 +35,10 @@ import org.springframework.context.ApplicationEvent
 @CompileStatic
 class StampListener extends AbstractPersistenceEventListener {
     private GrailsApplication grailsApplication
+
+    static final String CREATED_BY = "createdBy"
+    static final String LAST_UPDATED_BY = "lastUpdatedBy"
+
 
     StampListener(Datastore datastore, GrailsApplication grailsApplication) {
         super(datastore)
@@ -50,7 +51,7 @@ class StampListener extends AbstractPersistenceEventListener {
             log.trace("Event received for datastore {}, ignoring", event.source)
             return
         }
-        if (!(event.entityObject instanceof Stampable)) {
+        if (!(event.entityObject instanceof StampActor)) {
             return
         }
 
@@ -60,27 +61,26 @@ class StampListener extends AbstractPersistenceEventListener {
         }
 
         try {
-            Stampable domain = event.entityObject as Stampable
+            StampActor domain = event.entityObject as StampActor
             log.trace("Stamping object {}", event.entityObject.class.name)
 
             // Lookup the request resolver here to ensure that applications have a chance
             // to override this bean to provide different strategies
             AuditRequestResolver requestResolver = grailsApplication.mainContext.getBean(AuditRequestResolver)
 
-            switch(event.eventType) {
+            switch (event.eventType) {
                 case EventType.PreInsert:
-                    handleInsert(domain, requestResolver)
+                    handleInsert(event.entityAccess, requestResolver)
                     break
                 case EventType.PreUpdate:
-                    handleUpdate(domain, requestResolver)
+                    handleUpdate(event.entityAccess, requestResolver)
                     break
             }
         }
         catch (Exception e) {
             if (AuditLogContext.context.failOnError) {
                 throw e
-            }
-            else {
+            } else {
                 log.error("Error stamping domain ${event.entityObject}", e)
             }
         }
@@ -94,17 +94,17 @@ class StampListener extends AbstractPersistenceEventListener {
     /**
      * Stamp inserts
      */
-    protected void handleInsert(Stampable domain, AuditRequestResolver requestResolver) {
+    protected void handleInsert(EntityAccess entityAccess, AuditRequestResolver requestResolver) {
         // Set actors, Grails will take care of setting the dates
         String currentActor = requestResolver.currentActor
-        domain.createdBy = currentActor
-        domain.lastUpdatedBy = currentActor
+        entityAccess.setProperty(CREATED_BY, currentActor)
+        entityAccess.setProperty(LAST_UPDATED_BY, currentActor)
     }
 
     /**
      * Stamp updates
      */
-    protected void handleUpdate(Stampable domain, AuditRequestResolver requestResolver) {
-        domain.lastUpdatedBy = requestResolver.currentActor
+    protected void handleUpdate(EntityAccess entityAccess, AuditRequestResolver requestResolver) {
+        entityAccess.setProperty(LAST_UPDATED_BY, requestResolver.currentActor)
     }
 }
