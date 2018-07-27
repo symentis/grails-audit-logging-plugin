@@ -26,4 +26,6 @@ include::configuration.adoc[]
 
 include::usage.adoc[]
 
+include::stamping.adoc[]
+
 include::implementation.adoc[]

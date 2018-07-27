@@ -13,7 +13,7 @@ static auditable = true
 static auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
 ----
 
-Starting with version 3.0.0, the plugin uses an `Auditable` trait to configure and override auditing behavior.
+Starting with version 3.0.0, the plugin uses an `Auditable` trait and/or a `Stampable` trait as both a marker as well as a way to configure and override auditing behavior.
 
 For the first example, just adding `implements Auditable` will enable the default behavior.
 
