@@ -22,7 +22,7 @@
 <html>
 <head>
 
-<title>grails.plugins.orm.auditable (audit-logging 2.0.7-SNAPSHOT API)</title>
+<title>grails.plugins.orm.auditable (audit-logging 3.0.0 API)</title>
 <meta name="keywords" content="grails.plugins.orm.auditable package">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel ="stylesheet" TYPE="text/css" HREF="../../../../stylesheet.css" title="Style">
@@ -31,7 +31,7 @@
 <script type="text/javascript">
 function windowTitle()
 {
-    parent.document.title="grails.plugins.orm.auditable (audit-logging 2.0.7-SNAPSHOT API)";
+    parent.document.title="grails.plugins.orm.auditable (audit-logging 3.0.0 API)";
 }
 </script>
 <noscript>
@@ -77,6 +77,40 @@ function windowTitle()
 
 
 
+    <div class="summary">
+        <ul class="blockList">
+            <li class="blockList">
+                <table border="0" cellpadding="3" cellspacing="0" summary="Trait Summary">
+                    <caption><span>Trait Summary</span><span class="tabEnd">&nbsp;</span></caption>
+                    <tbody>
+                    <tr>
+                        <th class="colFirst" scope="col">Trait</th>
+                        <th class="colLast" scope="col">Description</th>
+                    </tr>
+<tr class="altColor">
+                            <td class="colOne">
+                                <strong><a href="Auditable.html" title="class in grails/plugins/orm/auditable">
+                                    Auditable
+                                </a></strong>
+                            </td>
+                            <td>Domain classes should implement this trait to provide auditing support</td>
+                        </tr>
+<tr class="altColor">
+                            <td class="colOne">
+                                <strong><a href="Stampable.html" title="class in grails/plugins/orm/auditable">
+                                    Stampable
+                                </a></strong>
+                            </td>
+                            <td>Entities should implement this trait to provide automatic stamping of date and user information</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </li>
+            </ul>
+        </div>
+    
+
 
     <div class="summary">
         <ul class="blockList">
@@ -90,19 +124,19 @@ function windowTitle()
                     </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="AbstractASTTransformation.html" title="class in grails/plugins/orm/auditable">
-                                    AbstractASTTransformation
+                                <strong><a href="Application.html" title="class in grails/plugins/orm/auditable">
+                                    Application
                                 </a></strong>
                             </td>
                             <td></td>
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="Application.html" title="class in grails/plugins/orm/auditable">
-                                    Application
+                                <strong><a href="AuditLogContext.html" title="class in grails/plugins/orm/auditable">
+                                    AuditLogContext
                                 </a></strong>
                             </td>
-                            <td></td>
+                            <td>Allows runtime overriding of any audit logging configurable property</td>
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
@@ -120,14 +154,6 @@ function windowTitle()
                             </td>
                             <td>Grails interceptor for logging saves, updates, deletes and acting on
  individual properties changes and delegating calls back to the Domain Class</td>
-                        </tr>
-<tr class="altColor">
-                            <td class="colOne">
-                                <strong><a href="AuditLogListenerThreadLocal.html" title="class in grails/plugins/orm/auditable">
-                                    AuditLogListenerThreadLocal
-                                </a></strong>
-                            </td>
-                            <td>ThreadLocals for AuditLog</td>
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
@@ -165,11 +191,12 @@ function windowTitle()
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="StampASTTransformation.html" title="class in grails/plugins/orm/auditable">
-                                    StampASTTransformation
+                                <strong><a href="StampListener.html" title="class in grails/plugins/orm/auditable">
+                                    StampListener
                                 </a></strong>
                             </td>
-                            <td></td>
+                            <td>Grails interceptor for logging saves, updates, deletes and acting on
+ individual properties changes and delegating calls back to the Domain Class</td>
                         </tr>
 
                     </tbody>
@@ -178,36 +205,25 @@ function windowTitle()
             </ul>
         </div>
     
-
-
-
 
 
     <div class="summary">
         <ul class="blockList">
             <li class="blockList">
-                <table border="0" cellpadding="3" cellspacing="0" summary="Annotation Type Summary">
-                    <caption><span>Annotation Type Summary</span><span class="tabEnd">&nbsp;</span></caption>
+                <table border="0" cellpadding="3" cellspacing="0" summary="Enum Summary">
+                    <caption><span>Enum Summary</span><span class="tabEnd">&nbsp;</span></caption>
                     <tbody>
                     <tr>
-                        <th class="colFirst" scope="col">Annotation Type</th>
+                        <th class="colFirst" scope="col">Enum</th>
                         <th class="colLast" scope="col">Description</th>
                     </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="Stamp.html" title="class in grails/plugins/orm/auditable">
-                                    Stamp
+                                <strong><a href="AuditEventType.html" title="class in grails/plugins/orm/auditable">
+                                    AuditEventType
                                 </a></strong>
                             </td>
-                            <td></td>
-                        </tr>
-<tr class="altColor">
-                            <td class="colOne">
-                                <strong><a href="StampInfo.html" title="class in grails/plugins/orm/auditable">
-                                    StampInfo
-                                </a></strong>
-                            </td>
-                            <td></td>
+                            <td>Simple enum for audit events</td>
                         </tr>
 
                     </tbody>
@@ -216,6 +232,9 @@ function windowTitle()
             </ul>
         </div>
     
+
+
+
 
 
 </div>
