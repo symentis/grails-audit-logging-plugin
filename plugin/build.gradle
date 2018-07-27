@@ -72,7 +72,7 @@ asciidoctorj {
     version = '1.5.4'
 }
 
-String buildDate() {
+static String buildDate() {
     def df = new SimpleDateFormat("yyyy-MM-dd")
     df.setTimeZone(TimeZone.getTimeZone("UTC"))
     return df.format(new Date())
@@ -82,26 +82,17 @@ task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
 
-bintray {
+grailsPublish {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
-    publications = ['maven']
-    publish = true
-    pkg {
-        repo = 'plugins'
-        userOrg = '' // If you want to publish to an organization
-        name = "$project.name"
-        websiteUrl = "https://robertoschwald.github.io/grails-${project.name}-plugin"
-        issueTrackerUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin/issues"
-        vcsUrl = "https://github.com/robertoschwald/grails-${project.name}-plugin"
-        licenses = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
-        publicDownloadNumbers = true
-        version {
-            name = project.version
-            desc = 'Grails Audit-Logging Plugin for Grails 3.x '
-            attributes = ['grails-plugin': "$project.group:$project.name"]
-        }
+    userOrg = 'symentis GmbH'
+    githubSlug = 'robertoschwald/grails-audit-logging-plugin'
+    license {
+        name = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
     }
+    title = "Grails Audit-Logging Plugin"
+    desc = "Grails Audit-Logging Plugin for Grails 3.3.x"
+    developers = [robertoschwald:"Robert Oschwald", longwa:"Aaron Long", elkr:"Elmar Kretzer"]
 }
 
 asciidoctor {
