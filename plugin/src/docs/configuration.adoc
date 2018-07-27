@@ -69,9 +69,6 @@ If you use the old configuration key, the plugin will log a notice.
 |`maxSize` of `newValue`/`oldValue`
 |Allow overriding the maximum length allowed in the `oldValue` and `newValue` fields before truncating. This property defaults to the max size allowed by the `constraint`, so it's best to just control it that way.
 
-|grails.plugin.auditLog.stampEnabled
-|`true`
-|Enable stamping support for entities with the `Stampable` trait (dateCreated, lastUpdated, createdBy, lastUpdatedBy).
 |====================
 NOTE: You can view the above defaults in the `DefaultAuditLogConfig.groovy`
 
@@ -198,7 +195,6 @@ grails {
             excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
             mask = ['password']
             logIds = true  
-            stampEnabled = true
         }
     }
 }

@@ -48,16 +48,3 @@ class MyDomain implements Auditable {
     ...
 }
 ```
-
-
-If you additionally want to enable stamping, implement the Stampable Trait:
-
-```groovy
-
-import grails.plugins.orm.auditable.Auditable
-
- class MyDomain implements Auditable, Stampable {
-     String whatever
-     ...
- }
- ```

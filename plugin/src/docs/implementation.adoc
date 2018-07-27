@@ -4,9 +4,6 @@ Most of the plugin code is marked as @CompileStatic.
 === AuditLogEventListener
 The Audit Logging plugin registers a PersistenceEventListener (`AuditLogListener`) bean per datasource, which listens to GORM events.
 
-=== StampEventListener
-The plugin registers a separate StampEventListener that responds to validate events. Ideally, we would stamp when an insert or update event occurs, but since the attributes are non-null by default, we need to populate them before the default validation is triggered.
-
 === Plugin Descriptor
 The Plugin Descriptor (AuditLogListenerGrailsPlugin) configures the plugin during startup.
 
@@ -15,8 +12,3 @@ The Plugin Descriptor (AuditLogListenerGrailsPlugin) configures the plugin durin
 
 === Auditable trait
 Enabling auditing on a Domain class is done by implementing the `Auditable` trait.
-
-=== Stampable trait
-Enabling stamping on a Domain class is done by implementing the `Stampable` trait.
-This trait adds the properties dateCreated, lastUpdated, createdBy, lastUpdatedBy
-to the domain class.
