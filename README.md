@@ -58,6 +58,7 @@ Special thanks to all the contributors to the project (in alphabetical order):
 	Matthew A Stewart
 	Paul Taylor
 	Sebastien Arbogast
+	Semyon Atamas
 	Shawn Hartsock
 	Tom Crossland
 	
