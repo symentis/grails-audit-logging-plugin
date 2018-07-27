@@ -85,7 +85,6 @@ task wrapper(type: Wrapper) {
 grailsPublish {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
-    userOrg = 'symentis GmbH'
     githubSlug = 'robertoschwald/grails-audit-logging-plugin'
     license {
         name = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
