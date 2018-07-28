@@ -77,6 +77,10 @@ To support unifying the configuration, trait, and context usage, some of the con
 | *Removed*
 | Use AuditRequestResolver
 
+| handlersOnly
+| *Removed*
+| Use Grails callback methods
+
 | stampAlways
 | *Removed*
 | Use a `TraitInjector` with `Stampable`
@@ -90,7 +94,7 @@ The Audit instances are still saved in a new session within any existing transac
 === Handlers Removed
 The handler callbacks such as `onChange`, `onSave`, etc. have been removed starting with version 3.0.0.
 
-This behavior is already provided by Grails using the `before*` and `after*` callback methods. 
+This behavior is already provided by Grails now using the `before*` and `after*` callback methods.
 
 For example, you could do something like:
 
@@ -101,8 +105,6 @@ def beforeInsert() {
     // Do something special if certain properties are dirty, etc.
 }
 ```
-
-Obviously, the `handlersOnly` configuration is also no longer relevant.
 
 === Actor Closure
 The actor closure has been replaced with a more formalized `AuditRequestResolver` strategy for resolving actor and URI information.

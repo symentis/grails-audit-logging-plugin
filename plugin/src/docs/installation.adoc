@@ -5,7 +5,7 @@ Add to your build.gradle project dependencies block:
 [source,groovy]
 ----
 dependencies {
-   compile 'org.grails.plugins:audit-logging:{version}'
+   compile 'org.grails.plugins:audit-logging:{VERSION}'
 }
 ----
 Then run the following to refresh gradle dependencies: 
@@ -25,13 +25,13 @@ For example:
 
     grails audit-quickstart org.myaudit.example AuditTrail
 
-This will create the Audit Domain class as well as configure:
+This will create the Audit Domain class and adds to application.groovy:
 
     grails.plugin.auditLog.auditDomainClassName = 'org.myaudit.example.AuditTrail'
     
 Once created, you should open the generated file to adjust the `mappings` and `constraints` to suit your needs.
 
-WARNING: Be sure to respect the existing nullability constraints or the plugin may not work correctly
+WARNING: Be sure to respect the existing nullability constraints or the plugin may not work correctly. You must update your db schema either by DDL, or using the database-migration plugin (recommended)
 
 === Prepare your Domain classes for Auditing
 
