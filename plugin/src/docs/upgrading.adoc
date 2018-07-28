@@ -4,36 +4,35 @@ The 3.0.0 version of the plugin is a major rewrite of the codebase. Therefore yo
 
 === Domain Classes
 Prior versions of the plugin used a static property syntax to enable and customize logging:
-[source,groovy]
-----
+
+```groovy
 // Legacy enable/disable
 static auditable = true
 
 // Legacy whitelist
 static auditable = [auditableProperties: ['name', 'famous', 'lastUpdated']]
-----
+```
 
 Starting with version 3.0.0, the plugin uses an `Auditable` trait and/or a `Stampable` trait as both a marker as well as a way to configure and override auditing behavior.
 
 For the first example, just adding `implements Auditable` will enable the default behavior.
 
-[source,groovy]
-----
+```groovy
 import grails.plugins.orm.auditable.Auditable
 class MyDomain implements Auditable {
   ..
 }
-----
+```
 
 For the second example above, you simply override the appropriate method on the `Auditable` trait, in this case the method is `getLogIncluded()`:
 
-[source,groovy]
-----
+```groovy
 @Override
 Collection<String> getLogIncluded() {
     ['name', 'famous', 'lastUpdated']
 }
-----
+```
+
 NOTE: The getter methods on `Auditable` all follow the `getLog*()` format to minimize collisions with user methods. Typically they are `getLog<Configuration Name>()` followed by whatever the configurable value (included, excluded, mask) with a few exceptions.
 
 === Configuration Changes
@@ -94,14 +93,15 @@ The handler callbacks such as `onChange`, `onSave`, etc. have been removed start
 This behavior is already provided by Grails using the `before*` and `after*` callback methods. 
 
 For example, you could do something like:
-[source,groovy]
-----
+
+```groovy
 def beforeInsert() {
     def dirtyAudit = getAuditableDirtyPropertyNames()
     
     // Do something special if certain properties are dirty, etc.
 }
-----
+```
+
 Obviously, the `handlersOnly` configuration is also no longer relevant.
 
 === Actor Closure
@@ -124,8 +124,7 @@ However, there are some limitations to implementing this as a trait:
 
 The `stampAlways` has been removed. If you want to mark *all* of your domain objects as stampable, you could define the following `TraitInjector`:
 
-[source,groovy]
-----
+```groovy
 @CompileStatic
 class StampableTraitInjector implements TraitInjector {
     @Override
@@ -138,4 +137,4 @@ class StampableTraitInjector implements TraitInjector {
         ['Domain'] as String[]
     }
 }
-----
+```

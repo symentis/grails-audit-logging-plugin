@@ -5,15 +5,16 @@ You can use the grails-audit-logging plugin in several ways.
 To enable auditing using the default configuration, simply implement the `Auditable` trait. 
 
 For example:
-[source,groovy]
-----
+
+```groovy
 class Author implements Auditable {
     String name
     Integer age
     
     static hasMany = [books: Book]
 }
-----
+```
+
 This will enable auditing for the domain using your configuration in `grails.plugin.auditLog` merged with the defaults from `DefaultAuditLogConfig.groovy` (in the plugin jar).
 
 === Context Overrides
@@ -25,8 +26,8 @@ One fairly common example is the need to disable audit logging completely for a 
 You can use the `AuditLogContext` object to override almost any configuration parameter for a given block
 
 For example:
-[source,groovy]
-----
+
+```groovy
 // Enable verbose logging with full class name excluding only properties named 'ssn'
 AuditLogContext.withConfig(verbose: true, logFullClassName: true, excluded: ['ssn']) { ... }
 
@@ -35,61 +36,62 @@ AuditLogContext.withConfig(verbose: false) { ... }
 
 // Disable all logging 
 AuditLogContext.withConfig(disabled: true) { ... }
-----
+```
+
 The last two are so common, there's a method that does them by name:
 
-[source,groovy]
-----
+```groovy
 // Disable verbose logging
 AuditLogContext.withoutVerboseAuditLog { ... }
 
 // Disable all logging
 AuditLogContext.withoutAuditLog { ... }
-----
+```
 
-WARNING: The AuditLogContext stores the context using ThreadLocal, so configuration is only present for the current thread. If you start something asynchronously, be sure you setup the context within the new execution thread.
-
+[WARNING]
+====
+The AuditLogContext stores the context using ThreadLocal, so configuration is only present for the current thread. If you start something asynchronously, be sure you setup the context within the new execution thread.
+====
 
 === Domain Overrides
 The context gives you programmatic control over configuration of auditing but you can go even finer grained, if needed, to control auditing on a per-entity basis.
 
 To override auditing for a specific entity or based on runtime values, just override the trait method:
 
-[source,groovy]
-----
+```groovy
 // Assuming this domain has a status attribute, disable auditing for anything not active, for example
 @Override
 boolean isAuditable() {
     this.status == ACTIVE
 }
-----
+```
 
 Another example is to override which properties get ignored for a specific entity:
-[source,groovy]
-----
+
+```groovy
 @Override
 Collection<String> getLogExcluded() {
     ['myField', 'version']
 }
-----
+```
 
 Control the specific whitelist of attributes logged:
-[source,groovy]
-----
+
+```groovy
 @Override
 Collection<String> getLogIncluded() {
     ['whiteListField1', 'whiteListField2']
 }
-----
+```
 
 Customize the id that is logged for the entity, for example instead of using Author's `id` property, log the Author's name and age as `Tolkien:85`:
-[source,groovy]
-----
+
+```groovy
 @Override
 String getLogEntityId() {
     "${name}:${age}"
 }
-----
+```
 
 The ability to override and augment the default behavior provided by the trait is what makes the trait implementation so flexible.
 
@@ -97,8 +99,8 @@ NOTE: Most of the `Auditable` methods rely on the AuditLogContext for defaults. 
 
 === Customized Auditable Trait
 You could also extend the trait entirely to override the default auditing behavior:
-[source,groovy]
-----
+
+```groovy
 trait MyAuditable<D> extends Auditable<D> {
     // Customize formatting behavior for new and old values
     @Override
@@ -115,30 +117,31 @@ trait MyAuditable<D> extends Auditable<D> {
         auditEntity.naturalKey = getNaturalKey()
     }
 }
-----
+```
 
 === Request Resolvers
 Audit logging usually requires auditing the user and/or request context for a specific action. The plugin supports a pluggable method of resolving request context by registering an `auditRequestResolver` bean that applications can override if needed.
 
 ==== Audit Request Resolvers
 The plugin ships with two resolvers:
-[source,groovy]
-----
+
+```groovy
 class DefaultAuditRequestResolver implements AuditRequestResolver { ... }
-----
+```
+
 and
-[source,groovy]
-----
+
+```groovy
 class SpringSecurityRequestResolver extends DefaultAuditRequestResolver { ... }
-----
+```
 
 The default resolver uses the `principal` in the active GrailsWebRequest to resolve the Actor name and Request URI for logging purposes.
 
 If a bean named `springSecurityService` is available, the second resolver is registered which uses the `currentUser()` method to resolve the user context.
 
 For other authentication strategies, you can implement and override the `auditRequestResolver` bean with your own implementation of:
-[source,groovy]
-----
+
+```groovy
 interface AuditRequestResolver {
     /**
      * @return the current actor
@@ -150,22 +153,23 @@ interface AuditRequestResolver {
      */
     String getCurrentURI()
 }
-----
+```
+
 Just register your resolver in `resources.groovy`:
-[source,groovy]
-----
+
+```groovy
 beans = {
     auditRequestResolver(CustomAuditRequestResolver) {
         customService = ref('customService')
     }
 }
-----
+```
 
 Below are a few examples for other common security frameworks. 
 
 ===== Acegi Plugin
-[source,groovy]
-----
+
+```groovy
 /**
  * @author Jorge Aguilera
  */
@@ -177,11 +181,11 @@ class AcegiAuditResolver extends DefaultAuditRequestResolver {
         authenticateService?.principal()?.username ?: super.getCurrentActor()
     }    
 }
-----
+```
 
 ===== CAS Authentication
-[source,groovy]
-----
+
+```groovy
 import edu.yale.its.tp.cas.client.filter.CASFilter
 
 class CASAuditResolver extends DefaultAuditRequestResolver {
@@ -193,11 +197,10 @@ class CASAuditResolver extends DefaultAuditRequestResolver {
         request?.session?.getAttribute(CASFilter.CAS_FILTER_USER)
     }    
 }
-----
+```
 
 ===== Shiro Plugin
-[source,groovy]
-----
+```groovy
 @Component('auditRequestResolver')
 class ShiroAuditResolver extends DefaultAuditRequestResolver {
     @Override
@@ -205,4 +208,4 @@ class ShiroAuditResolver extends DefaultAuditRequestResolver {
         org.apache.shiro.SecurityUtils.getSubject()?.getPrincipal()
     }    
 }
-----
+```

@@ -1,8 +1,7 @@
 == Stamping
 Stamping adds the following attributes to a domain object via the `Stampable` trait:
 
-[source,groovy]
-----
+```groovy
 trait Stampable<D> extends GormEntity<D> {
     Date dateCreated
     Date lastUpdated
@@ -10,7 +9,7 @@ trait Stampable<D> extends GormEntity<D> {
     String createdBy
     String lastUpdatedBy
 }
-----
+```
 
 The attributes will assume the default constraints, which should be fine for most cases.
 
@@ -20,18 +19,16 @@ You can configure the `constraints` and `mappings` block as usual in your domain
 Previous versions used an AST transformation to apply the stamping and could allow more configuration.
 For now, the stamping support has been boiled down to just the basic trait attributes and the ability to disable the plugin globally.
 
-[source,groovy]
-----
+```groovy
 // Enable or disable stamping
 grails.plugin.auditLog.stampEnabled = true
-----
+```
 
 WARNING: If you disable stamping but have `Stampable` entities, they will likely fail validation since the plugin will not be populating the fields which are still added to the domain objects. The main reason to disable stamping is to prevent the listener registration in the case that you just aren't using the `Stampable` support.
 
 If you want to mark *all* of your domain objects as stampable, you could define the following `TraitInjector`:
 
-[source,groovy]
-----
+```groovy
 @CompileStatic
 class StampableTraitInjector implements TraitInjector {
     @Override
@@ -44,4 +41,4 @@ class StampableTraitInjector implements TraitInjector {
         ['Domain'] as String[]
     }
 }
-----
+```

@@ -40,7 +40,6 @@ For every Domain class you want to be audited, implement the Auditable Trait.
 For example:
 
 ```groovy
-
 import grails.plugins.orm.auditable.Auditable
 
 class MyDomain implements Auditable {
@@ -53,11 +52,10 @@ class MyDomain implements Auditable {
 If you additionally want to enable stamping, implement the Stampable Trait:
 
 ```groovy
-
 import grails.plugins.orm.auditable.Auditable
 
  class MyDomain implements Auditable, Stampable {
      String whatever
      ...
  }
- ```
+```
