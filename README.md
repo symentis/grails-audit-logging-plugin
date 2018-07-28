@@ -41,7 +41,7 @@ Pull requests are highly appreciated and welcome!
 Please add integration tests for new features to the audit-test application.
 
 ## Contributors
-Special thanks to all the contributors to the project (in alphabetical order):
+Special thanks to all the contributors (in alphabetical order):
 
 	Aaron Long
 	Aldrin
