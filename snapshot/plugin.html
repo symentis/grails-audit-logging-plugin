@@ -1087,7 +1087,7 @@ please file a GitHub issue.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-   compile <span class="string"><span class="delimiter">'</span><span class="content">org.grails.plugins:audit-logging:{version}</span><span class="delimiter">'</span></span>
+   compile <span class="string"><span class="delimiter">'</span><span class="content">org.grails.plugins:audit-logging:{VERSION}</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -1128,7 +1128,7 @@ After installing the plugin, you must perform the following command to let the p
 </div>
 </div>
 <div class="paragraph">
-<p>This will create the Audit Domain class as well as configure:</p>
+<p>This will create the Audit Domain class and adds to application.groovy:</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1145,7 +1145,7 @@ After installing the plugin, you must perform the following command to let the p
 <i class="fa icon-warning" title="Warning"></i>
 </td>
 <td class="content">
-Be sure to respect the existing nullability constraints or the plugin may not work correctly
+Be sure to respect the existing nullability constraints or the plugin may not work correctly. You must update your db schema either by DDL, or using the database-migration plugin (recommended)
 </td>
 </tr>
 </table>
@@ -1314,6 +1314,11 @@ The getter methods on <code>Auditable</code> all follow the <code>getLog*()</cod
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Removed</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Use AuditRequestResolver</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">handlersOnly</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Removed</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use Grails callback methods</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1332,7 +1337,7 @@ The getter methods on <code>Auditable</code> all follow the <code>getLog*()</cod
 <p>The handler callbacks such as <code>onChange</code>, <code>onSave</code>, etc. have been removed starting with version 3.0.0.</p>
 </div>
 <div class="paragraph">
-<p>This behavior is already provided by Grails using the <code>before*</code> and <code>after*</code> callback methods.</p>
+<p>This behavior is already provided by Grails now using the <code>before*</code> and <code>after*</code> callback methods.</p>
 </div>
 <div class="paragraph">
 <p>For example, you could do something like:</p>
@@ -1345,9 +1350,6 @@ The getter methods on <code>Auditable</code> all follow the <code>getLog*()</cod
     <span class="comment">// Do something special if certain properties are dirty, etc.</span>
 }</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>Obviously, the <code>handlersOnly</code> configuration is also no longer relevant.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2145,7 +2147,7 @@ to the domain class.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.1-SNAPSHOT<br>
-Last updated 2018-07-28 11:52:12 +00:00
+Last updated 2018-07-28 12:05:52 +00:00
 </div>
 </div>
 </body>
