@@ -7,7 +7,7 @@ The master branch holds the codebase for plugin version 3.0.x (Grails 3.3.x).
 For older Grails versions, see "Supported Grails Versions" below.
 
 ## Documentation
- * For current release documentation, see [User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/latest/)
+ * For current release documentation, see [User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/latest/plugin.html)
  * For snapshot documentation, see [Snapshot User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/snapshot/plugin.html)
  * For 2.x documentation, see [2.x User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/2.0.0/plugin.html)
  * For 1.x documentation, see [1.x Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
