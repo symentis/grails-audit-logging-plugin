@@ -1,7 +1,9 @@
 #  Grails-Audit-Logging Documentation Branch
 
-[Grails 3.0.0-SNAPSHOT Documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/snapshot/)
+[Grails release documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/latest/)
 
-[Grails 1.x / 2.x Plugin Documentation](http://grails.org/plugin/audit-logging)
+[Grails latest SNAPSHOT documentation](https://robertoschwald.github.io/grails-audit-logging-plugin/snapshot/)
+
+[Grails 1.x / 2.x Plugin documentation](http://grails.org/plugin/audit-logging)
 
 
