@@ -61,7 +61,7 @@ dependencies {
     provided "org.grails.plugins:spring-security-core:3.2.0"
 
     testCompile "org.grails:grails-gorm-testing-support"
-    testCompile "org.grails:grails-plugin-testing"
+    testCompile "org.grails:grails-web-testing-support"
 }
 
 bootRepackage.enabled = false
