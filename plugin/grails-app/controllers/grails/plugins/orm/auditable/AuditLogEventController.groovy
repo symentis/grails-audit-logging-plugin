@@ -19,48 +19,50 @@
 package grails.plugins.orm.auditable
 
 class AuditLogEventController {
-  Class AuditLogEvent = AuditLogListenerUtil.auditDomainClass
+    private Class AuditLogEvent = AuditLogListenerUtil.auditDomainClass
 
-  // the delete, save and update actions only accept POST requests
-  static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+    // the delete, save and update actions only accept POST requests
+    static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 
-  def index() {
-    redirect(action: 'list', params: params)
-  }
-
-  def list() {
-    if (!params.max) params.max = 10
-
-    [auditLogEventInstanceList: AuditLogEvent.list(params), auditLogEventInstanceTotal: AuditLogEvent.count()]
-  }
-
-  def show() {
-    def  auditLogEvent = AuditLogEvent.get(params.id)
-    if (auditLogEvent == null) {
-      flash.message = "AuditLogEvent not found with id ${params.id}"
-      redirect(action: 'list')
-      return
+    def index() {
+        redirect(action: 'list', params: params)
     }
-    [auditLogEventInstance: auditLogEvent]
-  }
 
-  def delete() {
-    redirect(action: 'list')
-  }
+    def list() {
+        if (!params.max) {
+            params.max = 10
+        }
 
-  def edit() {
-    redirect(action: 'list')
-  }
+        [auditLogEventInstanceList: AuditLogEvent.list(params), auditLogEventInstanceTotal: AuditLogEvent.count()]
+    }
 
-  def update() {
-    redirect(action: 'list')
-  }
+    def show() {
+        def auditLogEvent = AuditLogEvent.get(params.id)
+        if (auditLogEvent == null) {
+            flash.message = "AuditLogEvent not found with id ${params.id}"
+            redirect(action: 'list')
+            return
+        }
+        [auditLogEventInstance: auditLogEvent]
+    }
 
-  def create() {
-    redirect(action: 'list')
-  }
+    def delete() {
+        redirect(action: 'list')
+    }
 
-  def save() {
-    redirect(action: 'list')
-  }
+    def edit() {
+        redirect(action: 'list')
+    }
+
+    def update() {
+        redirect(action: 'list')
+    }
+
+    def create() {
+        redirect(action: 'list')
+    }
+
+    def save() {
+        redirect(action: 'list')
+    }
 }

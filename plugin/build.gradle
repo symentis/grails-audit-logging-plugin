@@ -25,6 +25,7 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-plugin-publish"
+apply plugin: "org.grails.grails-gsp"
 apply plugin: "org.asciidoctor.convert"
 
 // Used for publishing to central repository, remove if not needed
@@ -46,22 +47,26 @@ repositories {
 
 dependencies {
     profile "org.grails.profiles:web-plugin"
-    compile "org.springframework.boot:spring-boot-starter-logging"
-    compile "org.springframework.boot:spring-boot-autoconfigure"
-    compile "org.grails:grails-core"
-    compile "org.grails:grails-datastore-gorm"
-    compile "org.grails:grails-web-boot"
 
-    console "org.grails:grails-console"
-
+    provided 'org.springframework.boot:spring-boot-starter-logging'
+    provided "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-autoconfigure"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
+    provided "org.grails:grails-web-boot"
+    provided "org.grails:grails-core"
+    provided "org.grails:grails-logging"
+    provided "org.grails:grails-plugin-rest"
+    provided "org.grails:grails-plugin-i18n"
+    provided "org.grails:grails-plugin-services"
+    provided "org.grails:grails-plugin-url-mappings"
+    provided "org.grails:grails-plugin-interceptors"
+    provided "org.grails.plugins:gsp"
+    provided "org.grails:grails-console"
     provided "org.grails:grails-plugin-services"
     provided "org.grails:grails-plugin-domain-class"
 
-    provided "javax.servlet:javax.servlet-api:3.1.0"
-    provided "org.grails.plugins:spring-security-core:3.2.0"
-
-    testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-plugin-testing"
+    testCompile "org.grails:grails-web-testing-support"
 }
 
 bootRepackage.enabled = false
