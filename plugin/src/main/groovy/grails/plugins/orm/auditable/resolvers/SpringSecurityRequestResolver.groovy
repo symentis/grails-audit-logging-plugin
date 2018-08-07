@@ -1,11 +1,10 @@
 package grails.plugins.orm.auditable.resolvers
 
-import grails.plugin.springsecurity.SpringSecurityService
-import groovy.transform.CompileStatic
-
-@CompileStatic
+/**
+ * Default resolver that uses the SpringSecurityService principal if available
+ */
 class SpringSecurityRequestResolver extends DefaultAuditRequestResolver {
-    SpringSecurityService springSecurityService
+    def springSecurityService
 
     @Override
     String getCurrentActor() {
