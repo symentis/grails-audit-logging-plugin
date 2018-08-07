@@ -1,4 +1,7 @@
 == Change Log
+* 3.0.1
+** Fix #169 Crash if project is not using Spring-Security-Core plugin
+** Minor changes to EventLogController
 * 3.0.0
 ** Major rewrite of plugin to be trait based
 ** Removed support for handler callbacks
