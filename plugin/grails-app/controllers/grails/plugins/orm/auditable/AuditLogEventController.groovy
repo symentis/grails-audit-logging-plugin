@@ -19,7 +19,7 @@
 package grails.plugins.orm.auditable
 
 class AuditLogEventController {
-    private Class AuditLogEvent = AuditLogListenerUtil.auditDomainClass
+    protected Class AuditLogEvent = AuditLogListenerUtil.auditDomainClass
 
     // the delete, save and update actions only accept POST requests
     static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
