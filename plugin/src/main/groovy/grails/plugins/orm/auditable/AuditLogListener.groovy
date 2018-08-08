@@ -176,6 +176,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         getAuditDomainClass().invokeMethod("withNewSession") { Object session ->
             Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
 
+            // Use a single date for all audit_log entries in this transaction
+            // Note, this will be ignored unless the audit_log domin has 'autoTimestamp false'
+            Date dateCreated = new Date()
+
             // This handles insert, delete, and update with any property level logging enabled
             if (newMap || oldMap) {
                 Set<String> allPropertyNames = (newMap.keySet() + oldMap.keySet())
@@ -198,6 +202,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                         actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
                         persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
                         propertyName: propertyName, oldValue: oldValueAsString, newValue: newValueAsString,
+                        dateCreated: dateCreated, lastUpdated: dateCreated
                     )
                     if (domain.beforeSaveLog(audit)) {
                         audit.save(failOnError: true)
@@ -206,7 +211,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
             else {
                 // Create a single entity for this event
-                GormEntity audit = createAuditLogDomainInstance(actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(), persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion)
+                GormEntity audit = createAuditLogDomainInstance(
+                    actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
+                    persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
+                    dateCreated: dateCreated, lastUpdated: dateCreated
+                )
                 if (domain.beforeSaveLog(audit)) {
                     audit.save(failOnError: true)
                 }

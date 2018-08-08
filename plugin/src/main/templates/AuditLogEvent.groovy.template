@@ -24,12 +24,7 @@ package ${packageName}
  * Grails to create a table for you. (e.g. DDL or db-migration plugin)
  */
 class ${auditClassName} implements Serializable {
-    private static final long serialVersionUID = 1L
-
-    static auditable = false
-
-    Date dateCreated
-    Date lastUpdated
+    static final long serialVersionUID = 1L
 
     String actor
     String uri
@@ -42,6 +37,9 @@ class ${auditClassName} implements Serializable {
     String oldValue
     String newValue
 
+    Date dateCreated
+    Date lastUpdated
+
     static constraints = {
         actor(nullable: true)
         uri(nullable: true)
@@ -50,7 +48,6 @@ class ${auditClassName} implements Serializable {
         persistedObjectVersion(nullable: true)
         eventName(nullable: true)
         propertyName(nullable: true)
-
         oldValue(nullable: true)
         newValue(nullable: true)
     }
@@ -70,10 +67,11 @@ class ${auditClassName} implements Serializable {
         // id generator:"uuid2", type:"string", "length:36"
 
         // no HQL queries package name import (was default in 1.x version)
-        //autoImport false
+        // autoImport false
 
         version false
-        
+        autoTimestamp false
+
         // for large column support (as in < 1.0.6 plugin versions), use this
         // oldValue type: 'text'
         // newValue type: 'text'
