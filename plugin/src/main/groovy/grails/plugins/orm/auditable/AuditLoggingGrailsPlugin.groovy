@@ -84,6 +84,10 @@ class AuditLoggingGrailsPlugin extends Plugin {
 
     @Override
     Closure doWithSpring() {{->
+        // Must load config before the application context has been refreshed
+        AuditLoggingConfigUtils.resetAuditConfig()
+        AuditLoggingConfigUtils.reloadAuditConfig()
+
         try {
             if (applicationContext.getBean("springSecurityService")) {
                 log.debug("Audit logging detected spring security, using spring security request resolver")
