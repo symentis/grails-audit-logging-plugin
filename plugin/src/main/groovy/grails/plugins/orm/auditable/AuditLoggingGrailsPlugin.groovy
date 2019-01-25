@@ -71,13 +71,23 @@ class AuditLoggingGrailsPlugin extends Plugin {
         Set<String> excludedDataStores = (config.getProperty("excludedDataSources") ?: []) as Set<String>
 
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
-            String dataSourceName = datastore.metaClass.getProperty(datastore, 'dataSourceName')
+            // mongo datastores don't have a dataSourceName property
+            if (datastore.getProperties().containsKey("dataSourceName")) {
+                String dataSourceName = datastore.metaClass.getProperty(datastore, 'dataSourceName')
 
-            if (!config.disabled && !excludedDataStores.contains(dataSourceName)) {
-                applicationContext.addApplicationListener(new AuditLogListener(datastore, grailsApplication))
-            }
-            if (config.stampEnabled && !excludedDataStores.contains(dataSourceName)) {
-                applicationContext.addApplicationListener(new StampListener(datastore, grailsApplication))
+                if (!config.disabled && !excludedDataStores.contains(dataSourceName)) {
+                    applicationContext.addApplicationListener(new AuditLogListener(datastore, grailsApplication))
+                }
+                if (config.stampEnabled && !excludedDataStores.contains(dataSourceName)) {
+                    applicationContext.addApplicationListener(new StampListener(datastore, grailsApplication))
+                }
+            } else {
+                if (!config.disabled) {
+                    applicationContext.addApplicationListener(new AuditLogListener(datastore, grailsApplication))
+                }
+                if (config.stampEnabled) {
+                    applicationContext.addApplicationListener(new StampListener(datastore, grailsApplication))
+                }
             }
         }
     }
