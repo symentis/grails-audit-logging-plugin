@@ -516,8 +516,8 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Grails Audit Logging Plugin</h1>
 <div class="details">
 <span id="author" class="author">Robert Oschwald</span><br>
-<span id="revnumber">version 3.0.2,</span>
-<span id="revdate">2018-12-23</span>
+<span id="revnumber">version 3.0.3,</span>
+<span id="revdate">2019-01-29</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -589,7 +589,7 @@ table.CodeRay td.code>pre{padding:0}
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Other formats: <a href="audit-logging-3.0.2.pdf">PDF</a>, <a href="audit-logging-3.0.2.epub">EPUB</a></p>
+<p>Other formats: <a href="audit-logging-3.0.3.pdf">PDF</a>, <a href="audit-logging-3.0.3.epub">EPUB</a></p>
 </div>
 </div>
 </div>
@@ -651,6 +651,10 @@ table.CodeRay td.code>pre{padding:0}
 <p>Please note, that only Hibernate5 is tested during development. If an issue occurs with your ORM mapper,
 please file a GitHub issue.</p>
 </div>
+<div class="paragraph">
+<p>While the plugin can log transactions for a MongoDB DataSource, it currently does not support MongoDB as an audit logging backend.
+If you use this plugin to log MongoDB transactions, you must configure a SQL DataSource for Audit Logging. See Ticket #181.</p>
+</div>
 </div>
 </div>
 </div>
@@ -659,6 +663,19 @@ please file a GitHub issue.</p>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
+<li>
+<p>3.0.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #180, Fixed checking of the pull request in the travis-build.sh</p>
+</li>
+<li>
+<p>Fix #176, #178, #179 Mongo datastores don&#8217;t have a dataSourceName property</p>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>3.0.2</p>
 <div class="ulist">
@@ -2169,8 +2186,8 @@ to the domain class.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 3.0.2<br>
-Last updated 2018-12-23 11:53:52 +00:00
+Version 3.0.3<br>
+Last updated 2019-01-29 16:18:48 +00:00
 </div>
 </div>
 </body>
