@@ -54,11 +54,13 @@ Special thanks to all the contributors (in alphabetical order):
 	Elmar Kretzer
 	Fernando Cambarieri
 	Graeme Rocher
+	Jeff Palmer
 	Jorge Aguilera
 	Juergen Baumann
 	Madhava Jay
 	Matthew A Stewart
 	Paul Taylor
+	Sami Mäkelä
 	Sebastien Arbogast
 	Semyon Atamas
 	Shawn Hartsock
