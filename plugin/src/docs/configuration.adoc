@@ -14,7 +14,7 @@ If you use the old configuration key, the plugin will log a notice.
 | *Property* | *Default Value* | *Meaning*
 
 |grails.plugin.auditLog.auditDomainClassName
-|*(Requred)* Use `grails audit-quickstart` to create
+|*(Required)* Use `grails audit-quickstart` to create
 |Domain Class Name for the Audit Domain class.
 
 |grails.plugin.auditLog.disabled
