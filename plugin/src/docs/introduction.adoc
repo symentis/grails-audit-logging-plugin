@@ -23,3 +23,6 @@ This plugin is GORM agnostic, so you can use it with the GORM implementation of 
 
 Please note, that only Hibernate5 is tested during development. If an issue occurs with your ORM mapper,
 please file a GitHub issue.
+
+While the plugin can log transactions for a MongoDB DataSource, it currently does not support MongoDB as an audit logging backend.
+If you use this plugin to log MongoDB transactions, you must configure a SQL DataSource for Audit Logging. See Ticket #181.

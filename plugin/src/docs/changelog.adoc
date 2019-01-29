@@ -1,4 +1,8 @@
 == Change Log
+* 3.0.3
+** Fix #180, Fixed checking of the pull request in the travis-build.sh
+** Fix #176, #178, #179 Mongo datastores don't have a dataSourceName property
+
 * 3.0.2
 ** Fix #174 Merge default config before application ctx is refreshed
 
