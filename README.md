@@ -18,7 +18,7 @@ For older Grails versions, see "Supported Grails Versions" below.
  * Grails   2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
 ## audit-quickstart
-You need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version(s) and later. 
+You need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's 2.0.x version or later. 
 See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
   
 With this, you get an auditlog domain class in your project which is fully under your control. 
@@ -60,7 +60,7 @@ Special thanks to all the contributors (in alphabetical order):
 	Madhava Jay
 	Matthew A Stewart
 	Paul Taylor
-	Sami Mäkelä
+	Sami Mäkelä
 	Sebastien Arbogast
 	Semyon Atamas
 	Shawn Hartsock
