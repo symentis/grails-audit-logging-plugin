@@ -84,16 +84,13 @@ class AuditLoggingGrailsPlugin extends Plugin {
 
     @Override
     Closure doWithSpring() {{->
-        try {
-            if (applicationContext.getBean("springSecurityService")) {
-                log.debug("Audit logging detected spring security, using spring security request resolver")
-                auditRequestResolver(SpringSecurityRequestResolver) {
-                    springSecurityService = ref('springSecurityService')
-                }
+        if (applicationContext.containsBean("springSecurityService")) {
+            log.debug("Audit logging detected spring security, using spring security request resolver")
+            auditRequestResolver(SpringSecurityRequestResolver) {
+                springSecurityService = ref('springSecurityService')
             }
         }
-        catch(NoSuchBeanDefinitionException ignored) {
-            log.debug("Audit logging using default request resolver")
+        else {
             auditRequestResolver(DefaultAuditRequestResolver)
         }
     }}
