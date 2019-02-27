@@ -18,7 +18,7 @@ For older Grails versions, see "Supported Grails Versions" below.
  * Grails   2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
 ## audit-quickstart
-You need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's version(s) and later. 
+You need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's 2.0.x version or later. 
 See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
   
 With this, you get an auditlog domain class in your project which is fully under your control. 
@@ -48,16 +48,19 @@ Special thanks to all the contributors (in alphabetical order):
 	Andrey Zhuchkov
 	Ankur Tripathi
 	Burt Beckwith 
+	Danny Casady
 	Dennie de Lange
 	Dhiraj Mahapatro
 	Elmar Kretzer
 	Fernando Cambarieri
 	Graeme Rocher
+	Jeff Palmer
 	Jorge Aguilera
 	Juergen Baumann
 	Madhava Jay
 	Matthew A Stewart
 	Paul Taylor
+	Sami Mäkelä
 	Sebastien Arbogast
 	Semyon Atamas
 	Shawn Hartsock
@@ -69,8 +72,10 @@ Special thanks to all the contributors (in alphabetical order):
 ## Continuous Integration Server
 [![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
 
-## Bintray
+## Bintray Repository
 <a href='https://bintray.com/robertoschwald/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
+
+[ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
 
 ***
 
