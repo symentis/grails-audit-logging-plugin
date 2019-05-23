@@ -52,6 +52,7 @@ Special thanks to all the contributors (in alphabetical order):
 	Dennie de Lange
 	Dhiraj Mahapatro
 	Elmar Kretzer
+    Felix Scheinost
 	Fernando Cambarieri
 	Graeme Rocher
 	Jeff Palmer
