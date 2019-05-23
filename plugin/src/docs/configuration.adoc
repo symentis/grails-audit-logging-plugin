@@ -80,13 +80,19 @@ When enabled, per-property logging is enabled for all operations.
 
     grails.plugin.auditLog.verbose = true
 
-You can enable verbose logging for specific event types using:
+or you can enable verbose logging for specific event types using:
 
-    grails.plugin.auditLog.verboseEvents = [AuditLogEvent.UPDATE]
+    grails.plugin.auditLog.verboseEvents = [AuditEventType.UPDATE]
+
+If both verbose=true and verboseEvents are set, verbose has precedence.
+
+If verbose=true, or verboseEvents contains AuditEventType.DELETE, deletion of an entity will cause
+all properties of the deleted entity to be logged, except associations (Collections), as this is
+currently not possible. See issue #153
 
 [WARNING]
 ====
-Verbose logging will insert 1 row of data per property of your domain object for insert and delete operations. This can result in a large amount of additional data, sometimes far more than the actual operation itself. Consider disabling verbose mode for bulk operations using the `AuditLogContext.withoutVerboseAuditLog { }` closure.
+Verbose logging will insert 1 row of data per property of your domain object for all or verboseEvents type operations. This can result in a large amount of additional data, sometimes far more than the actual operation itself. Consider disabling verbose mode for bulk operations using the `AuditLogContext.withoutVerboseAuditLog { }` closure.
 ====
 
 === Logging of Associated Ids
