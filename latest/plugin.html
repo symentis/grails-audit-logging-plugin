@@ -516,8 +516,8 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Grails Audit Logging Plugin</h1>
 <div class="details">
 <span id="author" class="author">Robert Oschwald</span><br>
-<span id="revnumber">version 3.0.3,</span>
-<span id="revdate">2019-01-29</span>
+<span id="revnumber">version 3.0.4,</span>
+<span id="revdate">2019-05-23</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -589,7 +589,7 @@ table.CodeRay td.code>pre{padding:0}
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Other formats: <a href="audit-logging-3.0.3.pdf">PDF</a>, <a href="audit-logging-3.0.3.epub">EPUB</a></p>
+<p>Other formats: <a href="audit-logging-3.0.4.pdf">PDF</a>, <a href="audit-logging-3.0.4.epub">EPUB</a></p>
 </div>
 </div>
 </div>
@@ -663,6 +663,19 @@ If you use this plugin to log MongoDB transactions, you must configure a SQL Dat
 <div class="sectionbody">
 <div class="ulist">
 <ul>
+<li>
+<p>3.0.4</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #153 NPE on delete for Hibernate PersistentCollection associations</p>
+</li>
+<li>
+<p>Fix documentation for verboseEvents</p>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>3.0.3</p>
 <div class="ulist">
@@ -1488,7 +1501,7 @@ If you use the old configuration key, the plugin will log a notice.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.auditDomainClassName</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>(Requred)</strong> Use <code>grails audit-quickstart</code> to create</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>(Required)</strong> Use <code>grails audit-quickstart</code> to create</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Domain Class Name for the Audit Domain class.</p></td>
 </tr>
 <tr>
@@ -1586,12 +1599,20 @@ You can view the above defaults in the <code>DefaultAuditLogConfig.groovy</code>
 </div>
 </div>
 <div class="paragraph">
-<p>You can enable verbose logging for specific event types using:</p>
+<p>or you can enable verbose logging for specific event types using:</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>grails.plugin.auditLog.verboseEvents = [AuditLogEvent.UPDATE]</pre>
+<pre>grails.plugin.auditLog.verboseEvents = [AuditEventType.UPDATE]</pre>
 </div>
+</div>
+<div class="paragraph">
+<p>If both verbose=true and verboseEvents are set, verbose has precedence.</p>
+</div>
+<div class="paragraph">
+<p>If verbose=true, or verboseEvents contains AuditEventType.DELETE, deletion of an entity will cause
+all properties of the deleted entity to be logged, except associations (Collections), as this is
+currently not possible. See issue #153</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -1601,7 +1622,7 @@ You can view the above defaults in the <code>DefaultAuditLogConfig.groovy</code>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Verbose logging will insert 1 row of data per property of your domain object for insert and delete operations. This can result in a large amount of additional data, sometimes far more than the actual operation itself. Consider disabling verbose mode for bulk operations using the <code>AuditLogContext.withoutVerboseAuditLog { }</code> closure.</p>
+<p>Verbose logging will insert 1 row of data per property of your domain object for all or verboseEvents type operations. This can result in a large amount of additional data, sometimes far more than the actual operation itself. Consider disabling verbose mode for bulk operations using the <code>AuditLogContext.withoutVerboseAuditLog { }</code> closure.</p>
 </div>
 </td>
 </tr>
@@ -2186,8 +2207,8 @@ to the domain class.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 3.0.3<br>
-Last updated 2019-01-29 16:18:48 +00:00
+Version 3.0.4<br>
+Last updated 2019-05-23 17:01:21 +00:00
 </div>
 </div>
 </body>
