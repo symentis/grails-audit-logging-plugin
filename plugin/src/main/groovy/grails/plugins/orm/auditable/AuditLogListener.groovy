@@ -120,6 +120,17 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
         if (map || !verbose) {
             if (auditEventType == AuditEventType.DELETE) {
+                map = map.collectEntries { String property, Object value ->
+                     // Accessing a hibernate PersistentCollection of a deleted entity yields a NPE in Grails 3.3.x.
+                    // We can't filter hibernate classes because this plugin is ORM-agnostic and has no dependency to any ORM implementation.
+                    // This is a workaround. We might not log some other ORM collection implementation even if it would be possible to log them.
+                    // (see #153)
+                    // TODO: Implement "nonVerboseDelete" switch in config (to only log the object id on delete)
+                    if (value instanceof Collection) {
+                        return [:]
+                    }
+                    return [(property):value]
+                } as Map<String, Object>
                 logChanges(domain, [:], map, auditEventType)
             }
             else {
