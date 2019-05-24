@@ -23,11 +23,11 @@ If you use the old configuration key, the plugin will log a notice.
 
 |grails.plugin.auditLog.verbose
 |`true`
-|Column by column change logging in insert and delete events is enabled by default. You can disable it if you are not interested in value changes.
+|Column by column change logging in insert and delete events (enabled by default). You can disable it if you are not interested in value changes, or if you want to set verbosity based on event type (see verboseEvents setting below)
 
 |grails.plugin.auditLog.verboseEvents
 |`[INSERT, UPDATE, DELETE]`
-|Set of `AuditEventType` enums. Enables verbose logging on a per-event type basis. If `verbose = true`, all event types are logged verbosely.
+|Set of `AuditEventType` enums. Enables verbose logging on a per-event type basis. If `verbose = true` (default), all event types are logged verbosely, regardless of this setting.
 
 |grails.plugin.auditLog.ignoreEvents
 |`[]`
@@ -76,7 +76,7 @@ If you use the old configuration key, the plugin will log a notice.
 NOTE: You can view the above defaults in the `DefaultAuditLogConfig.groovy`
 
 === Verbose mode
-When enabled, per-property logging is enabled for all operations.
+When enabled (default), per-property logging is enabled for all operations.
 
     grails.plugin.auditLog.verbose = true
 
@@ -196,7 +196,8 @@ grails {
     plugin {
         auditLog {
             auditDomainClassName = 'my.example.project.MyAuditTrail'
-            verbose = true 
+            verbose = false
+            verboseEvents = [AuditEventType.UPDATE, AuditEventType.INSERT]
             failOnError = true
             excluded = ['version', 'lastUpdated', 'lastUpdatedBy']
             mask = ['password']
