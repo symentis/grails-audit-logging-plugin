@@ -71,22 +71,33 @@ class AuditLoggingGrailsPlugin extends Plugin {
         Set<String> excludedDataStores = (config.getProperty("excludedDataSources") ?: []) as Set<String>
 
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
-            // mongo datastores don't have a dataSourceName property
-            if (datastore.getProperties().containsKey("dataSourceName")) {
-                String dataSourceName = datastore.metaClass.getProperty(datastore, 'dataSourceName')
 
-                if (!config.disabled && !excludedDataStores.contains(dataSourceName)) {
-                    applicationContext.addApplicationListener(new AuditLogListener(datastore, grailsApplication))
-                }
-                if (config.stampEnabled && !excludedDataStores.contains(dataSourceName)) {
-                    applicationContext.addApplicationListener(new StampListener(datastore, grailsApplication))
-                }
-            } else {
-                if (!config.disabled) {
-                    applicationContext.addApplicationListener(new AuditLogListener(datastore, grailsApplication))
-                }
-                if (config.stampEnabled) {
-                    applicationContext.addApplicationListener(new StampListener(datastore, grailsApplication))
+            //Retrieve all dataSources being managed by the DataStore within the application (i.e. child DataStores)
+            Map<String, String>  dataSources = datastore.metaClass.getProperty(datastore, 'datastoresByConnectionSource')
+
+            //Iterate through each DataSource to determine if they should have an AuditLogListener or StampListener instantiated for them
+            dataSources.each {
+                //Retrieve the specific childDataStore for a DataSource
+                Datastore childDataStore = datastore.getDatastoreForConnection(it.getKey().toString())
+
+                // mongo datastores don't have a dataSourceName property
+                if (childDataStore.getProperties().containsKey("dataSourceName")) {
+
+                    String dataSourceName = childDataStore.metaClass.getProperty(datastore, 'dataSourceName')
+
+                    if (!config.disabled && !excludedDataStores.contains(dataSourceName)) {
+                        applicationContext.addApplicationListener(new AuditLogListener(childDataStore, grailsApplication))
+                    }
+                    if (config.stampEnabled && !excludedDataStores.contains(dataSourceName)) {
+                        applicationContext.addApplicationListener(new StampListener(childDataStore, grailsApplication))
+                    }
+                } else {
+                    if (!config.disabled) {
+                        applicationContext.addApplicationListener(new AuditLogListener(childDataStore, grailsApplication))
+                    }
+                    if (config.stampEnabled) {
+                        applicationContext.addApplicationListener(new StampListener(childDataStore, grailsApplication))
+                    }
                 }
             }
         }
