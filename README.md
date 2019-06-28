@@ -47,7 +47,8 @@ Special thanks to all the contributors (in alphabetical order):
 	Aldrin
 	Andrey Zhuchkov
 	Ankur Tripathi
-	Burt Beckwith 
+	Burt Beckwith
+	bzamora33
 	Danny Casady
 	Dennie de Lange
 	Dhiraj Mahapatro
