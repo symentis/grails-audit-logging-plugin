@@ -32,8 +32,6 @@ If you already use a plugin version < 1.1.0, you must change the created AuditLo
 
 See [GitHub Issues](https://github.com/robertoschwald/grails-audit-logging-plugin/issues "Issues")
 
-(old) See [JIRA](http://jira.grails.org/browse/GPAUDITLOGGING "GPAUDITLOGGING JIRA") (All tickets migrated to GH)
-
 ## Pull Requests
 Pull requests are highly appreciated and welcome!
 Please add integration tests for new features to the audit-test application.
