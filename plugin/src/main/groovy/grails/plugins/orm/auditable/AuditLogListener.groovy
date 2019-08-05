@@ -159,7 +159,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             if (dirtyProperties) {
 
                 // Get the prior values for everything that is dirty
-                oldMap = dirtyProperties.collectEntries { String property -> [property, getPersistentValue(domain, property)] }
+                oldMap = dirtyProperties.collectEntries { String property -> [property, getOriginalValue(domain, property)] }
 
                 // Get the current values for everything that is dirty
                 newMap = makeMap(dirtyProperties, domain)
