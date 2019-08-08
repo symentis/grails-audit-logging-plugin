@@ -43,6 +43,8 @@ class AuditLogListenerUtil {
      */
     static GormEntity createAuditLogDomainInstance(Map params) {
         Class<GormEntity> clazz = getAuditDomainClass()
+        log.debug 'clazz: {}', clazz
+        log.debug 'params: {}', params
         clazz.newInstance(params)
     }
 
