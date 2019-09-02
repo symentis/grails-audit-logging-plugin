@@ -1,14 +1,5 @@
 # Grails Audit Logging Plugin
 
-## Fork Notes
-
-Forked original project to deal with ``getPersistentValue()`` for domain objects' dirty properties always being null. This may
-be related to using multiple datasources, but I'm not sure.
-
-The workaround is to use ``getOriginalValue()`` instead. This is configurable using `grails.plugin.auditLog.usePersistentDirtyPropertyValues`,
-which defaults to `true`, so the original behavior of the project is unchanged. A value of `false` will cause ``getOriginalValue()`` to be
-called instead of ``getPersistentValue()`` in `AuditLogListenerUtil.groovy`. All tests pass regardless of the value.
-
 ## Description
 
 The Audit Logging plugin for Grails adds generic event based Audit Logging to a Grails project.
