@@ -72,6 +72,10 @@ If you use the old configuration key, the plugin will log a notice.
 |grails.plugin.auditLog.stampEnabled
 |`true`
 |Enable stamping support for entities with the `Stampable` trait (dateCreated, lastUpdated, createdBy, lastUpdatedBy).
+
+|grails.plugin.auditLog.usePersistentDirtyPropertyValues
+|`true`
+|By default, the old persistent value is obtained using getPersistentValue(). On newer Grails versions, this could fail. If the original value is always NULL in your case, you can set this property to "false", so getOriginalValue() is used.
 |====================
 NOTE: You can view the above defaults in the `DefaultAuditLogConfig.groovy`
 
