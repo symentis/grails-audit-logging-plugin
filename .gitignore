@@ -24,3 +24,4 @@ audit-logging/classes
 classes
 /.asscache
 /audit-test/.asscache
+.vscode/settings.json
