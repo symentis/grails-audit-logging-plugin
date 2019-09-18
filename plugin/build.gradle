@@ -15,7 +15,7 @@ buildscript {
     }
 }
 
-version file("$rootDir/version.txt").text.trim()
+version project.file("../version.txt").text.trim()
 group "org.grails.plugins"
 
 apply plugin: "eclipse"
