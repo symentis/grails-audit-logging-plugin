@@ -4,15 +4,16 @@ import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.persistence.Transient
 
+import static grails.plugins.orm.auditable.AuditLogListenerUtil.makeMap
 /**
  * Domain classes should implement this trait to provide auditing support
  */
@@ -152,8 +153,40 @@ trait Auditable {
     String getLogEntityId() {
         log.debug("getLogEntityId()")
         if (this instanceof GormEntity) {
+            PersistentEntity persistentEntity = (PersistentEntity) getClass().invokeMethod("getGormPersistentEntity", null)
             log.debug("    this instanceof GormEntity")
-            return convertLoggedPropertyToString("id", ((GormEntity)this).ident())
+            if (persistentEntity.identity != null) {
+                return convertLoggedPropertyToString("id", ((GormEntity)this).ident())
+            }
+            else {
+                // Fetch composite ID values
+                PersistentProperty[] idProperties = persistentEntity.compositeIdentity
+                Map<String, Object> map = makeMap(idProperties*.name, this)
+
+                // Build a string representation of this class that looks like: [<persistent id property>:<value or id>]
+                StringBuilder stringBuilder = new StringBuilder()
+                stringBuilder.append("[")
+                map.eachWithIndex { Map.Entry<String, Object> entry, int i ->
+                    stringBuilder.append(entry.key)
+                    stringBuilder.append(":")
+                    switch (entry.value) {
+                        case Auditable:
+                            stringBuilder.append(((Auditable) entry.value).logEntityId)
+                            break
+                        case GormEntity:
+                            stringBuilder.append(((GormEntity) entry.value).ident().toString())
+                            break
+                        default:
+                            stringBuilder.append(convertLoggedPropertyToString(entry.key, entry.value))
+                            break
+                    }
+                    if (i != (map.size() - 1)) {
+                        stringBuilder.append(", ")
+                    }
+                }
+                stringBuilder.append("]")
+                return stringBuilder.toString()
+            }
         }
         if (this.respondsTo("getId")) {
             log.debug("    this respondsTo getId")
