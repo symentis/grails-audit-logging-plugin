@@ -4,11 +4,9 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Rollback
 import grails.plugins.orm.auditable.AuditEventType
 import grails.plugins.orm.auditable.AuditLogContext
-import grails.plugins.orm.auditable.Auditable
 import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.spring.BeanBuilder
 import grails.testing.mixin.integration.Integration
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.test.annotation.DirtiesContext
 import spock.lang.Shared
 import spock.lang.Specification
@@ -190,24 +188,22 @@ class AuditableSpec extends Specification {
         uri == "http://foo.com"
         actor == "Aaron"
     }
-}
 
-@SuppressWarnings("GroovyUnusedDeclaration")
-class TestEntity implements Auditable, GormEntity<TestEntity> {
-    String property
-    String otherProperty
-    String anotherProperty
+    void "composite ids are handled correctly"() {
+        when:
+        Author author = new Author(name: "Aaron", age: 37, famous: true).save(flush:true)
+        CompositeId compositeId = new CompositeId(
+          author: author,
+          string: "string",
+          nonAuditableCompositeId: new NonAuditableCompositeId(foo:"foo", bar:"bar")
+        )
 
-    // Just for testing
-    Serializable ident() {
-        "id"
-    }
-
-    @Override
-    String toString() {
-        property
+        then:
+        compositeId.logEntityId == "[author:$author.id, string:string, nonAuditableCompositeId:toString_for_non_auditable_foo_bar]"
     }
 }
+
+
 
 class TestAuditRequestResolver implements AuditRequestResolver {
     @Override
