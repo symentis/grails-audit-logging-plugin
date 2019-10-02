@@ -516,8 +516,8 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Grails Audit Logging Plugin</h1>
 <div class="details">
 <span id="author" class="author">Robert Oschwald</span><br>
-<span id="revnumber">version 3.0.4,</span>
-<span id="revdate">2019-05-23</span>
+<span id="revnumber">version 3.0.5,</span>
+<span id="revdate">2019-10-02</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -589,7 +589,7 @@ table.CodeRay td.code>pre{padding:0}
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Other formats: <a href="audit-logging-3.0.4.pdf">PDF</a>, <a href="audit-logging-3.0.4.epub">EPUB</a></p>
+<p>Other formats: <a href="audit-logging-3.0.5.pdf">PDF</a>, <a href="audit-logging-3.0.5.epub">EPUB</a></p>
 </div>
 </div>
 </div>
@@ -663,6 +663,19 @@ If you use this plugin to log MongoDB transactions, you must configure a SQL Dat
 <div class="sectionbody">
 <div class="ulist">
 <ul>
+<li>
+<p>3.0.5</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Add support for getOriginalValue() using config parameter.</p>
+</li>
+<li>
+<p>Fix #193 StackOverflow with composite ID and Auditable</p>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p>3.0.4</p>
 <div class="ulist">
@@ -1512,12 +1525,12 @@ If you use the old configuration key, the plugin will log a notice.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.verbose</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Column by column change logging in insert and delete events is enabled by default. You can disable it if you are not interested in value changes.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Column by column change logging in insert and delete events (enabled by default). You can disable it if you are not interested in value changes, or if you want to set verbosity based on event type (see verboseEvents setting below)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.verboseEvents</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[INSERT, UPDATE, DELETE]</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set of <code>AuditEventType</code> enums. Enables verbose logging on a per-event type basis. If <code>verbose = true</code>, all event types are logged verbosely.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set of <code>AuditEventType</code> enums. Enables verbose logging on a per-event type basis. If <code>verbose = true</code> (default), all event types are logged verbosely, regardless of this setting.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.ignoreEvents</p></td>
@@ -1574,6 +1587,11 @@ If you use the old configuration key, the plugin will log a notice.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Enable stamping support for entities with the <code>Stampable</code> trait (dateCreated, lastUpdated, createdBy, lastUpdatedBy).</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.usePersistentDirtyPropertyValues</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">By default, the old persistent value is obtained using getPersistentValue(). On newer Grails versions, this could fail. If the original value is always NULL in your case, you can set this property to "false", so getOriginalValue() is used.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="admonitionblock note">
@@ -1591,7 +1609,7 @@ You can view the above defaults in the <code>DefaultAuditLogConfig.groovy</code>
 <div class="sect2">
 <h3 id="verbose-mode">5.1. Verbose mode</h3>
 <div class="paragraph">
-<p>When enabled, per-property logging is enabled for all operations.</p>
+<p>When enabled (default), per-property logging is enabled for all operations.</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1779,7 +1797,8 @@ grails {
     plugin {
         auditLog {
             auditDomainClassName = <span class="string"><span class="delimiter">'</span><span class="content">my.example.project.MyAuditTrail</span><span class="delimiter">'</span></span>
-            verbose = <span class="predefined-constant">true</span>
+            verbose = <span class="predefined-constant">false</span>
+            verboseEvents = [AuditEventType.UPDATE, AuditEventType.INSERT]
             failOnError = <span class="predefined-constant">true</span>
             excluded = [<span class="string"><span class="delimiter">'</span><span class="content">version</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">lastUpdated</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">lastUpdatedBy</span><span class="delimiter">'</span></span>]
             mask = [<span class="string"><span class="delimiter">'</span><span class="content">password</span><span class="delimiter">'</span></span>]
@@ -2207,8 +2226,8 @@ to the domain class.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 3.0.4<br>
-Last updated 2019-05-23 17:01:21 +00:00
+Version 3.0.5<br>
+Last updated 2019-10-02 06:53:47 +00:00
 </div>
 </div>
 </body>
