@@ -25,7 +25,7 @@ import groovy.transform.ToString
  * This requires you to set up a table or allow
  * Grails to create a table for you. (e.g. DDL or db-migration plugin)
  */
-@ToString(includes = 'id,className,actor,propertyName,oldValue,newValue')
+@ToString(includes = 'id,className,actor,eventName,propertyName,oldValue,newValue')
 class AuditTrail implements Serializable {
     private static final long serialVersionUID = 1L
 
