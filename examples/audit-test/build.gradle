@@ -88,5 +88,14 @@ test {
     testLogging {
         showStandardStreams = true
         exceptionFormat = 'full'
+        events = ["passed", "failed", "skipped", 'standardOut', 'standardError']
+    }
+}
+
+integrationTest {
+    testLogging {
+        showStandardStreams = true
+        exceptionFormat = 'full'
+        events = ["passed", "failed", "skipped", 'standardOut', 'standardError']
     }
 }
