@@ -73,18 +73,12 @@ class AuditLoggingGrailsPlugin extends Plugin {
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
 
             //Retrieve all dataSources being managed by the DataStore within the application (i.e. child DataStores)
-            Map<String, String>  dataSources = datastore.metaClass.getProperty(datastore, 'datastoresByConnectionSource')
-
-            //Iterate through each DataSource to determine if they should have an AuditLogListener or StampListener instantiated for them
+            Map<String, String>  dataSources = datastore.metaClass.getProperty(datastore, 'datastoresByConnectionSource') as Map<String, String>
             dataSources.each {
-                //Retrieve the specific childDataStore for a DataSource
                 Datastore childDataStore = datastore.getDatastoreForConnection(it.getKey().toString())
-
                 // mongo datastores don't have a dataSourceName property
                 if (childDataStore.getProperties().containsKey("dataSourceName")) {
-
                     String dataSourceName = childDataStore.metaClass.getProperty(datastore, 'dataSourceName')
-
                     if (!config.disabled && !excludedDataStores.contains(dataSourceName)) {
                         applicationContext.addApplicationListener(new AuditLogListener(childDataStore, grailsApplication))
                     }
