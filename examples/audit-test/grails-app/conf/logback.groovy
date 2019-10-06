@@ -10,7 +10,7 @@ appender('STDOUT', ConsoleAppender) {
     }
 }
 
-logger("grails.plugins.orm.auditable", DEBUG)
+logger("grails.plugins.orm.auditable", INFO)
 logger("test", DEBUG)
 
 root(ERROR, ['STDOUT'])
