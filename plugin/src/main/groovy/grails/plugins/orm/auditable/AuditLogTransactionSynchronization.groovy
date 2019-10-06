@@ -12,9 +12,7 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
 
     void addToQueue(GormEntity auditInstance) {
         pendingAuditInstances << auditInstance
-        if (log.isTraceEnabled()) {
-            log.trace("Added $auditInstance to synchronization queue")
-        }
+        log.trace("Added {} to synchronization queue", auditInstance)
     }
 
     @Override
@@ -23,9 +21,7 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
             return
         }
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Writing ${pendingAuditInstances.size()} pending audit instances in afterCommit()")
-            }
+            log.debug("Writing {} pending audit instances in afterCommit()", pendingAuditInstances.size())
             AuditLogListenerUtil.getAuditDomainClass().invokeMethod("withNewTransaction") {
                 for (GormEntity entity in pendingAuditInstances) {
                     entity.save(failOnError: true)
