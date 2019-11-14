@@ -32,7 +32,7 @@ apply plugin: 'com.jfrog.bintray'
 
 ext {
     grailsVersion = project.grailsVersion
-    gradleWrapperVersion = project.gradleWrapperVersion
+    /*@JochengradleWrapperVersion = project.gradleWrapperVersion*/
 }
 
 //sourceCompatibility = 1.7
@@ -67,7 +67,7 @@ dependencies {
     testCompile "org.grails:grails-web-testing-support"
 }
 
-bootRepackage.enabled = false
+/*@JochenbootRepackage.enabled = false*/
 
 // Needed for org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6
 // See https://github.com/asciidoctor/asciidoctorj/issues/415
@@ -81,9 +81,9 @@ static String buildDate() {
     return df.format(new Date())
 }
 
-task wrapper(type: Wrapper) {
+/*@Jochentask wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
-}
+}*/
 
 grailsPublish {
     user = System.getenv('BINTRAY_USER')

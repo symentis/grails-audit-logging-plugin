@@ -23,6 +23,7 @@ import grails.gorm.validation.PersistentEntityValidator
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -37,35 +38,6 @@ import org.grails.datastore.mapping.model.types.ToMany
 @Slf4j
 @CompileStatic
 class AuditLogListenerUtil {
-    /**
-     * @param domain the domain instance
-     * @return configured AuditLogEvent instance
-     */
-    static GormEntity createAuditLogDomainInstance(Map params) {
-        Class<GormEntity> clazz = getAuditDomainClass()
-        log.debug 'clazz: {}', clazz
-        log.debug 'params: {}', params
-        clazz.newInstance(params)
-    }
-
-    /**
-     *
-     * @param domain the domain instance
-     * @return configured AuditLogEvent class
-     */
-    static Class<GormEntity> getAuditDomainClass() {
-        String auditLogClassName = AuditLoggingConfigUtils.auditConfig.getProperty('auditDomainClassName') as String
-        if (!auditLogClassName) {
-            throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
-        }
-
-        Class domainClass = Class.forName(auditLogClassName)
-        if (!GormEntity.isAssignableFrom(domainClass)) {
-            throw new IllegalArgumentException("The specified audit domain class $auditLogClassName is not a GORM entity")
-        }
-
-        domainClass as Class<GormEntity>
-    }
 
     /**
      * Get the original or persistent value for the given domain.property. This method includes
