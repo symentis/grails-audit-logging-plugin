@@ -70,7 +70,7 @@ class AuditTruncateSpec extends Specification {
         cleanup:
         log.info "Reset truncate length"
         setListenersTruncateLength oldTruncLength
-        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
+        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Truncate_at_255"() {
@@ -100,7 +100,7 @@ class AuditTruncateSpec extends Specification {
 
         cleanup:
         setListenersTruncateLength oldTruncLength
-        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
+        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Truncate_at_1024"() {
@@ -132,7 +132,7 @@ class AuditTruncateSpec extends Specification {
         cleanup:
         log.debug "Reset truncate length"
         setListenersTruncateLength oldTruncLength
-        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
+        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     private int getFirstListenerTruncateLength(){

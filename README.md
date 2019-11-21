@@ -4,7 +4,7 @@
 
 The Audit Logging plugin for Grails adds generic event based Audit Logging to a Grails project.
 
-The master branch holds the codebase for plugin version 3.0.x (Grails 3.3.x).
+The master branch holds the codebase for plugin version 4.0.x (Grails 4).
 
 For older Grails versions, see "Supported Grails Versions" below.
 
@@ -15,7 +15,8 @@ For older Grails versions, see "Supported Grails Versions" below.
  * For 1.x documentation, see [1.x Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
- * Grails   3.3.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master)
+ * Grails   4: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master)
+ * Grails   3.3.x: TODO
  * Grails   3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
  * Grails   2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 

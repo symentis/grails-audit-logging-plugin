@@ -1,4 +1,7 @@
 == Change Log
+* 4.0.0
+** First Grails 4 version
+
 * 3.0.5
 ** Add support for getOriginalValue() using config parameter.
 ** Fix #193 StackOverflow with composite ID and Auditable

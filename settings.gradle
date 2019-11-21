@@ -1,6 +1,5 @@
 rootProject.name = 'grails-audit-logging'
 
-include 'plugin'
-include 'examples/audit-test'
-
-findProject(":plugin").name = "audit-logging"
+include 'audit-logging'
+include 'examples:audit-test'
+project(':audit-logging').projectDir = file("./plugin")

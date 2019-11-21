@@ -5,16 +5,7 @@
 // You're free to add application-wide JavaScript to this file, but it's generally better
 // to create separate JavaScript files as needed.
 //
-//= require jquery-2.1.3.js
-//= require_tree .
+//= require jquery-3.3.1.min
+//= require bootstrap
+//= require popper.min
 //= require_self
-
-if (typeof jQuery !== 'undefined') {
-    (function($) {
-        $('#spinner').ajaxStart(function() {
-            $(this).fadeIn();
-        }).ajaxStop(function() {
-            $(this).fadeOut();
-        });
-    })(jQuery);
-}

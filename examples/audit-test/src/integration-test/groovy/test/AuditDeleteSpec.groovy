@@ -19,6 +19,7 @@
 package test
 
 import grails.gorm.transactions.Rollback
+import grails.gorm.transactions.Transactional
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
@@ -28,6 +29,7 @@ import spock.lang.Specification
 @Integration
 @Rollback
 class AuditDeleteSpec extends Specification {
+
     @Shared
     def defaultIgnoreList
 
@@ -47,7 +49,7 @@ class AuditDeleteSpec extends Specification {
         }
 
         // Remove all logging of the inserts, we are focused on deletes here
-        AuditTrail.withNewSession {
+        AuditTrail.withNewTransaction {
             AuditTrail.where { id != null }.deleteAll()
             assert AuditTrail.count() == 0
         }

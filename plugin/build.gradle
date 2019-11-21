@@ -2,27 +2,28 @@ import java.text.SimpleDateFormat
 
 buildscript {
     repositories {
-        mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
         jcenter()
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-        classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
-        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:3.0.10"
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2'
+        //TODO classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
+        //TODO classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
 version project.file("../version.txt").text.trim()
 group "org.grails.plugins"
 
-apply plugin: "eclipse"
-apply plugin: "idea"
-apply plugin: "org.grails.grails-plugin"
-apply plugin: "org.grails.grails-plugin-publish"
-apply plugin: "org.grails.grails-gsp"
+apply plugin:"eclipse"
+apply plugin:"idea"
+apply plugin:"org.grails.grails-plugin"
+apply plugin:"org.grails.grails-plugin-publish"
+apply plugin:"asset-pipeline"
+apply plugin:"org.grails.grails-gsp"
 apply plugin: "org.asciidoctor.convert"
 apply plugin: 'com.jfrog.bintray'
 
@@ -32,58 +33,59 @@ apply plugin: 'com.jfrog.bintray'
 
 ext {
     grailsVersion = project.grailsVersion
-    /*@JochengradleWrapperVersion = project.gradleWrapperVersion*/
 }
 
-//sourceCompatibility = 1.7
-//targetCompatibility = 1.7
-
 repositories {
-    mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
 }
 
-dependencies {
-    profile "org.grails.profiles:web-plugin"
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
 
-    provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
+dependencies {
+    provided "org.springframework.boot:spring-boot-starter-logging"
     provided "org.springframework.boot:spring-boot-autoconfigure"
+    provided "org.grails:grails-core"
+    provided "org.springframework.boot:spring-boot-starter-actuator"
     provided "org.springframework.boot:spring-boot-starter-tomcat"
     provided "org.grails:grails-web-boot"
-    provided "org.grails:grails-core"
     provided "org.grails:grails-logging"
     provided "org.grails:grails-plugin-rest"
+    provided "org.grails:grails-plugin-databinding"
     provided "org.grails:grails-plugin-i18n"
     provided "org.grails:grails-plugin-services"
     provided "org.grails:grails-plugin-url-mappings"
     provided "org.grails:grails-plugin-interceptors"
+    provided "org.grails.plugins:cache"
+    provided "org.grails.plugins:async"
+    provided "org.grails.plugins:scaffolding"
     provided "org.grails.plugins:gsp"
-    provided "org.grails:grails-console"
-    provided "org.grails:grails-plugin-services"
-    provided "org.grails:grails-plugin-domain-class"
-
-    testCompile "org.grails:grails-plugin-testing"
+    compileOnly "io.micronaut:micronaut-inject-groovy"
+    console "org.grails:grails-console"
+    profile "org.grails.profiles:web-plugin"
+    runtime "com.bertramlabs.plugins:asset-pipeline-grails:3.0.10"
+    testCompile "org.grails:grails-gorm-testing-support"
+    testCompile "org.mockito:mockito-core"
     testCompile "org.grails:grails-web-testing-support"
 }
 
-/*@JochenbootRepackage.enabled = false*/
-
-// Needed for org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6
-// See https://github.com/asciidoctor/asciidoctorj/issues/415
-asciidoctorj {
-    version = '1.5.4'
+bootRun {
+    jvmArgs(
+            '-Dspring.output.ansi.enabled=always',
+            '-noverify',
+            '-XX:TieredStopAtLevel=1',
+            '-Xmx1024m')
+    sourceResources sourceSets.main
+    String springProfilesActive = 'spring.profiles.active'
+    systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
 
-static String buildDate() {
-    def df = new SimpleDateFormat("yyyy-MM-dd")
-    df.setTimeZone(TimeZone.getTimeZone("UTC"))
-    return df.format(new Date())
-}
-
-/*@Jochentask wrapper(type: Wrapper) {
-    gradleVersion = gradleWrapperVersion
-}*/
+// enable if you wish to package this plugin as a standalone application
+bootJar.enabled = false
 
 grailsPublish {
     user = System.getenv('BINTRAY_USER')
@@ -93,8 +95,28 @@ grailsPublish {
         name = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
     }
     title = "Grails Audit-Logging Plugin"
-    desc = "Grails Audit-Logging Plugin for Grails 3.3.x"
+    desc = "Grails Audit-Logging Plugin for Grails 4.0.x"
     developers = [robertoschwald:"Robert Oschwald", longwa:"Aaron Long", elkr:"Elmar Kretzer"]
+}
+
+assets {
+    packagePlugin = true
+}
+
+// Needed for org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6
+// See https://github.com/asciidoctor/asciidoctorj/issues/415
+/*TODO asciidoctorj {
+    version = '1.5.4'
+}*/
+
+static String buildDate() {
+    def df = new SimpleDateFormat("yyyy-MM-dd")
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(new Date())
+}
+
+asciidoctorj {
+    version = '1.5.4'
 }
 
 asciidoctor {
@@ -104,7 +126,7 @@ asciidoctor {
         include 'index.adoc'
     }
     outputDir new File(buildDir, 'docs')
-    backends 'html5', 'pdf', 'epub3'
+    //TODO backends 'html5', 'pdf', 'epub3'
     attributes 'experimental': 'true',
         'source-highlighter': 'coderay',
         'compat-mode': 'true',
@@ -127,14 +149,16 @@ task docs(dependsOn: 'asciidoctor') {
         File dir = new File(buildDir, 'docs')
         dir.mkdirs()
 
-        ['pdf', 'epub'].each { String ext ->
+        //TODO
+        /* ['pdf', 'epub'].each { String ext ->
             File f = new File(dir, 'index.' + ext)
             if (f.exists()) {
                 f.renameTo new File(dir, project.name + '-' + project.version + '.' + ext)
             }
-        }
+        }*/
 
-        new File(buildDir, 'docs/ghpages.html') << file('src/docs/templates/index.tmpl').text.replaceAll("@VERSION@", project.version).replaceAll("@DOCDATE@", buildDate())
+        new File(buildDir, 'docs/ghpages.html') << file('src/docs/templates/index.tmpl').text
+                .replaceAll("@VERSION@", project.version).replaceAll("@DOCDATE@", buildDate())
 
         copy {
             from 'src/docs'

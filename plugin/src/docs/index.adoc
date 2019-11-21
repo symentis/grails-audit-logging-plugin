@@ -14,7 +14,7 @@ ifdef::backend-epub3[]
     :imagesdir: images
 endif::[]
 
-Other formats: link:audit-logging-{VERSION}.pdf[PDF], link:audit-logging-{VERSION}.epub[EPUB]
+//Other formats: link:audit-logging-{VERSION}.pdf[PDF], link:audit-logging-{VERSION}.epub[EPUB]
 
 include::introduction.adoc[]
 
