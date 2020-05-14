@@ -35,7 +35,18 @@ class AuditInsertSpec extends Specification {
 
     void setup() {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
-        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
+        AuditTrail.withNewTransaction {
+            AuditTrail.executeUpdate('delete from AuditTrail')
+        }
+    }
+
+    void cleanup() {
+        AuditTrail.withNewTransaction {
+            Review.executeUpdate("delete from Review")
+            Book.executeUpdate("delete from Book")
+            Author.executeUpdate("delete from Author")
+            AuditTrail.executeUpdate('delete from AuditTrail')
+        }
     }
 
     void "Test basic insert logging"() {
@@ -43,7 +54,9 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 37, famous: true)
 
         when:
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "author is saved"
         author.id
@@ -76,7 +89,9 @@ class AuditInsertSpec extends Specification {
         author.addToBooks(book)
 
         when:
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "review log is created"
         def events = AuditTrail.withCriteria { eq('className', 'test.Review') }
@@ -95,7 +110,9 @@ class AuditInsertSpec extends Specification {
         author.addToBooks(new Book(title: 'Foo', description: 'Bar', pages: 200))
 
         when:
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "author is saved"
         author.id
@@ -113,7 +130,9 @@ class AuditInsertSpec extends Specification {
         def publisher = new Publisher(code: 'ABC123', name: "Random House", active: true)
 
         when:
-        publisher.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            publisher.save(flush: true, failOnError: true)
+        }
 
         then:
         publisher.id
@@ -135,7 +154,9 @@ class AuditInsertSpec extends Specification {
         def publisher = new Publisher(code: 'ABC123', name: "Random House", active: false)
 
         when:
-        publisher.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            publisher.save(flush: true, failOnError: true)
+        }
 
         then:
         publisher.id
@@ -152,7 +173,9 @@ class AuditInsertSpec extends Specification {
         def author = new Author()
 
         when:
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "author is not saved"
         thrown(Exception)
@@ -169,12 +192,15 @@ class AuditInsertSpec extends Specification {
         when:
         println AuditTrail.withCriteria { eq('className', 'test.Author') }
         def author = new Author(name: name, age: 100, famous: true)
-        if (enabled) {
-            author.save(flush: true, failOnError: true)
-        }
-        else {
-            AuditLogContext.withoutAuditLog {
+
+        Author.withNewTransaction {
+            if (enabled) {
                 author.save(flush: true, failOnError: true)
+            }
+            else {
+                AuditLogContext.withoutAuditLog {
+                    author.save(flush: true, failOnError: true)
+                }
             }
         }
 
@@ -200,12 +226,15 @@ class AuditInsertSpec extends Specification {
         when:
         println AuditTrail.withCriteria { eq('className', 'test.Author') }
         def author = new Author(name: name, age: 100, famous: true)
-        if (enabled) {
-            author.save(flush: true, failOnError: true)
-        }
-        else {
-            AuditLogContext.withoutVerboseAuditLog {
+
+        Author.withNewTransaction {
+            if (enabled) {
                 author.save(flush: true, failOnError: true)
+            }
+            else {
+                AuditLogContext.withoutVerboseAuditLog {
+                    author.save(flush: true, failOnError: true)
+                }
             }
         }
 
@@ -231,7 +260,9 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 50)
 
         when:
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            author.save(flush: true, failOnError: true)
+        }
 
         then: "ignored properties not logged"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
@@ -247,9 +278,11 @@ class AuditInsertSpec extends Specification {
 
     void "Test context excluded properties"() {
         when:
-        AuditLogContext.withConfig(excluded: ['famous', 'age', 'dateCreated']) {
-            def author = new Author(name: "Aaron", age: 50)
-            author.save()
+        Author.withNewTransaction {
+            AuditLogContext.withConfig(excluded: ['famous', 'age', 'dateCreated']) {
+                def author = new Author(name: "Aaron", age: 50)
+                author.save()
+            }
         }
 
         then: "ignored properties not logged"
@@ -269,8 +302,10 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 50, famous: true, ssn: '123-981-0001')
 
         when:
-        AuditLogContext.withConfig(included: ['name', 'age', 'dateCreated']) {
-            author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            AuditLogContext.withConfig(included: ['name', 'age', 'dateCreated']) {
+                author.save(flush: true, failOnError: true)
+            }
         }
 
         then: "only properties in auditableProperties are logged"
@@ -287,8 +322,10 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 50, famous: true, ssn: '123-981-0001')
 
         when:
-        AuditLogContext.withConfig(included: ['name', 'age', 'dateCreated'], excluded: ['name', 'age']) {
-            author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            AuditLogContext.withConfig(included: ['name', 'age', 'dateCreated'], excluded: ['name', 'age']) {
+                author.save(flush: true, failOnError: true)
+            }
         }
 
         then: "only properties in auditableProperties are logged"

@@ -42,6 +42,12 @@ class AuditTruncateSpec extends Specification {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
     }
 
+    void cleanup() {
+        Tunnel.withNewTransaction {
+            Tunnel.executeUpdate('delete from Tunnel')
+        }
+    }
+
     void "No_Truncate"() {
         given:
         def oldTruncLength = getFirstListenerTruncateLength()
@@ -50,7 +56,9 @@ class AuditTruncateSpec extends Specification {
         def tunnel = new Tunnel(name: "shortdesc", description:"${'a'*255}")
 
         when:
-        tunnel.save(flush: true, failOnError: true)
+        Tunnel.withNewTransaction {
+            tunnel.save(flush: true, failOnError: true)
+        }
 
         then: "Tunnel is saved"
         tunnel.id

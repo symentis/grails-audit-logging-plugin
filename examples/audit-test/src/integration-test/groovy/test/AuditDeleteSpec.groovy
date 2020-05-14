@@ -88,7 +88,7 @@ class AuditDeleteSpec extends Specification {
 
     then: 'Author Audit Events are written'
     List<AuditTrail> events = AuditTrail.withCriteria { eq('className', 'test.Author') } as List<AuditTrail>
-    events.size() == new Author().getAuditablePropertyNames().size() - 1 // persistentCollections (books) are not logged on delete anymore. See #153
+    events.size() == new Author().getAuditablePropertyNames().size() - 1
 
     def first = events.find { it.propertyName == 'age' }
     first.oldValue == "37"
@@ -97,12 +97,12 @@ class AuditDeleteSpec extends Specification {
 
     and: 'Book Audit Events are written'
     List<AuditTrail> b1Events = AuditTrail.withCriteria { eq('className', 'test.Book'); eq('persistedObjectId', 'Hunger Games') } as List<AuditTrail>
-    b1Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
+    b1Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size() - 1
 
     def b2Events = AuditTrail.withCriteria {
       eq('className', 'test.Book'); eq('persistedObjectId', 'Catching Fire')
     }
-    b2Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size()
+    b2Events.size() == TestUtils.getAuditableProperties(Book.gormPersistentEntity, defaultIgnoreList).size() - 1
   }
 
   @Unroll
