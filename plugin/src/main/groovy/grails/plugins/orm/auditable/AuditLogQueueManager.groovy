@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.core.NamedThreadLocal
-import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * Queue audit logging changes for flushing on transaction commit to ensure proper transactional semantics
@@ -19,19 +18,11 @@ class AuditLogQueueManager {
     static void addToQueue(GormEntity auditInstance) {
         AuditLogTransactionSynchronization auditLogSync = threadLocal.get()
         if (!auditLogSync) {
-            auditLogSync = registerSynchronization()
+            auditLogSync = new AuditLogTransactionSynchronization()
             threadLocal.set(auditLogSync)
         }
-        auditLogSync.addToQueue(auditInstance)
-    }
 
-    private static AuditLogTransactionSynchronization registerSynchronization() {
-        AuditLogTransactionSynchronization auditLogSync = new AuditLogTransactionSynchronization()
-        TransactionSynchronizationManager.registerSynchronization(auditLogSync)
-        if (log.isDebugEnabled()) {
-            log.debug("Registered new audit log transaction synchronization $auditLogSync")
-        }
-        auditLogSync
+        auditLogSync.addToQueue(auditInstance)
     }
 }
 

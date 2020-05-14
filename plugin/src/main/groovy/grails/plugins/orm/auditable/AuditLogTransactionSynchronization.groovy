@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.transaction.support.TransactionSynchronizationAdapter
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Slf4j
 @CompileStatic
@@ -11,6 +12,9 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
     private List<GormEntity> pendingAuditInstances = []
 
     void addToQueue(GormEntity auditInstance) {
+        if (!pendingAuditInstances) {
+            TransactionSynchronizationManager.registerSynchronization(this)
+        }
         pendingAuditInstances << auditInstance
         log.trace("Added {} to synchronization queue", auditInstance)
     }
