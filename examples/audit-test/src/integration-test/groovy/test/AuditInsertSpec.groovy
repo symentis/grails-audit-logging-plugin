@@ -35,7 +35,7 @@ class AuditInsertSpec extends Specification {
 
     void setup() {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
-        AuditTrail.withNewSession { AuditTrail.executeUpdate('delete from AuditTrail') }
+        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Test basic insert logging"() {

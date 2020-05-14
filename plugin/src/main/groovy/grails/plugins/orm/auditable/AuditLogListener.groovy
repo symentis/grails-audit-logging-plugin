@@ -121,10 +121,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (map || !verbose) {
             if (auditEventType == AuditEventType.DELETE) {
                 map = map.collectEntries { String property, Object value ->
-                    // Accessing a hibernate PersistentCollection of a deleted entity yields a NPE in Grails 3.3.x.
+                     // Accessing a hibernate PersistentCollection of a deleted entity yields a NPE in Grails 3.3.x.
                     // We can't filter hibernate classes because this plugin is ORM-agnostic and has no dependency to any ORM implementation.
                     // This is a workaround. We might not log some other ORM collection implementation even if it would be possible to log them.
                     // (see #153)
+                    // TODO: Implement "nonVerboseDelete" switch in config (to only log the object id on delete)
                     if (value instanceof Collection) {
                         return [:]
                     }
@@ -159,7 +160,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             if (dirtyProperties) {
 
                 // Get the prior values for everything that is dirty
-                oldMap = dirtyProperties.collectEntries { String property -> [property, getPersistentValue(domain, property)] }
+                oldMap = dirtyProperties.collectEntries { String property -> [property, getOriginalValue(domain, property)] }
 
                 // Get the current values for everything that is dirty
                 newMap = makeMap(dirtyProperties, domain)
@@ -182,7 +183,6 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     protected void logChanges(Auditable domain, Map<String, Object> newMap, Map<String, Object> oldMap, AuditEventType eventType) {
         log.debug("Audit logging event {} and domain {}", eventType, domain.getClass().name)
 
-        // Wrap all of the logging in a single session to prevent flushing for each insert
         Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
 
         // Use a single date for all audit_log entries in this transaction

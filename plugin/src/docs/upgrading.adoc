@@ -1,4 +1,8 @@
-== Upgrading
+== Upgrading to 4.0.x
+
+The 4.0.0 version of the plugin is backwards compatible with 3.0.x. Any existing configuration and customization should work out of the box.
+
+== Upgrading to 3.0.x
 
 The 3.0.x version of the plugin is a major rewrite of the codebase. Therefore you need to upgrade your code for this version.
 

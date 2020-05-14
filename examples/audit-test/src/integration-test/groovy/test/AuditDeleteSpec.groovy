@@ -22,8 +22,6 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
-import groovy.util.logging.Slf4j
-import org.junit.Before
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Shared

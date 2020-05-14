@@ -4,12 +4,11 @@ import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.grails.datastore.mapping.model.PersistentProperty
 
 import javax.persistence.Transient
@@ -20,7 +19,7 @@ import static grails.plugins.orm.auditable.AuditLogListenerUtil.makeMap
  */
 @CompileStatic
 trait Auditable {
-    final static Logger logT = LoggerFactory.getLogger(Auditable.class)
+    final static Logger log = LoggerFactory.getLogger(Auditable.class)
 
     /**
      * If false, this entity will not be logged
@@ -152,10 +151,10 @@ trait Auditable {
      */
     @Transient
     String getLogEntityId() {
-        logT.debug("getLogEntityId()")
+        log.debug("getLogEntityId()")
         if (this instanceof GormEntity) {
             PersistentEntity persistentEntity = (PersistentEntity) getClass().invokeMethod("getGormPersistentEntity", null)
-            logT.debug("    this instanceof GormEntity")
+            log.debug("    this instanceof GormEntity")
             if (persistentEntity.identity != null) {
                 return convertLoggedPropertyToString("id", ((GormEntity)this).ident())
             }
@@ -190,7 +189,7 @@ trait Auditable {
             }
         }
         if (this.respondsTo("getId")) {
-            logT.debug("    this respondsTo getId")
+            log.debug("    this respondsTo getId")
             return convertLoggedPropertyToString("id", this.invokeMethod("getId", null))
         }
 
@@ -205,21 +204,21 @@ trait Auditable {
      * @return
      */
     String convertLoggedPropertyToString(String propertyName, Object value) {
-        logT.debug("convertLoggedPropertyToString(propertyName: ${propertyName}, value: ${value})")
+        log.debug("convertLoggedPropertyToString(propertyName: ${propertyName}, value: ${value})")
         if (value instanceof Enum) {
-            logT.debug("    value instanceof Enum")
+            log.debug("    value instanceof Enum")
             return ((Enum)value).name()
         }
         if (value instanceof Auditable) {
-            logT.debug("    value instanceof Auditable")
+            log.debug("    value instanceof Auditable")
             return "[id:${((Auditable)value).logEntityId}]$value"
         }
         if (value instanceof GormEntity) {
-            logT.debug("    value instanceof GormEntity")
+            log.debug("    value instanceof GormEntity")
             return "[id:${((GormEntity)value).ident()}]$value"
         }
         if (value instanceof Collection) {
-            logT.debug("    value instanceof Collection")
+            log.debug("    value instanceof Collection")
             if (logAssociatedIds) {
                 return ((Collection)value).collect {
                     convertLoggedPropertyToString(propertyName, it)
@@ -229,8 +228,9 @@ trait Auditable {
                 return "N/A"
             }
         }
-        logT.debug("    value.toString(): ${value?.toString()}")
-        return value?.toString()
+
+        log.debug("    value.toString(): ${value?.toString()}")
+        value?.toString()
     }
 
     /**

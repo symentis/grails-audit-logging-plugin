@@ -42,7 +42,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException
 @Slf4j
 @SuppressWarnings("GroovyUnusedDeclaration")
 class AuditLoggingGrailsPlugin extends Plugin {
-    def grailsVersion = '3.3.0 > *'
+    def grailsVersion = '4.0.0 > *'
 
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
@@ -73,12 +73,18 @@ class AuditLoggingGrailsPlugin extends Plugin {
         applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
 
             //Retrieve all dataSources being managed by the DataStore within the application (i.e. child DataStores)
-            Map<String, String>  dataSources = datastore.metaClass.getProperty(datastore, 'datastoresByConnectionSource') as Map<String, String>
+            Map<String, String>  dataSources = datastore.metaClass.getProperty(datastore, 'datastoresByConnectionSource')
+
+            //Iterate through each DataSource to determine if they should have an AuditLogListener or StampListener instantiated for them
             dataSources.each {
+                //Retrieve the specific childDataStore for a DataSource
                 Datastore childDataStore = datastore.getDatastoreForConnection(it.getKey().toString())
+
                 // mongo datastores don't have a dataSourceName property
                 if (childDataStore.getProperties().containsKey("dataSourceName")) {
+
                     String dataSourceName = childDataStore.metaClass.getProperty(datastore, 'dataSourceName')
+
                     if (!config.disabled && !excludedDataStores.contains(dataSourceName)) {
                         applicationContext.addApplicationListener(new AuditLogListener(childDataStore, grailsApplication))
                     }

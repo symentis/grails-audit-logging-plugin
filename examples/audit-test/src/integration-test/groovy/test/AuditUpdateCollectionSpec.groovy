@@ -36,7 +36,7 @@ class AuditUpdateCollectionSpec extends Specification {
             author.save(flush: true, failOnError: true)
 
             // Remove all logging of the inserts, we are focused on updates here
-            AuditTrail.withNewSession {
+            AuditTrail.withNewTransaction {
                 AuditTrail.where { id != null }.deleteAll()
                 assert AuditTrail.count() == 0
             }

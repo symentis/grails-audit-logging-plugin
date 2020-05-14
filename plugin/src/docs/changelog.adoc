@@ -1,6 +1,6 @@
 == Change Log
-* 4.0.0-SNAPSHOT1
-** Queue all audit changes and commit on transaction synchronization
+* 4.0.0
+** Initial support for Grails 4
 
 * 3.0.5
 ** Add support for getOriginalValue() using config parameter.

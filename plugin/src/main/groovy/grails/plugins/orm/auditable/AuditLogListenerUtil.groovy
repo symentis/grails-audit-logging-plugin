@@ -43,7 +43,8 @@ class AuditLogListenerUtil {
      */
     static GormEntity createAuditLogDomainInstance(Map params) {
         Class<GormEntity> clazz = getAuditDomainClass()
-        log.debug 'clazz: {}, params: {}', clazz, params
+        log.debug 'clazz: {}', clazz
+        log.debug 'params: {}', params
         clazz.newInstance(params)
     }
 
@@ -67,7 +68,7 @@ class AuditLogListenerUtil {
     }
 
     /**
-     * Get the persistent or original value for the given domain.property. This method includes
+     * Get the original or persistent or original value for the given domain.property. This method includes
      * some special case handling for hasMany properties, which don't follow normal rules.
      *
      * By default, getPersistentValue() is used to obtain the value.
@@ -77,7 +78,7 @@ class AuditLogListenerUtil {
      * @see GormEntity#getPersistentValue(java.lang.String)
      * @see org.grails.datastore.mapping.dirty.checking.DirtyCheckable#getOriginalValue(java.lang.String)
      */
-    static Object getPersistentValue(Auditable domain, String propertyName) {
+    static Object getOriginalValue(Auditable domain, String propertyName) {
         PersistentEntity entity = getPersistentEntity(domain)
         PersistentProperty property = entity.getPropertyByName(propertyName)
         ConfigObject config = AuditLoggingConfigUtils.getAuditConfig()
