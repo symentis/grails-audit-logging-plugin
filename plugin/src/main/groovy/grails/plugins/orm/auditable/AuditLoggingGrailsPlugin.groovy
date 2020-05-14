@@ -42,7 +42,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException
 @Slf4j
 @SuppressWarnings("GroovyUnusedDeclaration")
 class AuditLoggingGrailsPlugin extends Plugin {
-    def grailsVersion = '3.3.0 > *'
+    def grailsVersion = '4.0.0 > *'
 
     def title = "Audit Logging Plugin"
     def authorEmail = "roos@symentis.com"
