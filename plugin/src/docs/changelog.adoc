@@ -1,12 +1,29 @@
 == Change Log
+* 3.0.5
+** Add support for getOriginalValue() using config parameter.
+** Fix #193 StackOverflow with composite ID and Auditable
+
+* 3.0.4
+** Fix #153 NPE on delete for Hibernate PersistentCollection associations
+** Fix documentation for verboseEvents
+
+* 3.0.3
+** Fix #180, Fixed checking of the pull request in the travis-build.sh
+** Fix #176, #178, #179 Mongo datastores don't have a dataSourceName property
+
+* 3.0.2
+** Fix #174 Merge default config before application ctx is refreshed
+
 * 3.0.1
 ** Fix #169 Crash if project is not using Spring-Security-Core plugin
 ** Minor changes to EventLogController
+
 * 3.0.0
 ** Major rewrite of plugin to be trait based
 ** Removed support for handler callbacks
 ** Consolidated and cleaned up configuration
 ** Added AuditLogContext to allow configuration overrides at the block level
+
 * 2.0.6
 ** Fix #142 Re-introduced truncateLength support (and changed config parameter from 'TRUNCATE_LENGTH' to 'truncateLength')
 ** Fixed verbose param default description in documentation (Thanks to Matthew Moss)

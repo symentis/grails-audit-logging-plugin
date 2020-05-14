@@ -14,7 +14,7 @@ if [[ $EXIT_STATUS -ne 0 ]]; then
     exit $EXIT_STATUS
 fi
 
-if [ "${TRAVIS_PULL_REQUEST}" == 'true' ]; then
+if [ "${TRAVIS_PULL_REQUEST}" != 'false' ]; then
   echo "*** Stopping further execution, as this is a PR."
   exit $EXIT_STATUS
 fi

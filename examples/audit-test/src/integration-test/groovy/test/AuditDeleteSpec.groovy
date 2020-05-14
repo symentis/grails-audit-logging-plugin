@@ -65,7 +65,7 @@ class AuditDeleteSpec extends Specification {
         then: "audit logging is created"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
-        events.size() == author.getAuditablePropertyNames().size()
+        events.size() == author.getAuditablePropertyNames().size()  - 1 // persistentCollections (books) are not logged on delete anymore. See #153
 
         def first = events.find { it.propertyName == 'age' }
         first.oldValue == "37"
@@ -133,8 +133,8 @@ class AuditDeleteSpec extends Specification {
 
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
-        events.size() == 7
-        ['name', 'publisher', 'books', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
+        events.size() == 6 // persistentCollections (books) are not logged on delete anymore. See #153
+        ['name', 'publisher', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
             assert events.find { it.propertyName == name }, "${name} was not logged"
         }
         ['version', 'lastUpdated', 'lastUpdatedBy'].each { name ->
@@ -156,8 +156,8 @@ class AuditDeleteSpec extends Specification {
         then: "ignored properties not logged"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
 
-        events.size() == 7
-        ['name', 'publisher', 'books', 'ssn', 'lastUpdated', 'lastUpdatedBy', 'version'].each { name ->
+        events.size() == 6 // persistentCollections (books) are not logged on delete anymore. See #153
+        ['name', 'publisher', 'ssn', 'lastUpdated', 'lastUpdatedBy', 'version'].each { name ->
             assert events.find { it.propertyName == name }, "${name} was not logged"
         }
         ['famous', 'age', 'dateCreated'].each { name ->

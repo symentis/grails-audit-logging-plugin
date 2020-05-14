@@ -27,6 +27,7 @@ defaultAuditLog {
     mask = ['password']
     propertyMask = "**********"
     defaultActor = 'SYS'
+    usePersistentDirtyPropertyValues = true
 
     // Enable support for Stampable
     stampEnabled = true

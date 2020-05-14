@@ -43,6 +43,8 @@ class AuditLogListenerUtil {
      */
     static GormEntity createAuditLogDomainInstance(Map params) {
         Class<GormEntity> clazz = getAuditDomainClass()
+        log.debug 'clazz: {}', clazz
+        log.debug 'params: {}', params
         clazz.newInstance(params)
     }
 
@@ -66,13 +68,26 @@ class AuditLogListenerUtil {
     }
 
     /**
-     * Get the persistent value for the given domain.property. This method includes
+     * Get the original or persistent value for the given domain.property. This method includes
      * some special case handling for hasMany properties, which don't follow normal rules.
+     *
+     * Default value of AuditLogConfig.usePersistentDirtyPropertyValue is 'true'. If that does not
+     * work (i.e., original value is always null), then use 'false' instead.
+     *
+     * @see http://gorm.grails.org/6.1.x/api/org/grails/datastore/gorm/GormEntity.html#getPersistentValue(java.lang.String)
+     * @see http://gorm.grails.org/6.1.x/api/org/grails/datastore/mapping/dirty/checking/DirtyCheckable.html#getOriginalValue(java.lang.String)
      */
-    static Object getPersistentValue(Auditable domain, String propertyName) {
+    static Object getOriginalValue(Auditable domain, String propertyName) {
         PersistentEntity entity = getPersistentEntity(domain)
         PersistentProperty property = entity.getPropertyByName(propertyName)
-        property instanceof ToMany ? "N/A" : ((GormEntity)domain).getPersistentValue(propertyName)
+        ConfigObject config = AuditLoggingConfigUtils.getAuditConfig()
+        boolean usePersistentDirtyPropertyValues = config.getProperty("usePersistentDirtyPropertyValues")
+        if (usePersistentDirtyPropertyValues) {
+            property instanceof ToMany ? "N/A" : ((GormEntity)domain).getPersistentValue(propertyName)
+        }
+        else {
+            property instanceof ToMany ? "N/A" : ((GormEntity)domain).getOriginalValue(propertyName)
+        }
     }
 
     /**

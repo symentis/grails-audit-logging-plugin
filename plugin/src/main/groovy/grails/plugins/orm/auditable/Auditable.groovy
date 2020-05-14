@@ -7,14 +7,20 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.persistence.Transient
 
+import static grails.plugins.orm.auditable.AuditLogListenerUtil.makeMap
 /**
  * Domain classes should implement this trait to provide auditing support
  */
 @CompileStatic
 trait Auditable {
+    final static Logger log = LoggerFactory.getLogger(Auditable.class)
+
     /**
      * If false, this entity will not be logged
      */
@@ -145,10 +151,45 @@ trait Auditable {
      */
     @Transient
     String getLogEntityId() {
+        log.debug("getLogEntityId()")
         if (this instanceof GormEntity) {
-            return convertLoggedPropertyToString("id", ((GormEntity)this).ident())
+            PersistentEntity persistentEntity = (PersistentEntity) getClass().invokeMethod("getGormPersistentEntity", null)
+            log.debug("    this instanceof GormEntity")
+            if (persistentEntity.identity != null) {
+                return convertLoggedPropertyToString("id", ((GormEntity)this).ident())
+            }
+            else {
+                // Fetch composite ID values
+                PersistentProperty[] idProperties = persistentEntity.compositeIdentity
+                Map<String, Object> map = makeMap(idProperties*.name, this)
+
+                // Build a string representation of this class that looks like: [<persistent id property>:<value or id>]
+                StringBuilder stringBuilder = new StringBuilder()
+                stringBuilder.append("[")
+                map.eachWithIndex { Map.Entry<String, Object> entry, int i ->
+                    stringBuilder.append(entry.key)
+                    stringBuilder.append(":")
+                    switch (entry.value) {
+                        case Auditable:
+                            stringBuilder.append(((Auditable) entry.value).logEntityId)
+                            break
+                        case GormEntity:
+                            stringBuilder.append(((GormEntity) entry.value).ident().toString())
+                            break
+                        default:
+                            stringBuilder.append(convertLoggedPropertyToString(entry.key, entry.value))
+                            break
+                    }
+                    if (i != (map.size() - 1)) {
+                        stringBuilder.append(", ")
+                    }
+                }
+                stringBuilder.append("]")
+                return stringBuilder.toString()
+            }
         }
         if (this.respondsTo("getId")) {
+            log.debug("    this respondsTo getId")
             return convertLoggedPropertyToString("id", this.invokeMethod("getId", null))
         }
 
@@ -163,16 +204,21 @@ trait Auditable {
      * @return
      */
     String convertLoggedPropertyToString(String propertyName, Object value) {
+        log.debug("convertLoggedPropertyToString(propertyName: ${propertyName}, value: ${value})")
         if (value instanceof Enum) {
+            log.debug("    value instanceof Enum")
             return ((Enum)value).name()
         }
         if (value instanceof Auditable) {
+            log.debug("    value instanceof Auditable")
             return "[id:${((Auditable)value).logEntityId}]$value"
         }
         if (value instanceof GormEntity) {
+            log.debug("    value instanceof GormEntity")
             return "[id:${((GormEntity)value).ident()}]$value"
         }
         if (value instanceof Collection) {
+            log.debug("    value instanceof Collection")
             if (logAssociatedIds) {
                 return ((Collection)value).collect {
                     convertLoggedPropertyToString(propertyName, it)
@@ -183,6 +229,7 @@ trait Auditable {
             }
         }
 
+        log.debug("    value.toString(): ${value?.toString()}")
         value?.toString()
     }
 
