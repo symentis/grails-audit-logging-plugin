@@ -6,6 +6,7 @@ Robert Oschwald
 :toc: left
 :toclevels: 2
 :numbered:
+:sectanchors:
 :keywords: Grails, AuditLog, AuditTrail
 ifdef::backend-epub3[]
     :front-cover-image: image:cover.png[Front Cover,800,600]
