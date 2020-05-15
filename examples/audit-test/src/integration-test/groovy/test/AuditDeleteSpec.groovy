@@ -47,7 +47,7 @@ class AuditDeleteSpec extends Specification {
         }
 
         // Remove all logging of the inserts, we are focused on deletes here
-        AuditTrail.withNewSession {
+        AuditTrail.withNewTransaction {
             AuditTrail.where { id != null }.deleteAll()
             assert AuditTrail.count() == 0
         }
