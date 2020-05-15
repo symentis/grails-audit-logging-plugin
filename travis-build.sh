@@ -24,10 +24,10 @@ if [[ ( -n "$TRAVIS_TAG" ) || ( "$TRAVIS_BRANCH" == "master" ) ]]; then
 
   if [[ -n $TRAVIS_TAG ]]; then
       echo " *** Publishing to Bintray.."
-      ./gradlew audit-logging:bintrayUpload -S || EXIT_STATUS=$?
+      ./gradlew :audit-logging:bintrayUpload || EXIT_STATUS=$?
   else
-      echo " *** Publishing to Grails Artifactory, as no release-tag was found (Currently disabled due to Artifactory error)"
-      # ./gradlew audit-logging:publish -S || EXIT_STATUS=$?
+      echo " *** Publishing SNAPSHOT to OJO, as no release-tag was found (SKIPPED. Disabled for now, as we do not have right for deployment, yet)"
+      # ./gradlew :audit-logging:artifactoryPublish || EXIT_STATUS=$?
   fi
 
   echo "*** Building docs and publish to gh-pages branch.."
