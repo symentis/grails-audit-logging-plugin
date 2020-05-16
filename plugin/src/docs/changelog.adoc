@@ -1,4 +1,7 @@
 == Change Log
+* 3.0.6
+** Fix #175 ackport from 4.0.0 workaround for required Transaction in Hibernate >= 3.5
+
 * 3.0.5
 ** Add support for getOriginalValue() using config parameter.
 ** Fix #193 StackOverflow with composite ID and Auditable
