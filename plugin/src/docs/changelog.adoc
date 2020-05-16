@@ -1,4 +1,7 @@
 == Change Log
+* 4.0.1
+** Fix #189 IllegalArgumentException in validator
+
 * 4.0.0
 ** Initial support for Grails 4
 
