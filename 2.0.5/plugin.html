@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.4">
+<meta name="keywords" content="Grails, AuditLog, AuditTrail">
+<meta name="author" content="Robert Oschwald">
+<title>Grails Audit Logging Plugin - Reference Documentation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
+/* Remove comment around @import statement below when using as a custom stylesheet */
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
+article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block}
+audio,canvas,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+[hidden],template{display:none}
+script{display:none!important}
+html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{margin:0}
+a{background:transparent}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+abbr[title]{border-bottom:1px dotted}
+b,strong{font-weight:bold}
+dfn{font-style:italic}
+hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0}
+input[type="search"]{-webkit-appearance:textfield;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;box-sizing:content-box}
+input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+body{-webkit-font-smoothing:antialiased}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.center{margin-left:auto;margin-right:auto}
+.spread{width:100%}
+p.lead,.paragraph.lead>p,#preamble>.sectionbody>.paragraph:first-of-type p{font-size:1.21875em;line-height:1.6}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:none}
+p{font-family:inherit;font-weight:400;font-size:1em;line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #ddddd8;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol,ul.no-bullet,ol.no-bullet{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0;font-size:1em}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ul.no-bullet{list-style:none}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
+abbr{text-transform:none}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
+blockquote cite:before{content:"\2014 \0020"}
+blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media only screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
+table thead,table tfoot{background:#f7f8f7;font-weight:bold}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
+body{tab-size:4}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
+.clearfix:after,.float-group:after{clear:both}
+*:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menu{color:rgba(0,0,0,.8)}
+b.button:before,b.button:after{position:relative;top:-1px;font-weight:400}
+b.button:before{content:"[";padding:0 3px 0 2px}
+b.button:after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header:before,#header:after,#content:before,#content:after,#footnotes:before,#footnotes:after,#footer:before,#footer:after{content:" ";display:table}
+#header:after,#content:after,#footnotes:after,#footer:after{clear:both}
+#content{margin-top:1.25em}
+#content:before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #ddddd8}
+#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #ddddd8;padding-bottom:8px}
+#header .details{border-bottom:1px solid #ddddd8;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span:before{content:"\00a0\2013\00a0"}
+#header .details br+span.author:before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark:before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber:after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #ddddd8;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #efefed;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media only screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+#toc.toc2{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #efefed;left:auto;right:0}}
+@media only screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:100%;background-color:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:rgba(255,255,255,.8);line-height:1.44}
+.sect1{padding-bottom:.625em}
+@media only screen and (min-width:768px){.sect1{padding-bottom:1.25em}}
+.sect1+.sect1{border-top:1px solid #efefed}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor:before,h2>a.anchor:before,h3>a.anchor:before,#toctitle>a.anchor:before,.sidebarblock>.content>.title>a.anchor:before,h4>a.anchor:before,h5>a.anchor:before,h6>a.anchor:before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock>caption.title{white-space:nowrap;overflow:visible;max-width:0}
+.paragraph.lead>p,#preamble>.sectionbody>.paragraph:first-of-type p{color:rgba(0,0,0,.85)}
+table.tableblock #preamble>.sectionbody>.paragraph:first-of-type p{font-size:inherit}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #ddddd8;color:rgba(0,0,0,.6)}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
+.exampleblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child{margin-bottom:0}
+.sidebarblock{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+.sidebarblock>:first-child{margin-top:0}
+.sidebarblock>:last-child{margin-bottom:0}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock pre:not(.highlight),.listingblock pre[class="highlight"],.listingblock pre[class^="highlight "],.listingblock pre.CodeRay,.listingblock pre.prettyprint{background:#f7f7f8}
+.sidebarblock .literalblock pre,.sidebarblock .listingblock pre:not(.highlight),.sidebarblock .listingblock pre[class="highlight"],.sidebarblock .listingblock pre[class^="highlight "],.sidebarblock .listingblock pre.CodeRay,.sidebarblock .listingblock pre.prettyprint{background:#f2f1f1}
+.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;padding:1em;font-size:.8125em}
+.literalblock pre.nowrap,.literalblock pre[class].nowrap,.listingblock pre.nowrap,.listingblock pre[class].nowrap{overflow-x:auto;white-space:pre;word-wrap:normal}
+@media only screen and (min-width:768px){.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{font-size:.90625em}}
+@media only screen and (min-width:1280px){.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{font-size:1em}}
+.literalblock.output pre{color:#f7f7f8;background-color:rgba(0,0,0,.9)}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]:before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:#999}
+.listingblock:hover code[data-lang]:before{display:block}
+.listingblock.terminal pre .command:before{content:attr(data-prompt);padding-right:.5em;color:#999}
+.listingblock.terminal pre .command:not([data-prompt]):before{content:"$"}
+table.pyhltable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.pyhltable td{vertical-align:top;padding-top:0;padding-bottom:0;line-height:1.45}
+table.pyhltable td.code{padding-left:.75em;padding-right:0}
+pre.pygments .lineno,table.pyhltable td:not(.code){color:#999;padding-left:0;padding-right:.5em;border-right:1px solid #ddddd8}
+pre.pygments .lineno{display:inline-block;margin-right:.25em}
+table.pyhltable .linenodiv{background:none!important;padding-right:0!important}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock blockquote p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote:before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.5em;margin-right:.5ex;text-align:right}
+.quoteblock .quoteblock{margin-left:0;margin-right:0;padding:.5em 0;border-left:3px solid rgba(0,0,0,.6)}
+.quoteblock .quoteblock blockquote{padding:0 0 0 .75em}
+.quoteblock .quoteblock blockquote:before{display:none}
+.verseblock{margin:0 1em 1.25em 1em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract{margin:0 0 1.25em 0;display:block}
+.quoteblock.abstract blockquote,.quoteblock.abstract blockquote p{text-align:left;word-spacing:0}
+.quoteblock.abstract blockquote:before,.quoteblock.abstract blockquote p:first-of-type:before{display:none}
+table.tableblock{max-width:100%;border-collapse:separate}
+table.tableblock td>.paragraph:last-child p>p:last-child,table.tableblock th>p:last-child,table.tableblock td>p:last-child{margin-bottom:0}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all th.tableblock,table.grid-all td.tableblock{border-width:0 1px 1px 0}
+table.grid-all tfoot>tr>th.tableblock,table.grid-all tfoot>tr>td.tableblock{border-width:1px 1px 0 0}
+table.grid-cols th.tableblock,table.grid-cols td.tableblock{border-width:0 1px 0 0}
+table.grid-all *>tr>.tableblock:last-child,table.grid-cols *>tr>.tableblock:last-child{border-right-width:0}
+table.grid-rows th.tableblock,table.grid-rows td.tableblock{border-width:0 0 1px 0}
+table.grid-all tbody>tr:last-child>th.tableblock,table.grid-all tbody>tr:last-child>td.tableblock,table.grid-all thead:last-child>tr>th.tableblock,table.grid-rows tbody>tr:last-child>th.tableblock,table.grid-rows tbody>tr:last-child>td.tableblock,table.grid-rows thead:last-child>tr>th.tableblock{border-bottom-width:0}
+table.grid-rows tfoot>tr>th.tableblock,table.grid-rows tfoot>tr>td.tableblock{border-width:1px 0 0 0}
+table.frame-all{border-width:1px}
+table.frame-sides{border-width:0 1px}
+table.frame-topbot{border-width:1px 0}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{display:table-cell;line-height:1.6;background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+td>div.verse{white-space:pre}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.unstyled,ol.unnumbered,ul.checklist,ul.none{list-style-type:none}
+ul.unstyled,ol.unnumbered,ul.checklist{margin-left:.625em}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1em;font-size:.85em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{width:1em;position:relative;top:1px}
+ul.inline{margin:0 auto .625em auto;margin-left:-1.375em;margin-right:0;padding:0;list-style:none;overflow:hidden}
+ul.inline>li{list-style:none;float:left;margin-left:1.375em;display:block}
+ul.inline>li>*{display:block}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist>table tr>td:first-of-type{padding:0 .75em;line-height:1}
+.colist>table tr>td:last-of-type{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:solid 4px #fff;-webkit-box-shadow:0 0 0 1px #ddd;box-shadow:0 0 0 1px #ddd}
+.imageblock.left,.imageblock[style*="float: left"]{margin:.25em .625em 1.25em 0}
+.imageblock.right,.imageblock[style*="float: right"]{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em 0;border-width:1px 0 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;text-indent:-1.05em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
+.gist .file-data>table td.line-data{width:99%}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background-color:#00fafa}
+.black{color:#000}
+.black-background{background-color:#000}
+.blue{color:#0000bf}
+.blue-background{background-color:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background-color:#fa00fa}
+.gray{color:#606060}
+.gray-background{background-color:#7d7d7d}
+.green{color:#006000}
+.green-background{background-color:#007d00}
+.lime{color:#00bf00}
+.lime-background{background-color:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background-color:#7d0000}
+.navy{color:#000060}
+.navy-background{background-color:#00007d}
+.olive{color:#606000}
+.olive-background{background-color:#7d7d00}
+.purple{color:#600060}
+.purple-background{background-color:#7d007d}
+.red{color:#bf0000}
+.red-background{background-color:#fa0000}
+.silver{color:#909090}
+.silver-background{background-color:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background-color:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background-color:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background-color:#fafa00}
+span.icon>.fa{cursor:default}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note:before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip:before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning:before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution:before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important:before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background-color:rgba(0,0,0,.8);-webkit-border-radius:100px;border-radius:100px;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]:after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background-color:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@media print{@page{margin:1.25cm .75cm}
+*{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare):after,a[href^="https:"]:not(.bare):after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]:after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #ddddd8!important;padding-bottom:0!important}
+.sect1{padding-bottom:0!important}
+.sect1+.sect1{border:0!important}
+#header>h1:first-child{margin-top:1.25rem}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em 0}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span:before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]:before{display:block}
+#footer{background:none!important;padding:0 .9375em}
+#footer-text{color:rgba(0,0,0,.6)!important;font-size:.9em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+<style>
+/* Stylesheet for CodeRay to match GitHub theme | MIT License | http://foundation.zurb.com */
+/*pre.CodeRay {background-color:#f7f7f8;}*/
+.CodeRay .line-numbers{border-right:1px solid #d8d8d8;padding:0 0.5em 0 .25em}
+.CodeRay span.line-numbers{display:inline-block;margin-right:.5em;color:rgba(0,0,0,.3)}
+.CodeRay .line-numbers strong{color:rgba(0,0,0,.4)}
+table.CodeRay{border-collapse:separate;border-spacing:0;margin-bottom:0;border:0;background:none}
+table.CodeRay td{vertical-align: top;line-height:1.45}
+table.CodeRay td.line-numbers{text-align:right}
+table.CodeRay td.line-numbers>pre{padding:0;color:rgba(0,0,0,.3)}
+table.CodeRay td.code{padding:0 0 0 .5em}
+table.CodeRay td.code>pre{padding:0}
+.CodeRay .debug{color:#fff !important;background:#000080 !important}
+.CodeRay .annotation{color:#007}
+.CodeRay .attribute-name{color:#000080}
+.CodeRay .attribute-value{color:#700}
+.CodeRay .binary{color:#509}
+.CodeRay .comment{color:#998;font-style:italic}
+.CodeRay .char{color:#04d}
+.CodeRay .char .content{color:#04d}
+.CodeRay .char .delimiter{color:#039}
+.CodeRay .class{color:#458;font-weight:bold}
+.CodeRay .complex{color:#a08}
+.CodeRay .constant,.CodeRay .predefined-constant{color:#008080}
+.CodeRay .color{color:#099}
+.CodeRay .class-variable{color:#369}
+.CodeRay .decorator{color:#b0b}
+.CodeRay .definition{color:#099}
+.CodeRay .delimiter{color:#000}
+.CodeRay .doc{color:#970}
+.CodeRay .doctype{color:#34b}
+.CodeRay .doc-string{color:#d42}
+.CodeRay .escape{color:#666}
+.CodeRay .entity{color:#800}
+.CodeRay .error{color:#808}
+.CodeRay .exception{color:inherit}
+.CodeRay .filename{color:#099}
+.CodeRay .function{color:#900;font-weight:bold}
+.CodeRay .global-variable{color:#008080}
+.CodeRay .hex{color:#058}
+.CodeRay .integer,.CodeRay .float{color:#099}
+.CodeRay .include{color:#555}
+.CodeRay .inline{color:#000}
+.CodeRay .inline .inline{background:#ccc}
+.CodeRay .inline .inline .inline{background:#bbb}
+.CodeRay .inline .inline-delimiter{color:#d14}
+.CodeRay .inline-delimiter{color:#d14}
+.CodeRay .important{color:#555;font-weight:bold}
+.CodeRay .interpreted{color:#b2b}
+.CodeRay .instance-variable{color:#008080}
+.CodeRay .label{color:#970}
+.CodeRay .local-variable{color:#963}
+.CodeRay .octal{color:#40e}
+.CodeRay .predefined{color:#369}
+.CodeRay .preprocessor{color:#579}
+.CodeRay .pseudo-class{color:#555}
+.CodeRay .directive{font-weight:bold}
+.CodeRay .type{font-weight:bold}
+.CodeRay .predefined-type{color:inherit}
+.CodeRay .reserved,.CodeRay .keyword {color:#000;font-weight:bold}
+.CodeRay .key{color:#808}
+.CodeRay .key .delimiter{color:#606}
+.CodeRay .key .char{color:#80f}
+.CodeRay .value{color:#088}
+.CodeRay .regexp .delimiter{color:#808}
+.CodeRay .regexp .content{color:#808}
+.CodeRay .regexp .modifier{color:#808}
+.CodeRay .regexp .char{color:#d14}
+.CodeRay .regexp .function{color:#404;font-weight:bold}
+.CodeRay .string{color:#d20}
+.CodeRay .string .string .string{background:#ffd0d0}
+.CodeRay .string .content{color:#d14}
+.CodeRay .string .char{color:#d14}
+.CodeRay .string .delimiter{color:#d14}
+.CodeRay .shell{color:#d14}
+.CodeRay .shell .delimiter{color:#d14}
+.CodeRay .symbol{color:#990073}
+.CodeRay .symbol .content{color:#a60}
+.CodeRay .symbol .delimiter{color:#630}
+.CodeRay .tag{color:#008080}
+.CodeRay .tag-special{color:#d70}
+.CodeRay .variable{color:#036}
+.CodeRay .insert{background:#afa}
+.CodeRay .delete{background:#faa}
+.CodeRay .change{color:#aaf;background:#007}
+.CodeRay .head{color:#f8f;background:#505}
+.CodeRay .insert .insert{color:#080}
+.CodeRay .delete .delete{color:#800}
+.CodeRay .change .change{color:#66f}
+.CodeRay .head .head{color:#f4f}
+</style>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Grails Audit Logging Plugin - Reference Documentation</h1>
+<div class="details">
+<span id="author" class="author">Robert Oschwald</span><br>
+<span id="revnumber">version 2.0.5,</span>
+<span id="revdate">2017-06-04</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#description">1. Description</a>
+<ul class="sectlevel2">
+<li><a href="#compatibility">1.1. Compatibility</a></li>
+<li><a href="#orm-implementation-dependency">1.2. ORM implementation dependency</a></li>
+</ul>
+</li>
+<li><a href="#change-log">2. Change Log</a></li>
+<li><a href="#installation">3. Installation</a>
+<ul class="sectlevel2">
+<li><a href="#create-your-domain-artifact-using-audit-quickstart">3.1. Create your Domain Artifact using audit-quickstart</a></li>
+</ul>
+</li>
+<li><a href="#plugin-usage">4. Plugin Usage</a>
+<ul class="sectlevel2">
+<li><a href="#1-auditing-of-domain-class">4.1. 1. Auditing of domain class</a></li>
+<li><a href="#2-auditing-plus-domain-event-handlers">4.2. 2. Auditing plus domain event handlers</a></li>
+<li><a href="#3-use-event-handlers-only-no-auditing">4.3. 3. Use event handlers only (no auditing)</a></li>
+</ul>
+</li>
+<li><a href="#configuration">5. Configuration</a>
+<ul class="sectlevel2">
+<li><a href="#auditing-current-user-information-actorclosure">5.1. Auditing Current User Information (actorClosure)</a></li>
+<li><a href="#property-ignore-list">5.2. Property Ignore List</a></li>
+<li><a href="#verbose-mode">5.3. Verbose mode</a></li>
+<li><a href="#logging-of-associated-objectids-since-0-5-5">5.4. Logging of associated objectIds (since 0.5.5)</a></li>
+<li><a href="#property-value-masking-since-0-5-5">5.5. Property value masking (since 0.5.5)</a></li>
+<li><a href="#verbose-log-truncation-length">5.6. Verbose log truncation length</a></li>
+<li><a href="#transactional-auditlog-events">5.7. Transactional AuditLog events</a></li>
+<li><a href="#disable-auditing-by-config-since-0-5-5-3">5.8. Disable auditing by config (since 0.5.5.3)</a></li>
+<li><a href="#nonverbosedelete-logging-since-1-0-1">5.9. nonVerboseDelete logging (since 1.0.1)</a></li>
+<li><a href="#log-full-domain-class-name-since-1-0-3">5.10. log full domain class name (since 1.0.3)</a></li>
+<li><a href="#getauditloguri-closure-since-1-0-4">5.11. getAuditLogUri closure (since 1.0.4)</a></li>
+<li><a href="#domain-class-stamping-support-since-1-0-4">5.12. Domain class stamping support (since 1.0.4)</a></li>
+<li><a href="#domain-class-stamping-configuration-since-2-0-5">5.13. Domain class stamping configuration (since 2.0.5)</a></li>
+<li><a href="#ignoring-certain-events-since-1-0-5-2-0-0">5.14. Ignoring certain events (since 1.0.5 / 2.0.0)</a></li>
+<li><a href="#domain-name-replacements-since-2-0-1">5.15. Domain Name replacements (since 2.0.1)</a></li>
+<li><a href="#example-configuration">5.16. Example configuration</a></li>
+</ul>
+</li>
+<li><a href="#implementation">6. Implementation</a>
+<ul class="sectlevel2">
+<li><a href="#auditlogeventlistener">6.1. AuditLogEventListener</a></li>
+<li><a href="#plugin-descriptor">6.2. Plugin Descriptor</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="description">1. Description</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Audit Logging plugin adds Grails GORM Events based Audit Logging capabilities to a Grails project and it also adds
+support to domain models for hooking into the Grails GORM events system.</p>
+</div>
+<div class="paragraph">
+<p>Support for the following closures are added: onSave, onDelete, and onChange. The onChange closure can be used in two ways.
+First, it can be used with no parameters or it can be used with two parameters, oldMap and newMap.
+The first parameter is a LinkedHashMap representing the old state of the object before the change was applied,
+the second parameter is a LinkedHashMap representing the state of the object after changes are applied.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+GORM Events hook into the <em>'beforeInsert</em>' and the <em>'beforeUpdate</em>' events which work great for preventing updates
+but do not work well for <em>'Audit Logging</em>' where we would need critical information about the entity that is only
+available after these actions complete. We&#8217;ve chosen to prefix the handler names with "on" so that they do not conflict
+with other handler names in other existing plugins.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="compatibility">1.1. Compatibility</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>For Grails 3.x use version 2.0.0 or above.</p>
+</li>
+<li>
+<p>For Grails 2.x use version 1.0.0 or above.</p>
+</li>
+<li>
+<p>For Grails 1.3.x use version 0.5.5.3.</p>
+</li>
+<li>
+<p>For Grails &#8656; 1.2.0 use version 0.5.3.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="orm-implementation-dependency">1.2. ORM implementation dependency</h3>
+<div class="paragraph">
+<p>Starting with version 1.0.0, this plugin is ORM mapper agnostic, so you can use it with the ORM mapper of your choice
+(Hibernate3, Hibernate4, MongoDB, etc.).</p>
+</div>
+<div class="paragraph">
+<p>Please note, that only Hibernate3 and Hibernate4 are tested during development. If an issue occurs with your used ORM mapper,
+please file a GitHub issue.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="change-log">2. Change Log</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>2.0.5</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Only pass session to actorClosure if a session actually exists.</p>
+</li>
+<li>
+<p>Updated syncHibernateState to use correct name array</p>
+</li>
+<li>
+<p>Fix ignore list not used for insert and delete</p>
+</li>
+<li>
+<p>Fix #147 Document per-datasource auditLog.disabled config key</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.0.4</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Added option to specify createdBy,lastUpdatedBy, dateCreated,lastUpdated fieldnames per domainclass</p>
+</li>
+<li>
+<p>Removed blank constraint for nullable stampable properties.</p>
+</li>
+<li>
+<p>Remove preDelete as stampable event, does not make sense to stamp a delete event.</p>
+</li>
+<li>
+<p>Constraint fixes</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.0.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #129 Issue with Hibernate stamping. Stamping was ignored with dynamicUpdate = true and stamping was ignored on cascading saves.</p>
+</li>
+<li>
+<p>Fix #130 Docs for verbose mode</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.0.2</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #118, use Grails 3.0.10 internally.</p>
+</li>
+<li>
+<p>Fix #126 Support Many-To-Many logging (thanks to Andrey Zhuchkov)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.0.1</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #117 Clean build. Version 2.0.0 had issues with Spring Security due to unclean build.</p>
+</li>
+<li>
+<p>Fix #116 (paritially). Replacement Patterns do work, but trailing dots are ignored for now due to Grails 3.0.x limitations.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.0.0</p>
+<div class="ulist">
+<ul>
+<li>
+<p>First Grails3 version. Thanks to Graeme.</p>
+</li>
+<li>
+<p>audit-quickstart command to create the AuditLog domain artifact</p>
+</li>
+<li>
+<p>#96 Make identifiers available in the maps during onChange event. Thanks to dmahapatro.</p>
+</li>
+<li>
+<p>branch: master.</p>
+</li>
+<li>
+<p>For 1.0.x plugin version (Grails2), see 1.x_maintenance branch</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>1.0.5</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Migration of JIRA to GitHub Issues</p>
+</li>
+<li>
+<p>Fix #92 (Support for ignoring certain Events)</p>
+</li>
+<li>
+<p>Starting with this release, the main branch for the 1.0.x series is 1.x_maintenance. Master branch is for Grails 3.0 support, now. Both branches will be tested by Travis-CI.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>1.0.4</p>
+<div class="ulist">
+<ul>
+<li>
+<p>GPAUDITLOGGING-69 allow to set uri per domain object</p>
+</li>
+<li>
+<p>GPAUDITLOGGING-62 Add identifier in handler map</p>
+</li>
+<li>
+<p>GPAUDITLOGGING-29 support configurable id mapping for AuditLogEvent</p>
+</li>
+<li>
+<p>GPAUDITLOGGING-70 support configurable datasource name for AuditLogEvent</p>
+</li>
+<li>
+<p>GPAUDITLOGGING-74 Impossible to log values of zero or false</p>
+</li>
+<li>
+<p>GPAUDITLOGGING-75 Support automatic (audit) stamping support on entities</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>1.0.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>GPAUDITLOGGING-64 workaround for duplicate log entries written per configured dataSource</p>
+</li>
+<li>
+<p>GPAUDITLOGGING-63 logFullClassName property</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>1.0.2</p>
+<div class="ulist">
+<ul>
+<li>
+<p>GPAUDITLOGGING-66</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>1.0.1</p>
+<div class="ulist">
+<ul>
+<li>
+<p>closures</p>
+</li>
+<li>
+<p>nonVerboseDelete property</p>
+</li>
+<li>
+<p>provide domain identifier to onSave() handler</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>1.0.0</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Grails &gt;= 2.0</p>
+</li>
+<li>
+<p>ORM agnostic implementation</p>
+</li>
+<li>
+<p>major cleanup and new features</p>
+</li>
+<li>
+<p>fix #99 Plugin not working with MongoDB as Only Database</p>
+</li>
+<li>
+<p>Changed issue management url to GH.</p>
+</li>
+<li>
+<p>#13 Externalize AuditTrailEvent domain to user</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.5.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Added ability to disable audit logging by config.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.5.2</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Added issueManagement to plugin descriptor for the portal. No changes in the plugin code.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.5.1</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fixed the title. No changes in the plugin code.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.5</p>
+<div class="ulist">
+<ul>
+<li>
+<p>collections logging</p>
+</li>
+<li>
+<p>log ids</p>
+</li>
+<li>
+<p>replacement patterns</p>
+</li>
+<li>
+<p>property value masking</p>
+</li>
+<li>
+<p>large fields support</p>
+</li>
+<li>
+<p>fixes and enhancements</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.4</p>
+<div class="ulist">
+<ul>
+<li>
+<p>compatibility issues with Grails 1.3.x</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>GRAILSPLUGINS-2135</p>
+</li>
+<li>
+<p>GRAILSPLUGINS-2060</p>
+</li>
+<li>
+<p>an issue with extra JAR files that are somehow getting released as part of the plugin</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.2</p>
+<div class="ulist">
+<ul>
+<li>
+<p>GRAILSPLUGINS-1887 and GRAILSPLUGINS-1354</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5.1</p>
+<div class="ulist">
+<ul>
+<li>
+<p>fixes regression in field logging</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.5</p>
+<div class="ulist">
+<ul>
+<li>
+<p>GRAILSPLUGINS-391</p>
+</li>
+<li>
+<p>GRAILSPLUGINS-1496</p>
+</li>
+<li>
+<p>GRAILSPLUGINS-1181</p>
+</li>
+<li>
+<p>GRAILSPLUGINS-1515</p>
+</li>
+<li>
+<p>GRAILSPLUGINS-1811</p>
+</li>
+<li>
+<p>changes to AuditLogEvent domain object uses composite id to simplify logging</p>
+</li>
+<li>
+<p>changes to AuditLogListener uses new domain model with separate transaction</p>
+</li>
+<li>
+<p>for logging action to avoid invalidating the main hibernate session.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.4.1</p>
+<div class="ulist">
+<ul>
+<li>
+<p>repackaged for Grails 1.1.1 see GRAILSPLUGINS-1181</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.4</p>
+<div class="ulist">
+<ul>
+<li>
+<p>custom serializable implementation for AuditLogEvent so events can happen inside a webflow context.</p>
+</li>
+<li>
+<p>tweak application.properties for loading in other grails versions</p>
+</li>
+<li>
+<p>update to views to show URI in an event</p>
+</li>
+<li>
+<p>fix missing oldState bug in change event</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>0.3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>actorKey and username features allow for the logging of user or userPrincipal for most security systems.</p>
+</li>
+<li>
+<p>Fix #31 disable hotkeys for layout.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installation">3. Installation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Add to your build.gradle project dependencies block:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">/** Project dependencies **/
+dependencies {
+   ...
+   compile 'org.grails.plugins:audit-logging:2.0.5'
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>    grails compile</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or another script that triggers dependency resolution.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="create-your-domain-artifact-using-audit-quickstart">3.1. Create your Domain Artifact using audit-quickstart</h3>
+<div class="literalblock">
+<div class="content">
+<pre>    grails audit-quickstart &lt;your.package.name&gt; &lt;YourAuditLogEventClassName&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>example:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>    grails audit-quickstart org.myaudit.example AuditTrail</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Afterwards, set your needed mapping and constraint settings accordinghly in the created Domain Artifact.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="plugin-usage">4. Plugin Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use the grails-audit-logging plugin in several ways.</p>
+</div>
+<div class="sect2">
+<h3 id="1-auditing-of-domain-class">4.1. 1. Auditing of domain class</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="directive">static</span> auditable = <span class="predefined-constant">true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Enables audit logging using the introduced domain class AuditLogEvent which will record insert, update, and delete events. Update events will be logged in detail with the property name and the old and new values.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="2-auditing-plus-domain-event-handlers">4.2. 2. Auditing plus domain event handlers</h3>
+<div class="paragraph">
+<p>You may use the optional event handlers in your Domain classes. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="type">class</span> <span class="class">Person</span> {
+ <span class="directive">static</span> auditable = <span class="predefined-constant">true</span>
+ <span class="predefined-type">Long</span> id
+ <span class="predefined-type">Long</span> version
+ <span class="predefined-type">String</span> firstName
+ <span class="predefined-type">String</span> middleName
+ <span class="predefined-type">String</span> lastName
+
+ <span class="predefined-type">String</span> email
+
+ <span class="directive">static</span> constraints = {
+         firstName(<span class="key">nullable</span>:<span class="predefined-constant">true</span>,<span class="key">size</span>:<span class="integer">0</span>..<span class="integer">60</span>)
+         middleName(<span class="key">nullable</span>:<span class="predefined-constant">true</span>,<span class="key">size</span>:<span class="integer">0</span>..<span class="integer">60</span>)
+         lastName(<span class="key">nullable</span>:<span class="predefined-constant">false</span>,<span class="key">size</span>:<span class="integer">1</span>..<span class="integer">60</span>)
+         email(<span class="key">email</span>:<span class="predefined-constant">true</span>)
+ }
+
+ <span class="keyword">def</span> onSave = {
+         println <span class="string"><span class="delimiter">&quot;</span><span class="content">new person inserted</span><span class="delimiter">&quot;</span></span>
+         <span class="comment">// may optionally refer to newState map</span>
+ }
+ <span class="keyword">def</span> onDelete = {
+         println <span class="string"><span class="delimiter">&quot;</span><span class="content">person was deleted</span><span class="delimiter">&quot;</span></span>
+     <span class="comment">// may optionally refer to oldState map</span>
+ }
+ <span class="keyword">def</span> onChange = { oldMap,newMap -&gt;
+         println <span class="string"><span class="delimiter">&quot;</span><span class="content">Person was changed ...</span><span class="delimiter">&quot;</span></span>
+         oldMap.each({ key, oldVal -&gt;
+                 <span class="keyword">if</span>(oldVal != newMap[key]) {
+                    println <span class="string"><span class="delimiter">&quot;</span><span class="content"> * </span><span class="inline"><span class="inline-delimiter">$</span>key</span><span class="content"> changed from </span><span class="inline"><span class="inline-delimiter">$</span>oldVal</span><span class="content"> to </span><span class="delimiter">&quot;</span></span> + newMap[key]
+                }
+        })
+ }<span class="comment">//*/</span>
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="3-use-event-handlers-only-no-auditing">4.3. 3. Use event handlers only (no auditing)</h3>
+<div class="paragraph">
+<p>You may choose to disable the audit logging and only use the event handlers. You would do this by specifying in your domain class:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">static</span> auditable = [handlersOnly:<span class="predefined-constant">true</span>]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With "handlersOnly:true" specified, no AuditLogEvents will be persisted to the database and only the event handlers will be called.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration">5. Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The plugin configuration can be specified in the application.groovy file.
+It supports Environments blocks for environment-specific configuration.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Since version 2.0.0, the configuration key has changed from "auditLog" to "grails.plugins.auditLog".
+If you use the old configuration key, the plugin will log a notice.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 30%;">
+<col style="width: 30%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><strong>Property</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Default Value</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Meaning</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.auditDomainClassName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">use "grails audit-quickstart" to create one</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mandatory Domain Class Name for the AuditTrail Domain class. Mandatory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.verbose</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Column by column change logging in insert and delete events is enabled by default. You can disable it if you are not interested in value changes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.logIds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, object-ids of associated objects are logged</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.disabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, audit logging is disabled, but the eventHandlers are still triggered. Note: You can set "auditLog.disabled" in  DataSource configurations you do not want to have the AuditLogListener registered in. This could be useful if you have multiple DataSource definitions, but want to audit only a few of them.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.nonVerboseDelete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Log deletes non-verbosely if verbose = true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.logFullClassName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Log the entity including the package name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.TRUNCATE_LENGTH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">255</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure the truncation length of detail information. Must me &#8656; field size of oldMap and newMap in your Auditing domain class.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampEnabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add stamping fields to all auditable domain classes using AST transformation (dateCreated, lastUpdated, createdBy, lastUpdatedBy)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampAlways</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">always stamp Domain Classes regardless of @Stamp or "static stampable = true"</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampCreatedBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">createdBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Field name for stamping support</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">grails.plugin.auditLog.stampLastUpdatedBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">lastUpdatedBy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Field name for lastUpdateBy field.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">actorClosure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Closure to get the principal. Details see below.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="auditing-current-user-information-actorclosure">5.1. Auditing Current User Information (actorClosure)</h3>
+<div class="paragraph">
+<p>With version &gt;= 0.5, additional configuration can be specified in the application.groovy file of the project to help log the
+authenticated user for various security systems.
+For many security systems the defaults will work fine. To specify a property of the userPrincipal to be logged as the actor
+name (the person performing the action which triggered the event, e.g. the username) add these lines to application.groovy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">grails {
+  plugin {
+   auditLog {
+     actorClosure = { request, session -&gt;
+      session.user?.username
+     }
+   }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>It is currently not possible to define the actorClosure as a property like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">grails.plugin.auditLog.actorClosure = {...}</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="spring-security-core-plugin-1-1-2-or-higher">5.1.1. Spring Security Core Plugin 1.1.2 or higher</h4>
+<div class="paragraph">
+<p>If you save data from an unprotected URL (configAttribute:IS_AUTHENTICATED_ANONYMOUSLY), the principal is a String-object
+not a Principal-object. To cope with this behaviour you should use the following Closure definition in application.groovy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">org.codehaus.groovy.grails.plugin.springsecurity.SpringSecurityUtils</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">grails {
+  plugin {
+     auditLog {
+        actorClosure = { request, session -&gt;
+          <span class="keyword">if</span> (request.applicationContext.springSecurityService.principal <span class="keyword">instanceof</span> groovy.lang.String){
+           <span class="keyword">return</span> request.applicationContext.springSecurityService.principal
+          }
+          <span class="keyword">def</span> username = request.applicationContext.springSecurityService.principal?.username
+          <span class="keyword">if</span> (SpringSecurityUtils.isSwitched()){
+           username = SpringSecurityUtils.switchedUserOriginalUsername+<span class="string"><span class="delimiter">&quot;</span><span class="content"> AS </span><span class="delimiter">&quot;</span></span>+username
+          }
+          <span class="keyword">return</span> username
+        }
+     }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="spring-security-core-1-0-1-plugin">5.1.2. Spring Security Core 1.0.1 Plugin</h4>
+<div class="paragraph">
+<p>Based off of Jorge Aguilera&#8217;s example, the Spring Security Plugin uses the SpringSecurityService.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">grails {
+  plugin {
+    auditLog {
+      actorClosure = { request, session -&gt;
+       request.applicationContext.springSecurityService.principal?.username
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="acegi-plugin">5.1.3. Acegi Plugin</h4>
+<div class="paragraph">
+<p>Thanks to Jorge Aguilera for his example on how to integrate with the Acegi plugin:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">grails {
+  plugin {
+    auditLog {
+      actorClosure = { request, session -&gt;
+       <span class="keyword">return</span> request.applicationContext.authenticateService.principal()?.username
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cas-authentication">5.1.4. CAS Authentication</h4>
+<div class="paragraph">
+<p>For example if you are using a system such as CAS you can specify the CAS user attribute using a special configuration
+property to get the CAS user name. In application.groovy  add the following lines:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">edu.yale.its.tp.cas.client.filter.CASFilter</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">grails {
+  plugin {
+    auditLog {
+     actorClosure = { request, session -&gt;
+       session?.getAttribute(CASFilter.CAS_FILTER_USER)
+     }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>… and the audit_log table will have a record of which user and what controller triggered the event.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="shiro-plugin">5.1.5. Shiro Plugin</h4>
+<div class="paragraph">
+<p>With Shiro, add the following lines to use the currently logged in user&#8217;s username:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">grails {
+  plugin {
+    auditLog {
+     actorClosure = { request, session -&gt;
+       org.apache.shiro.SecurityUtils.getSubject()?.getPrincipal()
+     }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="other-security-systems">5.1.6. Other security systems</h4>
+<div class="paragraph">
+<p>If you are using a custom authentication system in your controller that puts the user data into the session you can set
+up the actorClosure to work with your security system instead.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="property-ignore-list">5.2. Property Ignore List</h3>
+<div class="paragraph">
+<p>It&#8217;s possible to configure which properties get ignored by auditing. The default ignore field list is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">[<span class="string"><span class="delimiter">'</span><span class="content">version</span><span class="delimiter">'</span></span>,<span class="string"><span class="delimiter">'</span><span class="content">lastUpdated</span><span class="delimiter">'</span></span>].</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you want to provide your own ignore list specify the ignore list like this in domain classes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="directive">static</span> auditable = [<span class="key">ignore</span>:[<span class="string"><span class="delimiter">'</span><span class="content">version</span><span class="delimiter">'</span></span>,<span class="string"><span class="delimiter">'</span><span class="content">lastUpdated</span><span class="delimiter">'</span></span>,<span class="string"><span class="delimiter">'</span><span class="content">myField</span><span class="delimiter">'</span></span>]]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If instead you want to trigger on version and lastUpdated changes you may specify an empty ignore list:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="directive">static</span> auditable = [<span class="key">ignore</span>:<span class="type">[]</span>]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="verbose-mode">5.3. Verbose mode</h3>
+<div class="paragraph">
+<p>You can enable verbose mode. If enabled, column by column change logging in insert and delete events is enabled.
+Old- and new values are stored in detailed to the audit logging table. Enable verbose logging with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> verbose = <span class="predefined-constant">true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This setting is disabled by default.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>When enabling verbose audit logging, you may get errors if you explicitly flush the session. In this case, do not enable
+verbose logging. Starting with version 1.0.1 of the plugin, additional closures are available to disable logging or
+verbose mode in a code block.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="logging-of-associated-objectids-since-0-5-5">5.4. Logging of associated objectIds (since 0.5.5)</h3>
+<div class="paragraph">
+<p>You can log the object-ids of associated objects. Logging will be performed in the format: "[id:&lt;objId&gt;]objDetails".
+You can enable id-logging with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> logIds = <span class="predefined-constant">true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This setting is disabled by default.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="property-value-masking-since-0-5-5">5.5. Property value masking (since 0.5.5)</h3>
+<div class="paragraph">
+<p>You can configure properties to mask on a per-Domain-Class base. If properties are defined as masked, their values are
+not stored into the audit log table if verbose mode is enabled. Instead, a mask of "<strong><strong></strong><strong></strong></strong>" will be logged.
+By default, "password" properties are masked. You can mask property fields in domain classes like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="directive">static</span> auditable = [<span class="key">mask</span>:<span class="string"><span class="delimiter">'</span><span class="content">password</span><span class="delimiter">'</span></span>,<span class="string"><span class="delimiter">'</span><span class="content">otherField</span><span class="delimiter">'</span></span>]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="verbose-log-truncation-length">5.6. Verbose log truncation length</h3>
+<div class="paragraph">
+<p>If you enabled verbose mode, you can configure the truncation length of detail information in the oldValue and newValue
+columns (Default is 255). Configure the TRUNCATE_LENGTH in application.groovy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> TRUNCATE_LENGTH = <span class="integer">400</span> <span class="comment">// don't forget to ensure &quot;oldMap&quot; and &quot;newMap&quot; fields are large enough!</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>When you set TRUNCATE_LENGTH to a value &gt; 255 you must ensure that oldMap and newMap fields in your audit-log domain class
+are large enough. Example setting with the same maxSize constraints as the former "largeValueColumnTypes" setting:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="directive">static</span> constraints = {
+  <span class="comment">// for large column support (as in &lt; 1.0.6 plugin versions)</span>
+  oldValue(<span class="key">nullable</span>: <span class="predefined-constant">true</span>, <span class="key">maxSize</span>: <span class="integer">65534</span>)
+  newValue(<span class="key">nullable</span>: <span class="predefined-constant">true</span>, <span class="key">maxSize</span>: <span class="integer">65534</span>)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When you forgot to set the constraints in your AuditLog class while setting TRUNCATE_LENGTH &gt; 255,
+a truncation warning may occur and only partial information is logged.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="transactional-auditlog-events">5.7. Transactional AuditLog events</h3>
+<div class="paragraph">
+<p>In application.groovy, you may specify whether the Audit Log uses transactions or not. If set to true then the logger will begin
+and commit transactions around audit log save events.
+If set to false (the default), the AuditLog may be persisted without a transaction wrapping its call to save.
+This setting should not be changed from defaults lightly as it can cause problems in integration testing.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> transactional = <span class="predefined-constant">true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You are only likely to want to change the defaults if you are working with a transactional database in test and production.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disable-auditing-by-config-since-0-5-5-3">5.8. Disable auditing by config (since 0.5.5.3)</h3>
+<div class="paragraph">
+<p>You can disable auditing by config. If you disable auditing, event handlers are still triggered but no changes are comitted
+to the audit log table. This can be used e.g. if you need to bootstrap many objects and want to programmatically disable
+auditing to not slow down the bootstrap process or if you want to audit log by Enviroment. With version &gt;= 1.0.0 of the
+plugin, you can disable auditing on a per-datasource base as well Currently, disabling the plugin on a per-datasource base
+does not work. See GPAUDITLOGGING-68</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> disabled = <span class="predefined-constant">true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Disabling in DataSource.groovy is currently not possible.</p>
+</div>
+<div class="paragraph">
+<p>This setting is "false" by default (auditing is enabled).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="nonverbosedelete-logging-since-1-0-1">5.9. nonVerboseDelete logging (since 1.0.1)</h3>
+<div class="paragraph">
+<p>If verbose logging is enabled (see above), you can log deletes in a non-verbose manner. This means, only the delete event
+is logged, but not the properties the deleted object hold prior the deletion.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> nonVerboseDelete = <span class="predefined-constant">true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This setting is "false" by default (verbosity of deletes depend on the verbose setting).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="log-full-domain-class-name-since-1-0-3">5.10. log full domain class name (since 1.0.3)</h3>
+<div class="paragraph">
+<p>By default, only the entity class name is logged. If you want to log the entity full name (including the package name),
+you can enable full logging. Thanks to tcrossland for this feature.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> logFullClassName = <span class="predefined-constant">true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This setting is "false" by default (entity name is logged).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="getauditloguri-closure-since-1-0-4">5.11. getAuditLogUri closure (since 1.0.4)</h3>
+<div class="paragraph">
+<p>By default, the "uri" field is filled with the request uri which caused the action.
+You can define a closure "getAuditLogUri" on a per-domain object base to define what should be written to the AuditLog
+"uri" field.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="type">class</span> <span class="class">User</span> {
+  <span class="directive">static</span> auditable = <span class="predefined-constant">true</span>
+  <span class="directive">static</span> belongsTo = [Client]
+
+  <span class="keyword">def</span> getAuditLogUri = {
+    clientId <span class="keyword">as</span> <span class="predefined-type">String</span>
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You need to take special care how you obtain the "uri" data in the getAuditLogUri closure.
+It is recommended to not perform costly calls.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain-class-stamping-support-since-1-0-4">5.12. Domain class stamping support (since 1.0.4)</h3>
+<div class="paragraph">
+<p>Since version 1.0.4, it is possible to enable domain class stamping support.
+With this feature enabled, all domain classes annotated with @Stamp or with field "static stampable = true" will get
+the fields dateCreated, lastUpdated, createdBy, lastUpdatedBy using an AST transformation.
+You can create your own StampASTTransformation implementation for your specific needs.
+The createdBy and lastUpdatedBy fieldnames can be declared in application.groovy.
+These fields will be filled with the result of the actor closure on the event PreInsert, PreUpdate and PreDelete.
+Thanks to tkvw for this feature.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">stampEnabled = <span class="predefined-constant">true</span> <span class="comment">// enable stamping support</span>
+stampAlways = <span class="predefined-constant">false</span> <span class="comment">// always stamp domain classes, regardless of @Stamp or static stampable = true existence</span>
+stampCreatedBy = <span class="string"><span class="delimiter">'</span><span class="content">createdBy</span><span class="delimiter">'</span></span> <span class="comment">// fieldname</span>
+stampLastUpdatedBy = <span class="string"><span class="delimiter">'</span><span class="content">lastUpdatedBy</span><span class="delimiter">'</span></span> <span class="comment">// fieldname</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain-class-stamping-configuration-since-2-0-5">5.13. Domain class stamping configuration (since 2.0.5)</h3>
+<div class="paragraph">
+<p>Since version 2.0.5, it is possible to specify the field configuration on a per domain-class base in the @Stamp annotation.
+With this, you can specify the createdBy, lastUpdatedBy, dateCreated, lastUpdated fieldnames per domain class.</p>
+</div>
+<div class="paragraph">
+<p>Adding @Stamp to the entity disables the default Grails autoStamping by adding "autoTimestamp false" to the mapping (this can&#8217;t be configured).</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> <span class="annotation">@Stamp</span>(
+     createdBy = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">originalWho</span><span class="delimiter">&quot;</span></span>, type=<span class="predefined-type">Date</span>.class),
+     dateCreated = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">originalWhen</span><span class="delimiter">&quot;</span></span>, type=<span class="predefined-type">Date</span>.class),
+     lastUpdatedBy = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">lastWho</span><span class="delimiter">&quot;</span></span>, nullable = <span class="predefined-constant">true</span>),
+     lastUpdated = <span class="annotation">@StampInfo</span>(fieldname=<span class="string"><span class="delimiter">&quot;</span><span class="content">lastWhen</span><span class="delimiter">&quot;</span></span>, nullable = <span class="predefined-constant">true</span>)
+     )</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ignoring-certain-events-since-1-0-5-2-0-0">5.14. Ignoring certain events (since 1.0.5 / 2.0.0)</h3>
+<div class="paragraph">
+<p>Since version 1.0.5, it is possible to ignore certain events on a per-domain base.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="directive">static</span> auditable = [<span class="key">ignoreEvents</span>:[<span class="string"><span class="delimiter">&quot;</span><span class="content">onChange</span><span class="delimiter">&quot;</span></span>,<span class="string"><span class="delimiter">&quot;</span><span class="content">onSave</span><span class="delimiter">&quot;</span></span>]]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="domain-name-replacements-since-2-0-1">5.15. Domain Name replacements (since 2.0.1)</h3>
+<div class="paragraph">
+<p>With the replacementPatterns Map, it is possible to rewrite domain names, e.g. to remove dedicated package names:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">replacementPatterns = [<span class="string"><span class="delimiter">&quot;</span><span class="content">local.example.xyz.User</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">UserDomain</span><span class="delimiter">&quot;</span></span>]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="example-configuration">5.16. Example configuration</h3>
+<div class="paragraph">
+<p>Example application.groovy configuration with various settings as described above:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">// AuditLog Plugin config</span>
+grails {
+  plugin {
+    auditLog {
+     auditDomainClassName = <span class="string"><span class="delimiter">'</span><span class="content">my.example.project.MyAuditTrail</span><span class="delimiter">'</span></span>
+     verbose = <span class="predefined-constant">true</span> <span class="comment">// verbosely log all changed values to db</span>
+     logIds = <span class="predefined-constant">true</span>  <span class="comment">// log db-ids of associated objects.</span>
+     TRUNCATE_LENGTH = <span class="integer">1000</span>
+     cacheDisabled = <span class="predefined-constant">true</span>  <span class="comment">// only for 1.x. Disable caching of AuditDomainClass.</span>
+     replacementPatterns = [<span class="string"><span class="delimiter">&quot;</span><span class="content">local.example.xyz.</span><span class="delimiter">&quot;</span></span>:<span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>] <span class="comment">// replace with empty string.</span>
+     actorClosure = { request, session -&gt;
+        <span class="comment">// SpringSecurity Core 1.1.2</span>
+        <span class="keyword">if</span> (request.applicationContext.springSecurityService.principal <span class="keyword">instanceof</span> groovy.lang.String){
+           <span class="keyword">return</span> request.applicationContext.springSecurityService.principal
+        }
+        <span class="keyword">def</span> username = request.applicationContext.springSecurityService.principal?.username
+        <span class="keyword">if</span> (SpringSecurityUtils.isSwitched()){
+           username = SpringSecurityUtils.switchedUserOriginalUsername+<span class="string"><span class="delimiter">&quot;</span><span class="content"> AS </span><span class="delimiter">&quot;</span></span>+username
+        }
+        <span class="keyword">return</span> username
+     }
+     stampEnabled = <span class="predefined-constant">true</span>
+     stampAlways = <span class="predefined-constant">true</span>
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="implementation">6. Implementation</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="auditlogeventlistener">6.1. AuditLogEventListener</h3>
+<div class="paragraph">
+<p>The Audit Logging plugin registers a PersistenceEventListener (AuditLogListener) bean per datasource, which listens to GORM events.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="plugin-descriptor">6.2. Plugin Descriptor</h3>
+<div class="paragraph">
+<p>The Plugin Descriptor (AuditLogListenerGrailsPlugin) configures the plugin during startup.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configures the plugin either by default values - see DefaultAuditLogConfig.groovy - or by user configured settings.</p>
+</li>
+<li>
+<p>Registers a PersistenceEventListener bean per datasource</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 2.0.5<br>
+Last updated 2017-06-04 13:46:49 UTC
+</div>
+</div>
+</body>
+</html>
