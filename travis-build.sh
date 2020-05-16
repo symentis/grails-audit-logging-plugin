@@ -56,14 +56,16 @@ if [[ ( -n "$TRAVIS_TAG" ) || ( "$TRAVIS_BRANCH" == "master" ) ]]; then
       git add latest/*
 
       version="$TRAVIS_TAG"
-      version=${version:1}
-      majorVersion=${version:0:4}
-      majorVersion="${majorVersion}x"
+      version=${version:0:5} # 5.0.1
+      majorVersion=${version:0:4} # 5.0.
+      majorVersion="${majorVersion}x" # 5.0.x
 
+      # Copy to version dir (3.0.3)
       mkdir -p "$version"
       cp -r ../docs/. "./$version/"
       git add "$version/*"
 
+      # Copy to major version dir (3.0.x)
       mkdir -p "$majorVersion"
       cp -r ../docs/. "./$majorVersion/"
       git add "$majorVersion/*"
