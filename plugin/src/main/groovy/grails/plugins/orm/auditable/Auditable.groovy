@@ -10,6 +10,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 
 import javax.persistence.Transient
 
@@ -98,8 +99,15 @@ trait Auditable {
      */
     @Transient
     String getLogURI() {
-        // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
-        Holders.applicationContext.getBean(AuditRequestResolver)?.currentURI
+        try {
+            // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
+            Holders.applicationContext.getBean(AuditRequestResolver)?.currentURI
+        } catch (NoSuchBeanDefinitionException ignore){
+            // Bean may not be initialized. See #203
+            log.debug("No AuditRequestResolver bean found in getLogURI()")
+            return null
+        }
+
     }
 
     /**
@@ -107,8 +115,14 @@ trait Auditable {
      */
     @Transient
     String getLogCurrentUserName() {
-        // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
-        Holders.applicationContext.getBean(AuditRequestResolver)?.currentActor ?: 'N/A'
+        try {
+            // Using holders here since we can't inject and need to defer to allow subclasses to override the resolver
+            Holders.applicationContext.getBean(AuditRequestResolver)?.currentActor ?: 'N/A'
+        } catch (NoSuchBeanDefinitionException ignore){
+            // Bean may not be initialized. See #203
+            log.debug("No AuditRequestResolver bean found in getLogCurrentUserName()")
+            return 'N/A'
+        }
     }
 
     /**
