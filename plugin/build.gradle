@@ -77,9 +77,9 @@ task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
 
-apply from: "${rootProject.projectDir}/gradle/grailsPublish.gradle"
-apply from: "${rootProject.projectDir}/gradle/artifactoryPublish.gradle"
-apply from: "${rootProject.projectDir}/gradle/docs.gradle"
+apply from: "../gradle/grailsPublish.gradle"
+apply from: "../gradle/artifactoryPublish.gradle"
+apply from: "../gradle/docs.gradle"
 
 
 
