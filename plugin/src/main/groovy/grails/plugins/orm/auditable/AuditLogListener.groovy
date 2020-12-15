@@ -184,10 +184,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         log.debug("Audit logging event {} and domain {}", eventType, domain.getClass().name)
 
         // Wrap all of the logging in a single session to prevent flushing for each insert
-        // FIXME - Temporary workaround for Grails 4.
-        //         This is not correct sematically as we really need to be part of the transaction or at least ensure
-        //         that audit logging is only committed when the transaction is committed.
-        getAuditDomainClass().invokeMethod("withNewTransaction") {
+        getAuditDomainClass().invokeMethod("withTransaction") {
             Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
 
             // Use a single date for all audit_log entries in this transaction
