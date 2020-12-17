@@ -54,7 +54,7 @@ class AuditLogListenerUtil {
      * @return configured AuditLogEvent class
      */
     static Class<GormEntity> getAuditDomainClass() {
-        String auditLogClassName = AuditLoggingConfigUtils.auditConfig.getProperty('auditDomainClassName') as String
+        String auditLogClassName = AuditLogContext.context['auditDomainClassName'] as String
         if (!auditLogClassName) {
             throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
         }
