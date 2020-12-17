@@ -1,10 +1,10 @@
 package test
 
+import grails.plugins.orm.auditable.AuditLogContext
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
 import spock.lang.Shared
 import spock.lang.Specification
-import test.Author
 
 @Integration
 class AuditInsertWithoutTransactionSpec extends Specification {
@@ -27,6 +27,20 @@ class AuditInsertWithoutTransactionSpec extends Specification {
         expect:
         Author.withNewSession {
             def events = AuditTrail.findAllByClassName("test.Author")
+            events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
+        }
+    }
+
+    def "test insert without transaction second datasource"() {
+        AuditLogContext.withConfig(auditDomainClassName:AuditTrailSecondDatasource.canonicalName) {
+            Author.withNewSession {
+                new Author(name: "Aaron", age: 37, famous: true).save(flush: true, failOnError: true)
+            }
+        }
+
+        expect:
+        AuditTrailSecondDatasource.withNewSession {
+            def events = AuditTrailSecondDatasource.findAllByClassName("test.Author")
             events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
         }
     }
