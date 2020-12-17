@@ -25,6 +25,7 @@ import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.annotation.Propagation
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -42,12 +43,6 @@ class AuditTruncateSpec extends Specification {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
     }
 
-    void cleanup() {
-        Tunnel.withNewTransaction {
-            Tunnel.executeUpdate('delete from Tunnel')
-        }
-    }
-
     void "No_Truncate"() {
         given:
         def oldTruncLength = getFirstListenerTruncateLength()
@@ -56,7 +51,7 @@ class AuditTruncateSpec extends Specification {
         def tunnel = new Tunnel(name: "shortdesc", description:"${'a'*255}")
 
         when:
-        Tunnel.withNewTransaction {
+        Tunnel.withNewTransaction(propagationBehavior: Propagation.NESTED) {
             tunnel.save(flush: true, failOnError: true)
         }
 
