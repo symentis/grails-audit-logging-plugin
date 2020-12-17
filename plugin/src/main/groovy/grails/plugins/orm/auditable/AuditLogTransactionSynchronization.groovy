@@ -12,6 +12,14 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
     private List<GormEntity> pendingAuditInstances = []
 
     void addToQueue(GormEntity auditInstance) {
+        if (!TransactionSynchronizationManager.synchronizationActive) {
+            // Seems like no transaction is active => Save audit instance without transaction as well
+            // withSession to ensure we have a session when using multiple datasources
+            AuditLogListenerUtil.getAuditDomainClass().invokeMethod("withSession") {
+                auditInstance.save(failOnError: true)
+            }
+            return
+        }
         if (!pendingAuditInstances) {
             TransactionSynchronizationManager.registerSynchronization(this)
         }
