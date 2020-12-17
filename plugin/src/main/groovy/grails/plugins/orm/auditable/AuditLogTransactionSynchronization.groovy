@@ -6,10 +6,14 @@ import org.grails.datastore.gorm.GormEntity
 import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
+import java.util.function.Function
+
 @Slf4j
 @CompileStatic
 class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapter {
     private List<GormEntity> pendingAuditInstances = []
+
+    Function<Integer, Void> afterCompletion = null
 
     void addToQueue(GormEntity auditInstance) {
         if (!TransactionSynchronizationManager.synchronizationActive) {
@@ -43,5 +47,10 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
         finally {
             pendingAuditInstances.clear()
         }
+    }
+
+    @Override
+    void afterCompletion(int status) {
+        afterCompletion?.apply(status)
     }
 }
