@@ -27,52 +27,60 @@ import spock.lang.Specification
 @Rollback
 class AuditUpdateSpec extends Specification {
 
-    void setupData() {
-        AuditLogContext.withoutAuditLog {
-            def author = new Author(name: "Aaron", age: 37, famous: true)
-            author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
-            author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
-            author.save(flush: true, failOnError: true)
+    void setup() {
+        Author.withNewTransaction {
+            AuditLogContext.withoutAuditLog {
+                def author = new Author(name: "Aaron", age: 37, famous: true)
+                author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
+                author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
+                author.save(flush: true, failOnError: true)
 
-            def publisher = new Publisher(code: 'ABC123', name: 'Random House', active: true)
-            publisher.save(flush: true, failOnError: true)
+                def publisher = new Publisher(code: 'ABC123', name: 'Random House', active: true)
+                publisher.save(flush: true, failOnError: true)
 
-            def heliport = new Heliport(code: 'EGLW', name: 'Battersea Heliport')
-            heliport.save(flush: true, failOnError: true)
-
-            // Remove all logging of the inserts, we are focused on updates here
-            AuditTrail.withNewTransaction {
-                AuditTrail.where { id != null }.deleteAll()
-                assert AuditTrail.count() == 0
+                def heliport = new Heliport(code: 'EGLW', name: 'Battersea Heliport')
+                heliport.save(flush: true, failOnError: true)
             }
         }
     }
 
-    void "Test persistedObjectVersion in update logging"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
+    void cleanup() {
+        Author.withNewTransaction {
+            Book.where {}.deleteAll()
+            Author.where {}.deleteAll()
+            Publisher.where {}.deleteAll()
+            Heliport.where {}.deleteAll()
+        }
+        AuditTrail.withNewTransaction {
+            AuditTrail.where {}.deleteAll()
+            assert AuditTrail.count() == 0
+        }
+    }
 
+    void "Test persistedObjectVersion in update logging"() {
         when:
-        author.age = 40
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.age = 40
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
-        first.persistedObjectVersion == author.version - 1
+        first.persistedObjectVersion == 0
+        first.oldValue == "37"
+        first.newValue == "40"
+        first.eventName == "UPDATE"
     }
-    
-    void "Test false/null differentiation"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
 
+    void "Test false/null differentiation"() {
         when:
-        author.famous = false
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.famous = false
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
@@ -83,15 +91,13 @@ class AuditUpdateSpec extends Specification {
         first.newValue == 'false'
         first.eventName == 'UPDATE'
     }
-    
-    void "Test persistedObjectVersion in update logging for domain class without version"() {
-        given:
-        setupData()
-        def heliport = Heliport.findByCode('EGLW')
 
+    void "Test persistedObjectVersion in update logging for domain class without version"() {
         when:
-        heliport.name = "London Heliport"
-        heliport.save(flush: true, failOnError: true)
+        Heliport.withNewTransaction {
+            def heliport = Heliport.findByCode('EGLW')
+            heliport.name = "London Heliport"
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Heliport') }
@@ -101,33 +107,12 @@ class AuditUpdateSpec extends Specification {
         first.persistedObjectVersion == null
     }
 
-    void "Test basic update logging"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
-        when:
-        author.age = 40
-        author.save(flush: true, failOnError: true)
-
-        then:
-        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
-        events.size() == 1
-
-        def first = events.find { it.propertyName == 'age' }
-        first.oldValue == "37"
-        first.newValue == "40"
-        first.eventName == "UPDATE"
-    }
-
     void "Test update to-one association"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        author.publisher = Publisher.findByName("Random House")
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.publisher = Publisher.findByName("Random House")
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
@@ -140,15 +125,13 @@ class AuditUpdateSpec extends Specification {
     }
 
     void "Test two saves, one flush"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        author.age = 40
-        author.save(failOnError: true)
-        author.age = 50
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.age = 40
+            author.save(failOnError: true)
+            author.age = 50
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
@@ -161,14 +144,12 @@ class AuditUpdateSpec extends Specification {
     }
 
     void "Test conditional logging disabled"() {
-        given:
-        setupData()
-        def publisher = Publisher.findByName("Random House")
-
-        when: "is not active"
-        publisher.name = "Spring"
-        publisher.active = false
-        publisher.save(flush: true, failOnError: true)
+        when:
+        Publisher.withNewTransaction {
+            def publisher = Publisher.findByName("Random House")
+            publisher.name = "Spring"
+            publisher.active = false
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Publisher') }
@@ -176,14 +157,12 @@ class AuditUpdateSpec extends Specification {
     }
 
     void "Test conditional logging enabled"() {
-        given:
-        setupData()
-        def publisher = Publisher.findByName("Random House")
-
-        when: "is not active"
-        publisher.name = "Spring"
-        publisher.active = true
-        publisher.save(flush: true, failOnError: true)
+        when:
+        Publisher.withNewTransaction {
+            def publisher = Publisher.findByName("Random House")
+            publisher.name = "Spring"
+            publisher.active = true
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Publisher') }
@@ -198,13 +177,11 @@ class AuditUpdateSpec extends Specification {
     }
 
     void "Test globally ignored properties"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        author.lastUpdatedBy = 'Aaron'
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.lastUpdatedBy = 'Aaron'
+        }
 
         then: "nothing logged"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
@@ -212,16 +189,15 @@ class AuditUpdateSpec extends Specification {
     }
 
     void "Test excluded properties via context"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        AuditLogContext.withConfig(excluded: ['name', 'famous', 'lastUpdate']) {
-            author.age = 50
-            author.famous = false
-            author.name = 'Bob'
-            author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            AuditLogContext.withConfig(excluded: ['name', 'famous', 'lastUpdate']) {
+                author.age = 50
+                author.famous = false
+                author.name = 'Bob'
+                author.save(flush: true, failOnError: true)
+            }
         }
 
         then: "ignored properties not logged"
@@ -230,20 +206,19 @@ class AuditUpdateSpec extends Specification {
         events.size() == 1
 
         def first = events.find { it.propertyName == 'age' }
-        first.persistedObjectVersion == author.version - 1
+        first.persistedObjectVersion == 0
     }
 
     void "Test included properties via context"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        AuditLogContext.withConfig(included: ['name', 'famous']) {
-            author.age = 50
-            author.famous = false
-            author.name = 'Bob'
-            author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            AuditLogContext.withConfig(included: ['name', 'famous']) {
+                author.age = 50
+                author.famous = false
+                author.name = 'Bob'
+                author.save(flush: true, failOnError: true)
+            }
         }
 
         then: "only properties in auditableProperties are logged"
@@ -252,21 +227,20 @@ class AuditUpdateSpec extends Specification {
         events.size() == 2
 
         ['name', 'famous'].each { name ->
-            assert events.find {it.propertyName == name}, "${name} was not logged"
+            assert events.find { it.propertyName == name }, "${name} was not logged"
         }
     }
 
     void "Test included properties overrides excluded"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        AuditLogContext.withConfig(included: ['name', 'famous', 'lastUpdated'], excluded: ['name', 'famous']) {
-            author.age = 50
-            author.famous = false
-            author.name = 'Bob'
-            author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            AuditLogContext.withConfig(included: ['name', 'famous', 'lastUpdated'], excluded: ['name', 'famous']) {
+                author.age = 50
+                author.famous = false
+                author.name = 'Bob'
+                author.save(flush: true, failOnError: true)
+            }
         }
 
         then: "only properties in auditableProperties are logged"
@@ -275,7 +249,7 @@ class AuditUpdateSpec extends Specification {
         events.size() == 2
 
         ['name', 'famous'].each { name ->
-            assert events.find {it.propertyName == name}, "${name} was not logged"
+            assert events.find { it.propertyName == name }, "${name} was not logged"
         }
     }
 }

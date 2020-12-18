@@ -158,10 +158,10 @@ class AuditDeleteSpec extends Specification {
         then: "ignored properties not logged"
         events.size() == 6
         ['name', 'publisher', 'ssn', 'age', 'famous', 'dateCreated'].each { name ->
-            assert events.find { it.propertyName == name }, "${name} was logged"
+            assert events.find { it.propertyName == name }, "${name} was not logged"
         }
         ['version', 'lastUpdated', 'lastUpdatedBy', 'books'].each { name ->
-            assert !events.find { it.propertyName == name }, "${name} was not logged"
+            assert !events.find { it.propertyName == name }, "${name} was logged"
         }
 
     }
@@ -181,10 +181,10 @@ class AuditDeleteSpec extends Specification {
         then: "ignored properties not logged"
         events.size() == 6
         ['name', 'publisher', 'ssn', 'lastUpdated', 'lastUpdatedBy', 'version'].each { name ->
-            assert events.find { it.propertyName == name }, "${name} was logged"
+            assert events.find { it.propertyName == name }, "${name} was not logged"
         }
         ['famous', 'age', 'dateCreated', 'books'].each { name ->
-            assert !events.find { it.propertyName == name }, "${name} was not logged"
+            assert !events.find { it.propertyName == name }, "${name} was logged"
         }
     }
 
@@ -203,7 +203,7 @@ class AuditDeleteSpec extends Specification {
         then: "ignored properties not logged"
         events.size() == 3
         ['famous', 'age', 'dateCreated'].each { name ->
-            assert events.find { it.propertyName == name }, "${name} was logged"
+            assert events.find { it.propertyName == name }, "${name} was not logged"
         }
     }
 
@@ -222,7 +222,7 @@ class AuditDeleteSpec extends Specification {
         then: "only properties in whitelist are logged"
         events.size() == 3
         ['famous', 'age', 'dateCreated'].each { name ->
-            assert events.find { it.propertyName == name }, "${name} was logged"
+            assert events.find { it.propertyName == name }, "${name} was not logged"
         }
     }
 }
