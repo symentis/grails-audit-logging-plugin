@@ -19,18 +19,15 @@
 package test
 
 import grails.core.GrailsApplication
-import grails.gorm.transactions.Rollback
 import grails.plugins.orm.auditable.AuditLogListener
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.annotation.Propagation
 import spock.lang.Shared
 import spock.lang.Specification
 
 @Integration
-@Rollback
 @Slf4j
 class AuditTruncateSpec extends Specification {
     @Autowired
@@ -43,24 +40,27 @@ class AuditTruncateSpec extends Specification {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
     }
 
+    void cleanup() {
+        AuditTrail.withNewTransaction {
+            AuditTrail.executeUpdate('delete from AuditTrail')
+        }
+    }
+
     void "No_Truncate"() {
         given:
         def oldTruncLength = getFirstListenerTruncateLength()
         setListenersTruncateLength(255)
 
-        def tunnel = new Tunnel(name: "shortdesc", description:"${'a'*255}")
-
         when:
-        Tunnel.withNewTransaction(propagationBehavior: Propagation.NESTED) {
-            tunnel.save(flush: true, failOnError: true)
+        Tunnel.withNewTransaction {
+            new Tunnel(name: "shortdesc", description: "${'a' * 255}").save(flush: true, failOnError: true)
         }
 
-        then: "Tunnel is saved"
-        tunnel.id
-
-        and: "description is not truncated from auditLog"
-        def events = AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
-        events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        then: "description is not truncated from auditLog"
+        def events = AuditTrail.withNewTransaction {
+            AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
+        }
+        events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
         first.oldValue == null
@@ -68,60 +68,53 @@ class AuditTruncateSpec extends Specification {
 
         def second = events.find { it.propertyName == 'description' }
         second.oldValue == null
-        second.newValue == 'a'*255
+        second.newValue == 'a' * 255
 
         cleanup:
         log.info "Reset truncate length"
         setListenersTruncateLength oldTruncLength
-        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Truncate_at_255"() {
         given:
         def oldTruncLength = getFirstListenerTruncateLength()
         setListenersTruncateLength(255)
-        def tunnel = new Tunnel(name: "shortdesc", description:"${'b'*1024}")
+        Tunnel.withNewTransaction {
+            new Tunnel(name: "shortdesc", description: "${'b' * 1024}").save(flush: true, failOnError: true)
+        }
 
-        when:
-        tunnel.save(flush: true, failOnError: true)
-
-        then: "Tunnel is saved"
-        tunnel.id
-
-        and: "description is truncated at 255 from auditLog"
-        def events = AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
-        events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        expect: "description is truncated at 255 from auditLog"
+        def events = AuditTrail.withNewTransaction {
+            AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
+        }
+        events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
         first.oldValue == null
         first.newValue == "shortdesc"
 
         def second = events.find { it.propertyName == 'description' }
-        log.info  second.newValue
+        log.info second.newValue
         second.oldValue == null
-        second.newValue == 'b'*255
+        second.newValue == 'b' * 255
 
         cleanup:
         setListenersTruncateLength oldTruncLength
-        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
     void "Truncate_at_1024"() {
         given:
         def oldTruncLength = getFirstListenerTruncateLength()
         setListenersTruncateLength(1024)
+        Tunnel.withNewTransaction {
+            new Tunnel(name: "shortdesc", description: "${'b' * 4096}").save(flush: true, failOnError: true)
+        }
 
-        def tunnel = new Tunnel(name: "shortdesc", description:"${'b'*4096}")
-
-        when:
-        tunnel.save(flush: true, failOnError: true)
-
-        then: "Tunnel is saved"
-        tunnel.id
-
-        and: "description is truncated at 255 from auditLog"
-        def events = AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
-        events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames  - defaultIgnoreList).size()
+        expect: "description is truncated at 255 from auditLog"
+        def events = AuditTrail.withNewTransaction {
+            AuditTrail.withCriteria { eq('className', 'test.Tunnel') }
+        }
+        events.size() == (Tunnel.gormPersistentEntity.persistentPropertyNames - defaultIgnoreList).size()
 
         def first = events.find { it.propertyName == 'name' }
         first.oldValue == null
@@ -130,22 +123,22 @@ class AuditTruncateSpec extends Specification {
         def second = events.find { it.propertyName == 'description' }
         log.debug second.newValue
         second.oldValue == null
-        second.newValue == 'b'*1024
+        second.newValue == 'b' * 1024
 
         cleanup:
         log.debug "Reset truncate length"
         setListenersTruncateLength oldTruncLength
-        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
-    private int getFirstListenerTruncateLength(){
-        List<AuditLogListener> auditListeners = grailsApplication.parentContext.applicationEventMulticaster.applicationListeners.findAll{it.class.simpleName == "AuditLogListener"}
+    private int getFirstListenerTruncateLength() {
+        List<AuditLogListener> auditListeners = grailsApplication.parentContext.applicationEventMulticaster.applicationListeners.findAll { it.class.simpleName == "AuditLogListener" }
         auditListeners?.first()?.truncateLength
     }
+
     private void setListenersTruncateLength(int truncateLength) {
         log.info("Set all AuditLogListeners truncate length ${truncateLength}")
         // Change the truncateLength of all auditLogListeners - Never do that in your application!
-        List<AuditLogListener> auditListeners = grailsApplication.parentContext.applicationEventMulticaster.applicationListeners.findAll{it.class.simpleName == "AuditLogListener"}
-        auditListeners*.truncateLength=truncateLength
+        List<AuditLogListener> auditListeners = grailsApplication.parentContext.applicationEventMulticaster.applicationListeners.findAll { it.class.simpleName == "AuditLogListener" }
+        auditListeners*.truncateLength = truncateLength
     }
 }

@@ -22,7 +22,6 @@ import grails.gorm.transactions.Rollback
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.util.StringUtils
 import spock.lang.Shared
 import spock.lang.Specification
