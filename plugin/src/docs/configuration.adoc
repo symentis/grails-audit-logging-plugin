@@ -189,7 +189,7 @@ AuditLogContext.withConfig(ignoreEvents = [AuditEventType.INSERT]) {
 ```
 
 === Runtime Overrides
-See the <<index#context-overrides,Context Overrides>> for help using `AuditLogContext` to override configuration for a block. 
+See the <<context-overrides,Context Overrides>> for help using `AuditLogContext` to override configuration for a block.
 
 === Example Configuration
 Example `application.groovy` configuration with various settings as described above:

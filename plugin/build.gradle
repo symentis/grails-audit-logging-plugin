@@ -8,11 +8,14 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-        classpath 'org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6'
-        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
     }
+}
+
+plugins {
+    id 'org.asciidoctor.jvm.convert' version '3.2.0'
+    id "org.asciidoctor.jvm.pdf" version "3.2.0"
+    id "org.asciidoctor.jvm.epub" version "3.2.0"
 }
 
 version project.file("../version.txt").text.trim()
@@ -23,12 +26,7 @@ apply plugin: "idea"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-plugin-publish"
 apply plugin: "org.grails.grails-gsp"
-apply plugin: "org.asciidoctor.convert"
-apply plugin: 'com.jfrog.bintray'
-
-// Used for publishing to central repository, remove if not needed
-// apply from: 'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
-// apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
+apply plugin: "com.jfrog.artifactory"
 
 ext {
     grailsVersion = project.grailsVersion
@@ -37,8 +35,11 @@ ext {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
 }
+
+sourceCompatibility = targetCompatibility = 1.8
 
 dependencies {
     profile "org.grails.profiles:web-plugin"
@@ -65,12 +66,6 @@ dependencies {
 
 bootJar.enabled = false
 
-// Needed for org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.6
-// See https://github.com/asciidoctor/asciidoctorj/issues/415
-asciidoctorj {
-    version = '1.5.4'
-}
-
 static String buildDate() {
     def df = new SimpleDateFormat("yyyy-MM-dd")
     df.setTimeZone(TimeZone.getTimeZone("UTC"))
@@ -81,61 +76,10 @@ task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
 
-grailsPublish {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    githubSlug = 'robertoschwald/grails-audit-logging-plugin'
-    license {
-        name = project.hasProperty('license') ? [project.license] : ['Apache-2.0']
-    }
-    title = "Grails Audit-Logging Plugin"
-    desc = "Grails Audit-Logging Plugin for Grails 3.3.x"
-    developers = [robertoschwald:"Robert Oschwald", longwa:"Aaron Long", elkr:"Elmar Kretzer"]
-}
+apply from: "${rootProject.projectDir}/gradle/grailsPublish.gradle"
+apply from: "${rootProject.projectDir}/gradle/artifactoryPublish.gradle"
+apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 
-asciidoctor {
-    separateOutputDirs = false
-    sourceDir = file('src/docs')
-    sources {
-        include 'index.adoc'
-    }
-    outputDir new File(buildDir, 'docs')
-    backends 'html5', 'pdf', 'epub3'
-    attributes 'experimental': 'true',
-        'source-highlighter': 'coderay',
-        'compat-mode': 'true',
-        toc: 'left',
-        icons: 'font',
-        setanchors: 'true',
-        idprefix: '',
-        idseparator: '-',
-        toc2: '',
-        numbered: '',
-        version: project.version,
-        groupId: project.group,
-        artifactId: project.name,
-        revnumber: project.version,
-        revdate: buildDate()
-}
 
-task docs(dependsOn: 'asciidoctor') {
-    doLast {
-        File dir = new File(buildDir, 'docs')
-        dir.mkdirs()
 
-        ['pdf', 'epub'].each { String ext ->
-            File f = new File(dir, 'index.' + ext)
-            if (f.exists()) {
-                f.renameTo new File(dir, project.name + '-' + project.version + '.' + ext)
-            }
-        }
 
-        new File(buildDir, 'docs/ghpages.html') << file('src/docs/templates/index.tmpl').text.replaceAll("@VERSION@", project.version).replaceAll("@DOCDATE@", buildDate())
-
-        copy {
-            from 'src/docs'
-            into new File(buildDir, 'docs').path
-            include '**/*.png'
-        }
-    }
-}
