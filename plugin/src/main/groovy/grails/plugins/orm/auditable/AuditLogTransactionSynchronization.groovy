@@ -29,8 +29,8 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
             //  => we should still use a transaction because in theory the audit domain could be in another datastore where allow_update_outside_transaction isn't set
             //
             //  => use withNewSession + withNewTransaction
-            AuditLogListenerUtil.getAuditDomainClass().invokeMethod("withNewSession") {
-                AuditLogListenerUtil.getAuditDomainClass().invokeMethod("withTransaction") {
+            auditInstance.invokeMethod("withNewSession") {
+                auditInstance.invokeMethod("withTransaction") {
                     auditInstance.save(failOnError: true)
                 }
             }
@@ -53,8 +53,8 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
         try {
             log.debug("Writing {} pending audit instances in afterCommit()", pendingAuditInstances.size())
             // Use withNewSession + withTransaction here as well to be completely independent from user session
-            AuditLogListenerUtil.getAuditDomainClass().invokeMethod("withNewSession") {
-                AuditLogListenerUtil.getAuditDomainClass().invokeMethod("withTransaction") {
+            pendingAuditInstances[0].invokeMethod("withNewSession") {
+                pendingAuditInstances[0].invokeMethod("withTransaction") {
                     for (GormEntity entity in pendingAuditInstances) {
                         entity.save(failOnError: true)
                     }
