@@ -104,6 +104,8 @@ test {
 }
 
 integrationTest {
+    // Added to pass on audit-test.AuditTrail.datasource
+    systemProperties += System.properties
     testLogging {
         showStandardStreams = true
         exceptionFormat = 'full'

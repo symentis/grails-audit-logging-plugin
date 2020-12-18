@@ -38,6 +38,15 @@ class AuditInsertSpec extends Specification {
         AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
     }
 
+    void cleanup() {
+        Author.withNewTransaction {
+            Review.where {}.deleteAll()
+            Book.where {}.deleteAll()
+            Author.where {}.deleteAll()
+            Publisher.where {}.deleteAll()
+        }
+    }
+
     void "Test basic insert logging"() {
         given:
         def author = new Author(name: "Aaron", age: 37, famous: true)

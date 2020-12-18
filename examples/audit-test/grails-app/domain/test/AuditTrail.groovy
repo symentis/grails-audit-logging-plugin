@@ -69,7 +69,10 @@ class AuditTrail implements Serializable {
 
         // Set similiar when you used "auditLog.useDatasource" in < 1.1.0 plugin version.
         // datasource "yourdatasource"
-        datasource 'second'
+        //
+        // Allow overriding datasource using environment variable
+        // Used to test different datasources on CI
+        datasource(System.getProperty("audit-test.AuditTrail.datasource", "second"))
 
         // no HQL queries package name import (was default in 1.x version)
         //autoImport false

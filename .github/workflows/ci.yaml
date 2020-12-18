@@ -1,0 +1,13 @@
+name: "CI"
+on:
+  pull_request:
+jobs:
+  tests-separate-datasource:
+    steps:
+      - run: ./gradlew :examples:audit-test:check
+  tests-same-datasource:
+    steps:
+      - run: ./gradlew :examples:audit-test:check -Daudit-test.AuditTrail.datasource=DEFAULT
+  tests-allow-update-outside-transaction:
+    steps:
+      - run: ./gradlew :examples:audit-test-allow-update-outside-transaction:check
