@@ -18,12 +18,9 @@
 */
 package test
 
-
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
-import org.junit.After
-import org.junit.Before
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -35,10 +32,6 @@ class AuditDeleteSpec extends Specification {
 
     void setup() {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
-    }
-
-    @Before
-    static void setupData() {
         Author.withNewTransaction {
             AuditLogContext.withoutAuditLog {
                 def author = new Author(name: "Aaron", age: 37, famous: true)
@@ -52,8 +45,7 @@ class AuditDeleteSpec extends Specification {
         }
     }
 
-    @After
-    static void cleanupData() {
+    void cleanup() {
         Author.withNewTransaction {
             Publisher.where {}.deleteAll()
             Book.where {}.deleteAll()
