@@ -15,6 +15,9 @@ class Author implements Auditable {
     Date lastUpdated
     String lastUpdatedBy
 
+    // name, age, famous, publisher, ssn, dateCreated
+    static int NUMBER_OF_AUDITABLE_PROPERTIES = 6
+
     static hasMany = [books: Book]
 
     static constraints = {
