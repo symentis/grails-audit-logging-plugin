@@ -44,7 +44,7 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 37, famous: true)
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             author.save(flush: true, failOnError: true)
         }
 
@@ -79,7 +79,7 @@ class AuditInsertSpec extends Specification {
         author.addToBooks(book)
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             author.save(flush: true, failOnError: true)
         }
 
@@ -100,7 +100,7 @@ class AuditInsertSpec extends Specification {
         author.addToBooks(new Book(title: 'Foo', description: 'Bar', pages: 200))
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             author.save(flush: true, failOnError: true)
         }
 
@@ -120,7 +120,7 @@ class AuditInsertSpec extends Specification {
         def publisher = new Publisher(code: 'ABC123', name: "Random House", active: true)
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             publisher.save(flush: true, failOnError: true)
         }
 
@@ -144,7 +144,7 @@ class AuditInsertSpec extends Specification {
         def publisher = new Publisher(code: 'ABC123', name: "Random House", active: false)
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             publisher.save(flush: true, failOnError: true)
         }
 
@@ -163,7 +163,7 @@ class AuditInsertSpec extends Specification {
         def author = new Author()
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             author.save(flush: true, failOnError: true)
         }
 
@@ -183,7 +183,7 @@ class AuditInsertSpec extends Specification {
         println AuditTrail.withCriteria { eq('className', 'test.Author') }
         def author = new Author(name: name, age: 100, famous: true)
 
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             if (enabled) {
                 author.save(flush: true, failOnError: true)
             }
@@ -217,7 +217,7 @@ class AuditInsertSpec extends Specification {
         println AuditTrail.withCriteria { eq('className', 'test.Author') }
         def author = new Author(name: name, age: 100, famous: true)
 
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             if (enabled) {
                 author.save(flush: true, failOnError: true)
             }
@@ -250,7 +250,7 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 50)
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             author.save(flush: true, failOnError: true)
         }
 
@@ -268,7 +268,7 @@ class AuditInsertSpec extends Specification {
 
     void "Test context excluded properties"() {
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             AuditLogContext.withConfig(excluded: ['famous', 'age', 'dateCreated']) {
                 def author = new Author(name: "Aaron", age: 50)
                 author.save()
@@ -292,7 +292,7 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 50, famous: true, ssn: '123-981-0001')
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             AuditLogContext.withConfig(included: ['name', 'age', 'dateCreated']) {
                 author.save(flush: true, failOnError: true)
             }
@@ -312,7 +312,7 @@ class AuditInsertSpec extends Specification {
         def author = new Author(name: "Aaron", age: 50, famous: true, ssn: '123-981-0001')
 
         when:
-        Author.withNewTransaction(propagationBehavior: Propagation.NESTED) {
+        Author.withNewTransaction {
             AuditLogContext.withConfig(included: ['name', 'age', 'dateCreated'], excluded: ['name', 'age']) {
                 author.save(flush: true, failOnError: true)
             }
