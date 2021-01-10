@@ -1,4 +1,8 @@
 == Change Log
+* 4.0.2
+** Fix #210 Add support for non-Date dateCreated/lastUpdated types
+** Fix #203 Prevent exception if AuditRequestResolverBean is not initialized (e.g. in tests)
+
 * 4.0.1
 ** Fix #189 IllegalArgumentException in validator
 

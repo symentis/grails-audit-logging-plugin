@@ -33,6 +33,8 @@ Once created, you should open the generated file to adjust the `mappings` and `c
 
 WARNING: Be sure to respect the existing nullability constraints or the plugin may not work correctly. You must update your db schema either by DDL, or using the database-migration plugin (recommended)
 
+NOTE: Since version 4.0.2 the dateCreated / lastUpdated fields can be of any type which is supported by the Grails DefaultTimestampProvider. By default, they are defined as java.util.Date in the created audit domain artifact. Both fields must be of same type.
+
 === Prepare your Domain classes for Auditing
 
 For every Domain class you want to be audited, implement the Auditable Trait.
