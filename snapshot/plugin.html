@@ -597,6 +597,19 @@ If you use this plugin to log MongoDB transactions, you must configure a SQL Dat
 <div class="ulist">
 <ul>
 <li>
+<p>4.0.2</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix #210 Add support for non-Date dateCreated/lastUpdated types</p>
+</li>
+<li>
+<p>Fix #203 Prevent exception if AuditRequestResolverBean is not initialized (e.g. in tests)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p>4.0.1</p>
 <div class="ulist">
 <ul>
@@ -1165,6 +1178,18 @@ After installing the plugin, you must perform the following command to let the p
 </td>
 <td class="content">
 Be sure to respect the existing nullability constraints or the plugin may not work correctly. You must update your db schema either by DDL, or using the database-migration plugin (recommended)
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Since version 4.0.2 the dateCreated / lastUpdated fields can be of any type which is supported by the Grails DefaultTimestampProvider. By default, they are defined as java.util.Date in the created audit domain artifact. Both fields must be of same type.
 </td>
 </tr>
 </table>
@@ -2188,7 +2213,7 @@ to the domain class.</p>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.2-SNAPSHOT<br>
-Last updated 2021-01-10 13:26:21 UTC
+Last updated 2021-01-10 13:59:25 UTC
 </div>
 </div>
 <style>
