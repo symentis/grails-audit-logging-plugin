@@ -22,6 +22,8 @@ import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.gorm.timestamp.DefaultTimestampProvider
+import org.grails.datastore.gorm.timestamp.TimestampProvider
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
@@ -42,11 +44,13 @@ import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
 class AuditLogListener extends AbstractPersistenceEventListener {
     private GrailsApplication grailsApplication
     private Integer truncateLength
+    private TimestampProvider timestampProvider
 
     AuditLogListener(Datastore datastore, GrailsApplication grailsApplication) {
         super(datastore)
         this.grailsApplication = grailsApplication
         this.truncateLength = determineTruncateLength()
+        this.timestampProvider = new DefaultTimestampProvider()
     }
 
     @Override
@@ -192,7 +196,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
             // Use a single date for all audit_log entries in this transaction
             // Note, this will be ignored unless the audit_log domin has 'autoTimestamp false'
-            Date dateCreated = new Date()
+            Object timestamp = createDefaultTimestamp()
 
             // This handles insert, delete, and update with any property level logging enabled
             if (newMap || oldMap) {
@@ -216,7 +220,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                         actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
                         persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
                         propertyName: propertyName, oldValue: oldValueAsString, newValue: newValueAsString,
-                        dateCreated: dateCreated, lastUpdated: dateCreated
+                        dateCreated: timestamp, lastUpdated: timestamp
                     )
                     if (domain.beforeSaveLog(audit)) {
                         audit.save(failOnError: true)
@@ -228,13 +232,30 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                 GormEntity audit = createAuditLogDomainInstance(
                     actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
                     persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
-                    dateCreated: dateCreated, lastUpdated: dateCreated
+                    dateCreated: timestamp, lastUpdated: timestamp
                 )
                 if (domain.beforeSaveLog(audit)) {
                     audit.save(failOnError: true)
                 }
             }
         }
+    }
+    
+    /**
+     * Create a timestamp of the type of the dateCreated or lastUpdated properties of the audit domain class.
+     * @return the timestamp
+     */
+    private Object createDefaultTimestamp() {
+        MetaClass metaClass = getAuditDomainClass().metaClass
+        for (String property : ["dateCreated", "lastUpdated"]) {
+            if (metaClass.hasProperty(property)) {
+                Class<?> timestampClass = metaClass.getMetaProperty(property).getType()
+                return timestampProvider.createTimestamp(timestampClass)
+            }
+        }
+
+        // no dateCreated / lastUpdated properties so no need to return a value to be used by the map constructor
+        return null
     }
 
     /**
