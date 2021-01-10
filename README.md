@@ -66,6 +66,7 @@ Special thanks to all the contributors (in alphabetical order):
 	Jorge Aguilera
 	Juergen Baumann
 	Madhava Jay
+    Matt Long
 	Matthew A Stewart
 	Paul Taylor
 	Sami Mäkelä
