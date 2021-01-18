@@ -18,14 +18,19 @@
 */
 package test
 
-import grails.gorm.transactions.Rollback
+import audit.test.HeliportService
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration
+import groovy.util.logging.Slf4j
+import org.hibernate.Session
+import org.springframework.transaction.TransactionStatus
 import spock.lang.Specification
 
+@Slf4j
 @Integration
-@Rollback
 class AuditUpdateSpec extends Specification {
+
+    HeliportService heliportService
 
     void setup() {
         Author.withNewTransaction {
@@ -45,6 +50,12 @@ class AuditUpdateSpec extends Specification {
 
                 def heliport = new Heliport(code: 'EGLW', name: 'Battersea Heliport')
                 heliport.save(flush: true, failOnError: true)
+            }
+        }
+        EntityInSecondDatastore.withNewTransaction {
+            AuditLogContext.withoutAuditLog {
+                EntityInSecondDatastore.where {}.deleteAll()
+                new EntityInSecondDatastore(name:"name", someIntegerProperty:1).save(flush: true, failOnError: true)
             }
         }
         AuditTrail.withNewTransaction {
@@ -247,5 +258,101 @@ class AuditUpdateSpec extends Specification {
         ['name', 'famous'].each { name ->
             assert events.find { it.propertyName == name }, "${name} was not logged"
         }
+    }
+
+    void "Test rollback behaviour"() {
+        when:
+        Author.withNewTransaction { TransactionStatus transactionStatus ->
+            def author = Author.findByName("Aaron")
+            author.age = 1
+            Author.withSession { Session session ->
+                session.flush()
+            }
+            transactionStatus.setRollbackOnly()
+        }
+
+        then:
+        Author.withNewTransaction { TransactionStatus transactionStatus ->
+            Author.findByName("Aaron").age == 37
+        }
+        AuditTrail.withNewTransaction {
+            AuditTrail.list() == []
+        }
+
+        when:
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.age = 3
+        }
+
+        then:
+        Author.currentGormStaticApi().datastore
+        Author.withNewTransaction {
+            Author.findByName("Aaron").age == 3
+        }
+        AuditTrail.withNewTransaction {
+            AuditTrail.count
+        } == 1
+    }
+
+    void "Test nested transactions"() {
+        when:
+        Author.withNewTransaction { TransactionStatus transactionStatus ->
+            Author.findByName("Aaron").age = 1
+            Author.withSession { Session session ->
+                session.flush()
+            }
+            Book.withNewTransaction { TransactionStatus transactionStatus2 ->
+                Book.findByTitle("Hunger Games").pages = 401
+            }
+            transactionStatus.setRollbackOnly()
+        }
+
+        then:
+        Author.withNewTransaction {
+            Author.findByName("Aaron")
+        }.age == 37
+        Book.withNewTransaction {
+            Book.findByTitle("Hunger Games")
+        }.pages == 401
+        AuditTrail.withNewTransaction {
+            AuditTrail.count
+        } == 1
+        AuditTrail.withNewTransaction {
+            AuditTrail.list()[0]
+        }.newValue == "401"
+    }
+
+    void "test nested transactions different datastores" () {
+        when:
+        // Domain Foo has two datastores DEFAULT, second
+        Author.withNewTransaction { TransactionStatus transactionStatus ->
+            EntityInSecondDatastore.withNewTransaction {
+                 new Author(name: "name2", age: 12, famous: true).save(flush: true, failOnError: true)
+                 new EntityInSecondDatastore(name:"name2", someIntegerProperty:1).save(flush: true, failOnError: true)
+                // Commit new EntityInSecondDatastore
+
+                // Problem, because we have flush: true the AuditTrails are both immediately queued to the active synchronization
+                // When the EntityInSecondDatastore commits *all* queued AuditTrails are saved
+                // But we would only want to save those from EntityInSecondDatastore
+                // => hibernate-envers solves this by having a queue for each transaction
+                //    so even if we have multiple transactions we could queue e.g. the AuditTrails for Author independent from the AuditTrails for  EntityInSecondDatastore
+                //    and commit them independently
+                // Problem: We couldn't find a GORM api that would allow us to do that
+            }
+            // Rollback new Author
+            transactionStatus.setRollbackOnly()
+        }
+
+        then:
+        Author.withNewTransaction {
+            Author.findByName("name2")
+        } == null
+        EntityInSecondDatastore.withNewTransaction {
+            EntityInSecondDatastore.findByName("name2")
+        } != null
+        AuditTrail.withNewTransaction {
+            AuditTrail.list().collect { it.className }.unique()
+        }.size() == 1
     }
 }
