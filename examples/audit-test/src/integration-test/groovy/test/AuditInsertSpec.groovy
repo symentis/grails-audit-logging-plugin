@@ -18,7 +18,7 @@
 */
 package test
 
-import grails.gorm.transactions.Rollback
+
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.plugins.orm.auditable.AuditLoggingConfigUtils
 import grails.testing.mixin.integration.Integration
@@ -28,7 +28,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 @Integration
-@Rollback
 class AuditInsertSpec extends Specification {
     @Shared
     def defaultIgnoreList
