@@ -72,25 +72,26 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             AuditEventType auditEventType = AuditEventType.forEventType(event.eventType)
             Auditable domain = event.entityObject as Auditable
 
-            if (domain.isAuditable(auditEventType)) {
-                log.trace("Audit logging: Event {} for object {}", auditEventType, event.entityObject.class.name)
+            if (!domain.isAuditable(auditEventType)) {
+                return
+            }
 
-                switch (event.eventType) {
-                    case EventType.PostInsert:
-                    case EventType.PreDelete:
-                        handleInsertAndDelete(domain, auditEventType, event)
-                        break
-                    case EventType.PreUpdate:
-                        handleUpdate(domain, auditEventType, event)
-                        break
-                }
+            log.trace("Audit logging: Event {} for object {}", auditEventType, event.entityObject.class.name)
+
+            switch (event.eventType) {
+                case EventType.PostInsert:
+                case EventType.PreDelete:
+                    handleInsertAndDelete(domain, auditEventType, event)
+                    break
+                case EventType.PreUpdate:
+                    handleUpdate(domain, auditEventType, event)
+                    break
             }
         }
         catch (Exception e) {
             if (AuditLogContext.context.failOnError) {
                 throw e
-            }
-            else {
+            } else {
                 log.error("Error creating audit log for event ${event.eventType} and domain ${event.entityObject}", e)
             }
         }
@@ -125,7 +126,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (map || !verbose) {
             if (auditEventType == AuditEventType.DELETE) {
                 map = map.collectEntries { String property, Object value ->
-                     // Accessing a hibernate PersistentCollection of a deleted entity yields a NPE in Grails 3.3.x.
+                    // Accessing a hibernate PersistentCollection of a deleted entity yields a NPE in Grails 3.3.x.
                     // We can't filter hibernate classes because this plugin is ORM-agnostic and has no dependency to any ORM implementation.
                     // This is a workaround. We might not log some other ORM collection implementation even if it would be possible to log them.
                     // (see #153)
@@ -133,11 +134,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     if (value instanceof Collection) {
                         return [:]
                     }
-                    return [(property):value]
+                    return [(property): value]
                 } as Map<String, Object>
                 logChanges(domain, [:], map, auditEventType, event)
-            }
-            else {
+            } else {
                 logChanges(domain, map, [:], auditEventType, event)
             }
         }
