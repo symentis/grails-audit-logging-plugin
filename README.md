@@ -18,14 +18,13 @@ For older Grails versions, see "Supported Grails Versions" below.
  * For 1.x documentation, see [1.x Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
- * Grails   4.0.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master)
- * Grails   3.3.x: [3.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/3.x_maintenance)
- * Grails   3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
- * Grails   2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
+ * Grails 4.0.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master)
+ * Grails 3.3.x: [3.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/3.x_maintenance)
+ * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
+ * Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
 ## audit-quickstart
 You need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's 2.0.x version or later.
-See issue [#13](https://github.com/robertoschwald/grails-audit-logging-plugin/issues/13)
 
 With this, you get an auditlog domain class in your project which is fully under your control.
 The domain name is registered in your application.groovy with key "grails.plugins.auditLog.auditDomainClassName".
@@ -34,7 +33,6 @@ Example:
 
 ```
 grails audit-quickstart org.example.myproject MyAuditLogEvent
-
 ```
 
 ## Issue Management
@@ -66,6 +64,7 @@ Special thanks to all the contributors (in alphabetical order):
 	Jorge Aguilera
 	Juergen Baumann
 	Madhava Jay
+    Matt Long
 	Matthew A Stewart
 	Paul Taylor
 	Sami Mäkelä
