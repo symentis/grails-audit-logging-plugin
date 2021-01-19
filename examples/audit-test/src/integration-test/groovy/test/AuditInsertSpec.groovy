@@ -34,15 +34,16 @@ class AuditInsertSpec extends Specification {
 
     void setup() {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
-        AuditTrail.withNewTransaction { AuditTrail.executeUpdate('delete from AuditTrail') }
-    }
-
-    void cleanup() {
-        Author.withNewTransaction {
-            Review.where {}.deleteAll()
-            Book.where {}.deleteAll()
-            Author.where {}.deleteAll()
-            Publisher.where {}.deleteAll()
+        AuditTrail.withNewTransaction {
+            AuditTrail.executeUpdate('delete from AuditTrail')
+        }
+        AuditLogContext.withoutAuditLog {
+            Author.withNewTransaction {
+                Review.where {}.deleteAll()
+                Book.where {}.deleteAll()
+                Author.where {}.deleteAll()
+                Publisher.where {}.deleteAll()
+            }
         }
     }
 
@@ -193,8 +194,7 @@ class AuditInsertSpec extends Specification {
         Author.withNewTransaction {
             if (enabled) {
                 author.save(flush: true, failOnError: true)
-            }
-            else {
+            } else {
                 AuditLogContext.withoutAuditLog {
                     author.save(flush: true, failOnError: true)
                 }
@@ -227,8 +227,7 @@ class AuditInsertSpec extends Specification {
         Author.withNewTransaction {
             if (enabled) {
                 author.save(flush: true, failOnError: true)
-            }
-            else {
+            } else {
                 AuditLogContext.withoutVerboseAuditLog {
                     author.save(flush: true, failOnError: true)
                 }

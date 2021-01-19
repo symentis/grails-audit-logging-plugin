@@ -38,9 +38,6 @@ class AuditTruncateSpec extends Specification {
 
     void setup() {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
-    }
-
-    void cleanup() {
         AuditTrail.withNewTransaction {
             AuditTrail.executeUpdate('delete from AuditTrail')
         }

@@ -28,19 +28,15 @@ class AuditUpdateCollectionSpec extends Specification {
     void setup() {
         Author.withNewTransaction {
             AuditLogContext.withoutAuditLog {
+                Book.where {}.deleteAll()
+                Author.where {}.deleteAll()
+
                 def author = new Author(name: "Aaron", age: 37, famous: true)
                 author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
                 author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
                 author.addToBooks(new Book(title: 'Mocking Jay', description: 'Blah', pages: 600))
                 author.save(flush: true, failOnError: true)
             }
-        }
-    }
-
-    void cleanup() {
-        Author.withNewTransaction {
-            Book.where {}.deleteAll()
-            Author.where {}.deleteAll()
         }
         AuditTrail.withNewTransaction {
             AuditTrail.where {}.deleteAll()
