@@ -3,6 +3,7 @@ package grails.plugins.orm.auditable
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.springframework.core.NamedThreadLocal
 import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
@@ -15,8 +16,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 class AuditLogQueueManager {
     private static final ThreadLocal<AuditLogTransactionSynchronization> threadLocal = new NamedThreadLocal<AuditLogTransactionSynchronization>("auditLog.synch")
 
-    static void addToQueue(GormEntity auditInstance) {
-
+    static void addToQueue(GormEntity auditInstance, AbstractPersistenceEvent event) {
         if (!TransactionSynchronizationManager.synchronizationActive) {
             // Seems like no transaction is active
             //  => Save audit entry right now

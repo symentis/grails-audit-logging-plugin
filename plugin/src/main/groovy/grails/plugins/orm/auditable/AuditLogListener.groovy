@@ -74,10 +74,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                 switch (event.eventType) {
                     case EventType.PostInsert:
                     case EventType.PreDelete:
-                        handleInsertAndDelete(domain, auditEventType)
+                        handleInsertAndDelete(domain, auditEventType, event)
                         break
                     case EventType.PreUpdate:
-                        handleUpdate(domain, auditEventType)
+                        handleUpdate(domain, auditEventType, event)
                         break
                 }
             }
@@ -102,7 +102,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     /**
      * We must use the preDelete event if we want to capture what the old object was like.
      */
-    protected void handleInsertAndDelete(Auditable domain, AuditEventType auditEventType) {
+    protected void handleInsertAndDelete(Auditable domain, AuditEventType auditEventType, AbstractPersistenceEvent event) {
         if (domain.logIgnoreEvents?.contains(auditEventType)) {
             return
         }
@@ -131,10 +131,10 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     }
                     return [(property):value]
                 } as Map<String, Object>
-                logChanges(domain, [:], map, auditEventType)
+                logChanges(domain, [:], map, auditEventType, event)
             }
             else {
-                logChanges(domain, map, [:], auditEventType)
+                logChanges(domain, map, [:], auditEventType, event)
             }
         }
     }
@@ -142,7 +142,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     /**
      * Look at persistent and transient state for the object and log differences
      */
-    protected void handleUpdate(Auditable domain, AuditEventType auditEventType) {
+    protected void handleUpdate(Auditable domain, AuditEventType auditEventType, AbstractPersistenceEvent event) {
         if (domain.logIgnoreEvents?.contains(auditEventType)) {
             return
         }
@@ -168,7 +168,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
 
         if (newMap || oldMap || !verbose) {
-            logChanges(domain, newMap, oldMap, auditEventType)
+            logChanges(domain, newMap, oldMap, auditEventType, event)
         }
     }
 
@@ -180,7 +180,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * @param oldMap null for insert and delete, for updates holds the original persisted values filtered to what we care about
      * @param eventType the type of event we are logging
      */
-    protected void logChanges(Auditable domain, Map<String, Object> newMap, Map<String, Object> oldMap, AuditEventType eventType) {
+    protected void logChanges(Auditable domain, Map<String, Object> newMap, Map<String, Object> oldMap, AuditEventType eventType, AbstractPersistenceEvent event) {
         log.debug("Audit logging event {} and domain {}", eventType, domain.getClass().name)
 
         Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
@@ -214,7 +214,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     dateCreated: dateCreated, lastUpdated: dateCreated
                 )
                 if (domain.beforeSaveLog(audit)) {
-                    AuditLogQueueManager.addToQueue(audit)
+                    AuditLogQueueManager.addToQueue(audit, event)
                 }
             }
         }
@@ -226,7 +226,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                 dateCreated: dateCreated, lastUpdated: dateCreated
             )
             if (domain.beforeSaveLog(audit)) {
-                AuditLogQueueManager.addToQueue(audit)
+                AuditLogQueueManager.addToQueue(audit, event)
             }
         }
     }
