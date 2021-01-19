@@ -4,25 +4,34 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [8, 11]
     steps:
       - uses: actions/checkout@v2
       - run: cd $GITHUB_WORKSPACE
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          java-package: jdk
+          architecture: x64
 
       - run: ./gradlew check
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
-          name: testreport-audit-test
+          name: testreport-audit-test-${{ matrix.java }}
           path: examples/audit-test/build/reports/tests
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
-          name: testreport-audit-test-allow-update-outside-transaction
+          name: testreport-audit-test-allow-update-outside-transaction-${{ matrix.java }}
           path: examples/audit-test-allow-update-outside-transaction/build/reports/tests
 
       - run: ./gradlew :examples:audit-test:check -Daudit-test.AuditTrail.datasource=DEFAULT
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
-          name: testreport-audit-test-single-datasource
+          name: testreport-audit-test-single-datasource-${{ matrix.java }}
           path: examples/audit-test/build/reports/tests
