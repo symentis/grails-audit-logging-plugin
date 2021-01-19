@@ -18,7 +18,6 @@
 */
 package test
 
-import audit.test.HeliportService
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration
 import groovy.util.logging.Slf4j
@@ -29,8 +28,6 @@ import spock.lang.Specification
 @Slf4j
 @Integration
 class AuditUpdateSpec extends Specification {
-
-    HeliportService heliportService
 
     void setup() {
         Author.withNewTransaction {
