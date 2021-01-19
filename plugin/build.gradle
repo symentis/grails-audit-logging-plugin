@@ -61,6 +61,9 @@ dependencies {
     provided "org.grails:grails-plugin-services"
     provided "org.grails:grails-plugin-domain-class"
 
+    // TODO: We need to make this configurable/pluggable
+    provided "org.grails.plugins:hibernate5"
+
     testCompile "org.grails:grails-web-testing-support"
 }
 

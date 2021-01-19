@@ -4,8 +4,14 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
-import org.springframework.core.NamedThreadLocal
-import org.springframework.transaction.support.TransactionSynchronizationManager
+import org.grails.orm.hibernate.HibernateDatastore
+import org.hibernate.Transaction
+import org.hibernate.action.spi.AfterTransactionCompletionProcess
+import org.hibernate.engine.spi.SharedSessionContractImplementor
+import org.hibernate.internal.SessionImpl
+
+import java.util.concurrent.ConcurrentHashMap
+
 /**
  * Queue audit logging changes for flushing on transaction commit to ensure proper transactional semantics
  *
@@ -14,10 +20,17 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Slf4j
 @CompileStatic
 class AuditLogQueueManager {
-    private static final ThreadLocal<AuditLogTransactionSynchronization> threadLocal = new NamedThreadLocal<AuditLogTransactionSynchronization>("auditLog.synch")
+
+    private static final Map<Transaction, AuditLogTransactionSynchronization> auditProcesses = new ConcurrentHashMap<>()
 
     static void addToQueue(GormEntity auditInstance, AbstractPersistenceEvent event) {
-        if (!TransactionSynchronizationManager.synchronizationActive) {
+        if (!(event.source instanceof HibernateDatastore)) {
+            log.warn("Can't handle audit event for entity from unsupported datastore ${event.source.class.name}")
+            return
+        }
+        SessionImpl session = (SessionImpl) ((HibernateDatastore) event.source).sessionFactory.currentSession
+
+        if (!session.transactionInProgress) {
             // Seems like no transaction is active
             //  => Save audit entry right now
             // In Hibernate > 5.2 this can only happen by setting `hibernate.allow_update_outside_transaction: true`
@@ -38,20 +51,40 @@ class AuditLogQueueManager {
             return
         }
 
-        AuditLogTransactionSynchronization auditLogSync = TransactionSynchronizationManager.synchronizations.findResult {
-            if (it instanceof AuditLogTransactionSynchronization) {
-                return (AuditLogTransactionSynchronization) it
-            }
-            return null
+
+        Transaction transaction = (Transaction) session.transaction
+
+        AuditLogTransactionSynchronization auditProcess = auditProcesses[transaction]
+        if (auditProcess == null) {
+            auditProcess = auditProcesses[transaction] = new AuditLogTransactionSynchronization()
+            // Roughly this is like a Spring transaction synchronization (TransactionSynchronizationManager.registerSynchronization)
+            // The difference is that even when using nested transactions like
+            // DomainInDatastoreOne.withNewTransaction {
+            //   DomainInDatastoreTwo.withNewTransaction {
+            //     <some operation on DomainInDatastoreOne> + flush
+            //   }
+            // }
+            // We are able to register a synchroniation on the OUTER transaction even though this code is running while the
+            // INNER transaction is active.
+            //
+            // Just using Spring Transactions and/or GORM would be better because it would allow to be datastore agnostic
+            // But simply using TransactionSynchronizationManager.registerSynchronization doesn't work because it would register the synchronization in the innermost transaction.
+            //
+            // TODO: Find GORM agnostic way of doing this
+            //       If we don't find a GORM agnostic way we need to abstract this implementation away e.g. auditlogging-hibernate
+            session.actionQueue.registerProcess(
+              new AfterTransactionCompletionProcess() {
+                  @Override
+                  void doAfterTransactionCompletion(boolean success, SharedSessionContractImplementor session2) {
+                      if (success && auditProcesses.remove(transaction)) {
+                          auditProcess.afterCommit()
+                      }
+                  }
+              }
+            )
         }
 
-        if (!auditLogSync) {
-            auditLogSync = new AuditLogTransactionSynchronization()
-            TransactionSynchronizationManager.registerSynchronization(auditLogSync)
-            log.trace("Registered new ${AuditLogTransactionSynchronization.simpleName} in TransactionSynchronizationManager")
-        }
-
-        auditLogSync.addToQueue(auditInstance)
+        auditProcess.addToQueue(auditInstance)
     }
 }
 

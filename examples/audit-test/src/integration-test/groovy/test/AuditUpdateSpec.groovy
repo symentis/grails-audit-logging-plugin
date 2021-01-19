@@ -72,7 +72,7 @@ class AuditUpdateSpec extends Specification {
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
 
-        def first = events.find { it.propertyName == 'age' }
+        AuditTrail first = events.find { it.propertyName == 'age' }
         first.persistedObjectVersion == 0
         first.oldValue == "37"
         first.newValue == "40"
@@ -307,33 +307,30 @@ class AuditUpdateSpec extends Specification {
         then:
         Author.withNewTransaction {
             Author.findByName("Aaron")
-        }.age == 37
+        }.age == 37 // rolled back change -> original value
         Book.withNewTransaction {
             Book.findByTitle("Hunger Games")
-        }.pages == 401
+        }.pages == 401 // committed change -> new value
         AuditTrail.withNewTransaction {
             AuditTrail.count
-        } == 1
+        } == 1 // AuditTrail only for committed change
         AuditTrail.withNewTransaction {
             AuditTrail.list()[0]
         }.newValue == "401"
     }
 
-    void "test nested transactions different datastores"() {
+    void "test nested transactions different datastores: rollback outer"() {
+        expect:
+        AuditTrail.withNewTransaction {
+            AuditTrail.list().collect { it.className }.unique()
+        } == []
+
         when:
         Author.withNewTransaction { TransactionStatus transactionStatus ->
             EntityInSecondDatastore.withNewTransaction {
                 new Author(name: "name2", age: 12, famous: true).save(flush: true, failOnError: true)
                 new EntityInSecondDatastore(name: "name2", someIntegerProperty: 1).save(flush: true, failOnError: true)
                 // Commit new EntityInSecondDatastore
-
-                // Problem, because we have flush: true the AuditTrails are both immediately queued to the active synchronization
-                // When the EntityInSecondDatastore commits *all* queued AuditTrails are saved
-                // But we would only want to save those from EntityInSecondDatastore
-                // => hibernate-envers solves this by having a queue for each transaction
-                //    so even if we have multiple transactions we could queue e.g. the AuditTrails for Author independent from the AuditTrails for  EntityInSecondDatastore
-                //    and commit them independently
-                // Problem: We couldn't find a GORM api that would allow us to do that
             }
             // Rollback new Author
             transactionStatus.setRollbackOnly()
@@ -349,6 +346,13 @@ class AuditUpdateSpec extends Specification {
         AuditTrail.withNewTransaction {
             AuditTrail.list().collect { it.className }.unique()
         } == ["test.EntityInSecondDatastore"]
+    }
+
+    void "test nested transactions different datastores: rollback inner"() {
+        expect:
+        AuditTrail.withNewTransaction {
+            AuditTrail.list().collect { it.className }.unique()
+        } == []
 
         when:
         Author.withNewTransaction {

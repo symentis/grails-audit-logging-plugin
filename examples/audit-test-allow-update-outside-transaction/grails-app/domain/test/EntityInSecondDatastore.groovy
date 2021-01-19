@@ -2,7 +2,7 @@ package test
 
 import grails.plugins.orm.auditable.Auditable
 
-class EntityInSecondDatastore implements Auditable{
+class EntityInSecondDatastore implements Auditable {
 
     String name
     Integer someIntegerProperty

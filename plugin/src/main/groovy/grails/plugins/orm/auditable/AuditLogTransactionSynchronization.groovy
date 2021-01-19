@@ -3,11 +3,10 @@ package grails.plugins.orm.auditable
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.transaction.support.TransactionSynchronizationAdapter
 
 @Slf4j
 @CompileStatic
-class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapter {
+class AuditLogTransactionSynchronization {
     private List<GormEntity> pendingAuditInstances = []
 
     void addToQueue(GormEntity auditInstance) {
@@ -17,7 +16,6 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
         log.trace("Added {} to synchronization queue", auditInstance)
     }
 
-    @Override
     void afterCommit() {
         if (!pendingAuditInstances) {
             return
@@ -36,10 +34,5 @@ class AuditLogTransactionSynchronization extends TransactionSynchronizationAdapt
         finally {
             pendingAuditInstances.clear()
         }
-    }
-
-    @Override
-    void afterCompletion(int status) {
-        log.trace("afterComplication called with status $status")
     }
 }
