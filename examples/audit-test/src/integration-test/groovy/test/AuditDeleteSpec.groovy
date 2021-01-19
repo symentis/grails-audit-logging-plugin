@@ -32,8 +32,15 @@ class AuditDeleteSpec extends Specification {
 
     void setup() {
         defaultIgnoreList = ['id'] + AuditLoggingConfigUtils.auditConfig.excluded?.asImmutable() ?: []
-        Author.withNewTransaction {
-            AuditLogContext.withoutAuditLog {
+        AuditLogContext.withoutAuditLog {
+            AuditTrail.withNewTransaction {
+                AuditTrail.where {}.deleteAll()
+            }
+            Author.withNewTransaction {
+                Publisher.where {}.deleteAll()
+                Book.where {}.deleteAll()
+                Author.where {}.deleteAll()
+
                 def author = new Author(name: "Aaron", age: 37, famous: true)
                 author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
                 author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
@@ -46,14 +53,7 @@ class AuditDeleteSpec extends Specification {
     }
 
     void cleanup() {
-        Author.withNewTransaction {
-            Publisher.where {}.deleteAll()
-            Book.where {}.deleteAll()
-            Author.where {}.deleteAll()
-        }
-        AuditTrail.withNewTransaction {
-            AuditTrail.where {}.deleteAll()
-        }
+
     }
 
     void "Test default delete logging"() {
