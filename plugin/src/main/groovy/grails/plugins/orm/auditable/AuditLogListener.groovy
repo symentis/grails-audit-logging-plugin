@@ -226,7 +226,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             GormEntity audit = createAuditLogDomainInstance(
                 actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
                 persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
-                dateCreated: dateCreated, lastUpdated: dateCreated
+                dateCreated: timestamp, lastUpdated: timestamp
             )
             if (domain.beforeSaveLog(audit)) {
                 AuditLogQueueManager.addToQueue(audit, event)
