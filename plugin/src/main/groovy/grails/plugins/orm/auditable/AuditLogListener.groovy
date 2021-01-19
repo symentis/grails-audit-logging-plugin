@@ -186,7 +186,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      */
     protected void logChanges(Auditable domain, Map<String, Object> newMap, Map<String, Object> oldMap, AuditEventType eventType, AbstractPersistenceEvent event) {
         log.debug("Audit logging event {} and domain {}", eventType, domain.getClass().name)
-      
+
         Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
 
         // Use a single date for all audit_log entries in this transaction
@@ -215,14 +215,13 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
                     persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
                     propertyName: propertyName, oldValue: oldValueAsString, newValue: newValueAsString,
-                    dateCreated: dateCreated, lastUpdated: dateCreated
+                    dateCreated: timestamp, lastUpdated: timestamp
                 )
                 if (domain.beforeSaveLog(audit)) {
                     AuditLogQueueManager.addToQueue(audit, event)
                 }
             }
-        }
-        else {
+        } else {
             // Create a single entity for this event
             GormEntity audit = createAuditLogDomainInstance(
                 actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
@@ -234,7 +233,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
         }
     }
-    
+
     /**
      * Create a timestamp of the type of the dateCreated or lastUpdated properties of the audit domain class.
      * @return the timestamp
