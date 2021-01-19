@@ -77,7 +77,7 @@ Special thanks to all the contributors (in alphabetical order):
 
 
 ## Continuous Integration Server
-[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg?branch=master)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
+[![Build Status](https://github.com/robertoschwald/grails-audit-logging-plugin/workflows/CI/badge.svg)](https://github.com/robertoschwald/grails-audit-logging-plugin/actions)
 
 ## Bintray Repository
 <a href='https://bintray.com/robertoschwald/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
