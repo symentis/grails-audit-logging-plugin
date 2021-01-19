@@ -44,24 +44,19 @@ class AuditInsertWithoutTransactionSpec extends Specification {
             events.size() == TestUtils.getAuditableProperties(Author.gormPersistentEntity, defaultIgnoreList).size()
         }
     }
-}
 
-//class Listener extends AbstractPersistenceEventListener {
-//    protected Listener(Datastore datastore) {
-//        super(datastore)
-//    }
-//
-//    @Override
-//    protected void onPersistenceEvent(AbstractPersistenceEvent event) {
-//        def asf = Holders.applicationContext.getBean(AuditLoggingProcessManager)
-//        Author.withSession { Session session ->
-//            def tx = session.getTransaction()
-////            new GrailsTransactionTemplate(Holders.applicationContext.getBean(PlatformTransactionManager), new DefaultTransactionDefinition()).execute({})
-//        }
-//    }
-//
-//    @Override
-//    boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
-//        eventType.isAssignableFrom(PostInsertEvent)
-//    }
-//}
+    def "test transaction synchronization is active but not for changed domain"() {
+        expect:
+        Author.withNewSession {
+            EntityInSecondDatastore.withNewTransaction {
+                new Author(name: "Aaron", age: 37, famous: true).save(flush: true, failOnError: true)
+
+                // We have a transaction active but not for the session that the Author is saved in
+                // => AuditTrail needs to be saved immediately
+                AuditTrail.withNewSession {
+                    AuditTrail.count
+                }
+            }
+        } == 1
+    }
+}

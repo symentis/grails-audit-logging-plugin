@@ -52,7 +52,7 @@ class AuditUpdateSpec extends Specification {
         EntityInSecondDatastore.withNewTransaction {
             AuditLogContext.withoutAuditLog {
                 EntityInSecondDatastore.where {}.deleteAll()
-                new EntityInSecondDatastore(name:"name", someIntegerProperty:1).save(flush: true, failOnError: true)
+                new EntityInSecondDatastore(name: "name", someIntegerProperty: 1).save(flush: true, failOnError: true)
             }
         }
         AuditTrail.withNewTransaction {
@@ -283,7 +283,6 @@ class AuditUpdateSpec extends Specification {
         }
 
         then:
-        Author.currentGormStaticApi().datastore
         Author.withNewTransaction {
             Author.findByName("Aaron").age == 3
         }
@@ -320,13 +319,12 @@ class AuditUpdateSpec extends Specification {
         }.newValue == "401"
     }
 
-    void "test nested transactions different datastores" () {
+    void "test nested transactions different datastores"() {
         when:
-        // Domain Foo has two datastores DEFAULT, second
         Author.withNewTransaction { TransactionStatus transactionStatus ->
             EntityInSecondDatastore.withNewTransaction {
-                 new Author(name: "name2", age: 12, famous: true).save(flush: true, failOnError: true)
-                 new EntityInSecondDatastore(name:"name2", someIntegerProperty:1).save(flush: true, failOnError: true)
+                new Author(name: "name2", age: 12, famous: true).save(flush: true, failOnError: true)
+                new EntityInSecondDatastore(name: "name2", someIntegerProperty: 1).save(flush: true, failOnError: true)
                 // Commit new EntityInSecondDatastore
 
                 // Problem, because we have flush: true the AuditTrails are both immediately queued to the active synchronization
@@ -350,6 +348,28 @@ class AuditUpdateSpec extends Specification {
         } != null
         AuditTrail.withNewTransaction {
             AuditTrail.list().collect { it.className }.unique()
-        }.size() == 1
+        } == ["test.EntityInSecondDatastore"]
+
+        when:
+        Author.withNewTransaction {
+            EntityInSecondDatastore.withNewTransaction { TransactionStatus transactionStatus ->
+                new Author(name: "name2", age: 12, famous: true).save(flush: true, failOnError: true)
+                new EntityInSecondDatastore(name: "name2", someIntegerProperty: 1).save(flush: true, failOnError: true)
+                // Rollback new EntityInSecondDatastore
+                transactionStatus.setRollbackOnly()
+            }
+            // Commit new Author
+        }
+
+        then:
+        Author.withNewTransaction {
+            Author.findByName("name2")
+        } != null
+        EntityInSecondDatastore.withNewTransaction {
+            EntityInSecondDatastore.findByName("name2")
+        } == null
+        AuditTrail.withNewTransaction {
+            AuditTrail.list().collect { it.className }.unique()
+        } == ["test.Author"]
     }
 }
