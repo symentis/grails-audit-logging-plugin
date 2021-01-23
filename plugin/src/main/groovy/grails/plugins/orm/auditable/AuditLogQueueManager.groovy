@@ -41,7 +41,7 @@ class AuditLogQueueManager {
             //  => we can't cause a session flush of the session that is used to flush the changes to the observed entity
             //    => we can't use withNewTransaction because it reuses the current session
             //  => we should still use a transaction because in theory the audit domain could be in another datastore
-            // where allow_update_outside_transaction isn't set
+            //        where allow_update_outside_transaction isn't set
             //
             //  => use withNewSession + withNewTransaction
             auditInstance.invokeMethod("withNewSession") {
