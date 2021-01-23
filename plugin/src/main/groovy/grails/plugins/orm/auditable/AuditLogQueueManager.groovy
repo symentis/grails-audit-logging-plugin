@@ -64,7 +64,7 @@ class AuditLogQueueManager {
             //     <some operation on DomainInDatastoreOne> + flush
             //   }
             // }
-            // We are able to register a synchroniation on the OUTER transaction even though this code is running while the
+            // we are able to register a synchroniation on the OUTER transaction even though this code is running while the
             // INNER transaction is active.
             //
             // Just using Spring Transactions and/or GORM would be better because it would allow to be datastore agnostic
