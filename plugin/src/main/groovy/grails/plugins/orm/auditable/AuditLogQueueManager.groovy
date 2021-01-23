@@ -68,7 +68,8 @@ class AuditLogQueueManager {
             // INNER transaction is active.
             //
             // Just using Spring Transactions and/or GORM would be better because it would allow to be datastore agnostic
-            // But simply using TransactionSynchronizationManager.registerSynchronization doesn't work because it would register the synchronization in the innermost transaction.
+            // But simply using TransactionSynchronizationManager.registerSynchronization doesn't work because it would 
+            // register the synchronisation in the innermost transaction.
             //
             // TODO: Find GORM agnostic way of doing this
             //       If we don't find a GORM agnostic way we need to abstract this implementation away e.g. auditlogging-hibernate
@@ -87,4 +88,3 @@ class AuditLogQueueManager {
         auditProcess.addToQueue(auditInstance)
     }
 }
-
