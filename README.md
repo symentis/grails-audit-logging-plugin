@@ -19,8 +19,8 @@ For older Grails versions, see "Supported Grails Versions" below.
 
 ## Supported Grails versions
  * Grails 4.0.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master) [ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
- * Grails 3.3.x: [3.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/3.x_maintenance)
- * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
+ * Grails 3.3.x: [3.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/3.x_maintenance) [ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg?version=3.0.6) ](https://bintray.com/robertoschwald/plugins/audit-logging/3.0.6/link)
+ * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance) [ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg?version=2.0.6) ](https://bintray.com/robertoschwald/plugins/audit-logging/2.0.6/link)
  * Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
 
 ## audit-quickstart
