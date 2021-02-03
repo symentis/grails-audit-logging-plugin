@@ -201,6 +201,20 @@ class AuditableSpec extends Specification {
         then:
         compositeId.logEntityId == "[author:$author.id, string:string, nonAuditableCompositeId:toString_for_non_auditable_foo_bar]"
     }
+
+    void "test nested withConfig"() {
+        when:
+        Boolean isDisabled = null
+        AuditLogContext.withoutAuditLog {
+            AuditLogContext.withoutAuditLog {
+                // no-op
+            }
+            isDisabled = AuditLogContext.context.disabled
+        }
+
+        then:
+        isDisabled
+    }
 }
 
 
