@@ -23,7 +23,7 @@ if [ "${TRAVIS_JDK_VERSION}" != "openjdk8" ] ; then
    echo "Not publishing, as it is not JDK8"
    exit $EXIT_STATUS
 fi
- 
+
 if [[ ( -n "$TRAVIS_TAG" ) || ( "$TRAVIS_BRANCH" == "master" ) ]]; then
   echo "*** Publishing archives for branch $TRAVIS_BRANCH"
 
