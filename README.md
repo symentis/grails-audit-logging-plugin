@@ -1,7 +1,5 @@
 # Grails Audit Logging Plugin
 
-[ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
-
 ## Description
 
 The Audit Logging plugin for Grails adds generic event based Audit Logging to a Grails project.
@@ -20,7 +18,7 @@ For older Grails versions, see "Supported Grails Versions" below.
  * For 1.x documentation, see [1.x Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
- * Grails 4.0.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master)
+ * Grails 4.0.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master) [ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
  * Grails 3.3.x: [3.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/3.x_maintenance)
  * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance)
  * Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
