@@ -1,5 +1,7 @@
 # Grails Audit Logging Plugin
 
+[ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
+
 ## Description
 
 The Audit Logging plugin for Grails adds generic event based Audit Logging to a Grails project.
