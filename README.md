@@ -15,7 +15,6 @@ For older Grails versions, see "Supported Grails Versions" below.
  * For snapshot documentation, see [Snapshot User Guide](https://symentis.github.io/grails-audit-logging-plugin/snapshot/plugin.html)
  * For 3.x documentation, see [3.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/3.0.x/plugin.html)
  * For 2.x documentation, see [2.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/2.0.x/plugin.html)
- * For 1.x documentation, see [1.x Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
  * Grails 4.0.x: [master branch](https://github.com/symentis/grails-audit-logging-plugin/tree/master) [ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
