@@ -11,17 +11,17 @@ We currently work on a Grails 4.x branch using a new approach. See [PR 212](http
 For older Grails versions, see "Supported Grails Versions" below.
 
 ## Documentation
- * For current release documentation, see [User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/latest/plugin.html)
- * For snapshot documentation, see [Snapshot User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/snapshot/plugin.html)
- * For 3.x documentation, see [3.x User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/3.0.x/plugin.html)
- * For 2.x documentation, see [2.x User Guide](https://robertoschwald.github.io/grails-audit-logging-plugin/2.0.x/plugin.html)
+ * For current release documentation, see [User Guide](https://symentis.github.io/grails-audit-logging-plugin/latest/plugin.html)
+ * For snapshot documentation, see [Snapshot User Guide](https://symentis.github.io/grails-audit-logging-plugin/snapshot/plugin.html)
+ * For 3.x documentation, see [3.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/3.0.x/plugin.html)
+ * For 2.x documentation, see [2.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/2.0.x/plugin.html)
  * For 1.x documentation, see [1.x Grails Plugin Page](http://grails.org/plugin/audit-logging "Grails Plugin Page")
 
 ## Supported Grails versions
- * Grails 4.0.x: [master branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/master) [ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
- * Grails 3.3.x: [3.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/3.x_maintenance) [ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg?version=3.0.6) ](https://bintray.com/robertoschwald/plugins/audit-logging/3.0.6/link)
- * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/2.x_maintenance) [ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg?version=2.0.6) ](https://bintray.com/robertoschwald/plugins/audit-logging/2.0.6/link)
- * Grails 2.x: [1.x_maintenance branch](https://github.com/robertoschwald/grails-audit-logging-plugin/tree/1.x_maintenance)
+ * Grails 4.0.x: [master branch](https://github.com/symentis/grails-audit-logging-plugin/tree/master) [ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
+ * Grails 3.3.x: [3.x_maintenance branch](https://github.com/symentis/grails-audit-logging-plugin/tree/3.x_maintenance) [ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg?version=3.0.6) ](https://bintray.com/robertoschwald/plugins/audit-logging/3.0.6/link)
+ * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/symentis/grails-audit-logging-plugin/tree/2.x_maintenance) [ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg?version=2.0.6) ](https://bintray.com/robertoschwald/plugins/audit-logging/2.0.6/link)
+ * Grails 2.x: [1.x_maintenance branch](https://github.com/symentis/grails-audit-logging-plugin/tree/1.x_maintenance)
 
 ## audit-quickstart
 You need to perform "grails audit-quickstart \<package\> \<DomainClass\>" after installing this plugin's 2.0.x version or later.
@@ -37,7 +37,7 @@ grails audit-quickstart org.example.myproject MyAuditLogEvent
 
 ## Issue Management
 
-See [GitHub Issues](https://github.com/robertoschwald/grails-audit-logging-plugin/issues "Issues")
+See [GitHub Issues](https://github.com/symentis/grails-audit-logging-plugin/issues "Issues")
 
 ## Pull Requests
 Pull requests are highly appreciated and welcome!
@@ -45,7 +45,7 @@ Pull requests are highly appreciated and welcome!
 Please add integration tests for new features to the audit-test application.
 
 ## Contributors
-Special thanks to all the <a href="https://github.com/robertoschwald/grails-audit-logging-plugin/graphs/contributors">contributors</a> (in alphabetical order):
+Special thanks to all the <a href="https://github.com/symentis/grails-audit-logging-plugin/graphs/contributors">contributors</a> (in alphabetical order):
 
 	Aaron Long
 	Aldrin
@@ -77,12 +77,12 @@ Special thanks to all the <a href="https://github.com/robertoschwald/grails-audi
 
 
 ## Continuous Integration Server
-[![Build Status](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin.svg?branch=master)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
+[![Build Status](https://travis-ci.org/symentis/grails-audit-logging-plugin.svg?branch=master)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
 
 ## Bintray Repository
-<a href='https://bintray.com/robertoschwald/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
+<a href='https://bintray.com/symentis/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
 
-[ ![Download](https://api.bintray.com/packages/robertoschwald/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
 
 ***
 
