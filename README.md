@@ -9,6 +9,8 @@ The master branch holds the codebase for plugin version 4.0.x (Grails 4.0.x).
 We currently work on a Grails 4.x branch using a new approach. See [PR 212](https://github.com/robertoschwald/grails-audit-logging-plugin/pull/212)
 
 For older Grails versions, see "Supported Grails Versions" below.
+## Moving to Maven Central
+This repositories new artifacts are currently moved to Maven Central, sind Bintray will shut down MAY/01/21. You can obtain the old artifacts from https://repo.grails.org.
 
 ## Documentation
  * For current release documentation, see [User Guide](https://symentis.github.io/grails-audit-logging-plugin/latest/plugin.html)
