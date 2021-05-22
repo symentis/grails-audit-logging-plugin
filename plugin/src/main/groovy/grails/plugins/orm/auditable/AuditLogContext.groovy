@@ -37,12 +37,15 @@ class AuditLogContext {
      *
      */
     static withConfig(Map config, Closure block) {
+        def previousValue = null
         try {
+            // First getting and then setting should be okay as we use a ThreadLocal so no race conditions should be possible
+            previousValue = auditLogConfig.get()
             auditLogConfig.set(mergeConfig(config))
             block.call()
         }
         finally {
-            auditLogConfig.remove()
+            auditLogConfig.set(previousValue)
         }
     }
 
