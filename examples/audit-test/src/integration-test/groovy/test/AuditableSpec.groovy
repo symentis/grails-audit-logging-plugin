@@ -22,6 +22,22 @@ class AuditableSpec extends Specification {
         entity = new TestEntity(property: 'foo')
     }
 
+    void "includePackages are respected"() {
+        expect:
+        !AuditLogContext.withConfig(includePackages: ['p1', 'p2']) { entity.isAuditable(AuditEventType.INSERT) }
+        AuditLogContext.withConfig(includePackages: ['test', 'p2']) { entity.isAuditable(AuditEventType.INSERT) }
+        AuditLogContext.withConfig(includePackages: []) { entity.isAuditable(AuditEventType.INSERT) }
+        AuditLogContext.withConfig([:]) { entity.isAuditable(AuditEventType.INSERT) }
+    }
+
+    void "excludePackages are respected"() {
+        expect:
+        AuditLogContext.withConfig(excludePackages: ['p1', 'p2']) { entity.isAuditable(AuditEventType.INSERT) }
+        !AuditLogContext.withConfig(excludePackages: ['test', 'p2']) { entity.isAuditable(AuditEventType.INSERT) }
+        AuditLogContext.withConfig(excludePackages: []) { entity.isAuditable(AuditEventType.INSERT) }
+        AuditLogContext.withConfig([:]) { entity.isAuditable(AuditEventType.INSERT) }
+    }
+
     void "excluded properties are respected"() {
         expect:
         AuditLogContext.withConfig(excluded: ['p1', 'p2']) { entity.getLogExcluded() } == ['p1', 'p2'] as Set<String>

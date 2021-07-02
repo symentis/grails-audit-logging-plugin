@@ -11,6 +11,8 @@ grails {
             useDatasource = 'second' // store in "second" datasource
             replacementPatterns = ["a.b": ""]
             truncateLength = 1000000
+            includePackages = [ 'test', 'other.one' ]
+            excludePackages = [ 'not.this.package', 'or.this.one' ]
         }
     }
 }

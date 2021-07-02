@@ -27,6 +27,16 @@ trait Auditable {
      */
     @Transient
     boolean isAuditable(AuditEventType eventType) {
+        List<String> includePackages = AuditLogContext.context.includePackages as List<String>
+        if (includePackages && !includePackages.any { this.class.name.startsWith(it + ".") }) {
+            return false
+        }
+
+        List<String> excludePackages = AuditLogContext.context.excludePackages as List<String>
+        if (excludePackages && excludePackages.any { this.class.name.startsWith(it + ".") }) {
+            return false
+        }
+
         true
     }
 
