@@ -80,7 +80,7 @@ Special thanks to all the <a href="https://github.com/symentis/grails-audit-logg
 
 
 ## Continuous Integration Server
-![Build Status](https://github.com/symentis/grails-audit-logging-plugin/actions/workflows/ci.yaml/badge.svg)
+![Build Status](https://github.com/symentis/grails-audit-logging-plugin/actions/workflows/ci.yaml/badge.svg?branch=master)
 
 ## Maven Central Repository
 This plugin will be available from Maven Central, soon. Older versions (up to 4.0.3) are available from the [Grails Artifact Repository](https://repo.grails.org/ui/).
