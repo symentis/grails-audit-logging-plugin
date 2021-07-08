@@ -20,7 +20,7 @@ This repositories new artifacts are currently moved to Maven Central, sind Bintr
  * For 2.x documentation, see [2.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/2.0.x/plugin.html)
 
 ## Supported Grails versions
- * Grails 4.0.x: [master branch (5.0.x version)](https://github.com/symentis/grails-audit-logging-plugin/tree/master) Alternatively up to Grails 4.0.9: [4.0.x version](https://github.com/symentis/grails-audit-logging-plugin/tree/4.x_maintenance)
+ * Grails 4.0.x: [master branch (5.0.x version)](https://github.com/symentis/grails-audit-logging-plugin/tree/master) Alternatively up to Grails 4.0.9: [4.x_maintenance branch](https://github.com/symentis/grails-audit-logging-plugin/tree/4.x_maintenance)
  * Grails 3.3.x: [3.x_maintenance branch](https://github.com/symentis/grails-audit-logging-plugin/tree/3.x_maintenance)
  * Grails 3.0.x-3.2.x: [2.x_maintenance branch](https://github.com/symentis/grails-audit-logging-plugin/tree/2.x_maintenance)
  * Grails 2.x: [1.x_maintenance branch](https://github.com/symentis/grails-audit-logging-plugin/tree/1.x_maintenance)
