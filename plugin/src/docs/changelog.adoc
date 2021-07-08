@@ -1,6 +1,10 @@
 == Change Log
-* 4.0.3
+* 5.0.0
+** New: Participate in current Transaction by queuing audit logs. Supports nested transactions. Plugin is currently NOT ORM agnostic and needs Hibernate due to this change (PR #212). See documentation.
 ** Fix #213 nested withoutAuditLog calls
+** Fix #192 Column 'date_created' cannot be null (PR #218)
+** Fix #175 javax.persistence.TransactionRequiredException: no transaction is in progress
+** Fix #173 Changes to withNewSession semantics make it useless for audit log listener
 
 * 4.0.2
 ** Fix #210 Add support for non-Date dateCreated/lastUpdated types

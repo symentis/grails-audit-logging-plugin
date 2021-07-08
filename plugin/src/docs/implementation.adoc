@@ -2,7 +2,7 @@
 Most of the plugin code is marked as @CompileStatic.
 
 == Auditing and Transactions
-All audit events for the entire transaction are queued up.
+All audit events for the current transaction are queued up.
 They are flushed after the transaction has successfully been committed.
 This allows the AuditLogListener to use its own session and transaction.
 

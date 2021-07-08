@@ -1,3 +1,10 @@
+== Upgrading to 5.0.x
+
+** The 5.0.0 version has some significant changes to the 4.0.x version.
+* The groupId of the plugin has changed from org.grails.plugin to com.symentis
+* The configuration keys are the same as in 4.0.x
+* The mechanism to audit log transaction data has changed. We now participate in transactions and queue up audit logs. The audit logs are flushed with the current transaction. If the current transaction fails, no audit logs of this transaction are committed. Due to this major change, the plugin is currently not ORM agnostic and for now depends on Hibernate. As the plugin itself does not support other GORM implementations like Mongo (see #179), this shouldn't affect current projects.
+
 == Upgrading to 4.0.x
 
 The 4.0.0 version of the plugin is backwards compatible with 3.0.x. Any existing configuration and customization should work out of the box.

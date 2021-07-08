@@ -2,10 +2,12 @@
 === Dependencies
 Add to your build.gradle project dependencies block:
 
+WARNING: Due to the move to Maven Central, the plugin groupId has changed from org.grails.plugin to com.symentis.
+
 [source,groovy]
 ----
 dependencies {
-   compile 'org.grails.plugins:audit-logging:{VERSION}'
+   compile 'com.symentis:audit-logging:{VERSION}'
 }
 ----
 Then run the following to refresh gradle dependencies: 
@@ -15,7 +17,7 @@ Then run the following to refresh gradle dependencies:
 gradle classes
 ----
 
-NOTE: After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class within your project.
+NOTE: After installing the plugin, you must perform the following command to let the plugin create the audit-logging domain class and register it in application.groovy within your project.
 
 === Create Audit Domain Artifact
 
@@ -29,7 +31,7 @@ This will create the Audit Domain class and adds to application.groovy:
 
     grails.plugin.auditLog.auditDomainClassName = 'org.myaudit.example.AuditTrail'
     
-Once created, you should open the generated file to adjust the `mappings` and `constraints` to suit your needs.
+Once created, you should open the generated file to adjust the `mappings` and `constraints` to suit your needs. Next, setup additional plugin config. See
 
 WARNING: Be sure to respect the existing nullability constraints or the plugin may not work correctly. You must update your db schema either by DDL, or using the database-migration plugin (recommended)
 

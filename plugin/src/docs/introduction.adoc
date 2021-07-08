@@ -9,7 +9,8 @@ It also provides a convenient way to add Update and Create user stamping by exte
 [cols="1,2",width="50%",options="header,footer"]
 |====================
 |Grails Version  | Audit Logging Plugin Version
-|4.0.0 and later | 4.0.0
+|4.0.0 and later | 5.0.0 (participating in Transactions). This is the recommended version if you use Grails 4.
+|4.0.x | 4.0.x
 |3.3.x | 3.0.x
 |3.0.0 to 3.2.0 | 2.0.x
 |2.0.0 to 2.5 | 1.0.x
