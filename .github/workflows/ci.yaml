@@ -46,9 +46,10 @@ jobs:
         with:
           name: testreport-audit-test-allow-update-outside-transaction-${{ matrix.java }}
           path: examples/audit-test-allow-update-outside-transaction/build/reports/tests
+      - name: Run tests with single datasource
+        run: ./gradlew :examples:audit-test:check -Daudit-test.AuditTrail.datasource=DEFAULT
       - name: Upload audit-test single-datasource artifacts
         uses: actions/upload-artifact@v2
-        run: ./gradlew :examples:audit-test:check -Daudit-test.AuditTrail.datasource=DEFAULT
         if: ${{ always() }}
         with:
           name: testreport-audit-test-single-datasource-${{ matrix.java }}
