@@ -15,6 +15,7 @@ This repositories new artifacts are currently moved to Maven Central, sind Bintr
 ## Documentation
  * For current release documentation, see [User Guide](https://symentis.github.io/grails-audit-logging-plugin/latest/plugin.html)
  * For snapshot documentation, see [Snapshot User Guide](https://symentis.github.io/grails-audit-logging-plugin/snapshot/plugin.html)
+ * For 4.x documentation, see [3.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/4.0.x/plugin.html)
  * For 3.x documentation, see [3.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/3.0.x/plugin.html)
  * For 2.x documentation, see [2.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/2.0.x/plugin.html)
 
@@ -49,6 +50,7 @@ Please add integration tests for new features to the audit-test application.
 Special thanks to all the <a href="https://github.com/symentis/grails-audit-logging-plugin/graphs/contributors">contributors</a> (in alphabetical order):
 
 	Aaron Long
+    Alan Wikie
 	Aldrin
 	Andrey Zhuchkov
 	Ankur Tripathi
@@ -78,13 +80,10 @@ Special thanks to all the <a href="https://github.com/symentis/grails-audit-logg
 
 
 ## Continuous Integration Server
-[![Build Status](https://travis-ci.org/symentis/grails-audit-logging-plugin.svg?branch=master)](https://travis-ci.org/symentis/grails-audit-logging-plugin)
+![Build Status](https://github.com/symentis/grails-audit-logging-plugin/actions/workflows/ci.yaml/badge.svg)
 
-## Bintray Repository
-<a href='https://bintray.com/symentis/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
-
-[ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg) ](https://bintray.com/symentis/plugins/audit-logging/_latestVersion)
-
+## Maven Central Repository
+This plugin will be available from Maven Central, soon. Older versions (up to 4.0.3) are available from the [Grails Artifact Repository](https://repo.grails.org/ui/).
 ***
 
 <a href="https://www.yourkit.com/java/profiler/index.jsp"><img src="https://www.yourkit.com/images/yklogo.png" alt="YourKit Java Profiler"/></a>
