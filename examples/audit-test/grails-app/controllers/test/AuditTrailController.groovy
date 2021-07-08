@@ -19,6 +19,9 @@
 
 package test
 
+import grails.gorm.transactions.Transactional
+
+@Transactional("second")
 class AuditTrailController {
 
   // the delete, save and update actions only accept POST requests

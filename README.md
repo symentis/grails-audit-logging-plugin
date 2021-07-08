@@ -45,7 +45,7 @@ Pull requests are highly appreciated and welcome!
 Please add integration tests for new features to the audit-test application.
 
 ## Contributors
-Special thanks to all the <a href="https://github.com/robertoschwald/grails-audit-logging-plugin/graphs/contributors">contributors</a> (in alphabetical order):
+Special thanks to all the <a href="https://github.com/symentis/grails-audit-logging-plugin/graphs/contributors">contributors</a> (in alphabetical order):
 
 	Aaron Long
 	Aldrin

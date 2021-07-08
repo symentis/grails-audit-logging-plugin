@@ -4,11 +4,10 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
     }
 }
 
@@ -16,6 +15,7 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.2.0'
     id "org.asciidoctor.jvm.pdf" version "3.2.0"
     id "org.asciidoctor.jvm.epub" version "3.2.0"
+    id "com.jfrog.artifactory" version "4.21.0"
 }
 
 version project.file("../version.txt").text.trim()
@@ -26,7 +26,6 @@ apply plugin: "idea"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-plugin-publish"
 apply plugin: "org.grails.grails-gsp"
-apply plugin: "com.jfrog.artifactory"
 
 ext {
     grailsVersion = project.grailsVersion
@@ -61,7 +60,7 @@ dependencies {
     provided "org.grails:grails-plugin-services"
     provided "org.grails:grails-plugin-domain-class"
 
-    testCompile "org.grails:grails-plugin-testing"
+    testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-web-testing-support"
 }
 

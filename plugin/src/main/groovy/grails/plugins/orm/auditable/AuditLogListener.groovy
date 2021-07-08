@@ -21,6 +21,7 @@ package grails.plugins.orm.auditable
 import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.timestamp.DefaultTimestampProvider
 import org.grails.datastore.gorm.timestamp.TimestampProvider
@@ -31,6 +32,7 @@ import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PostInsertEvent
 import org.grails.datastore.mapping.engine.event.PreDeleteEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.context.ApplicationEvent
 
 import static grails.plugins.orm.auditable.AuditLogListenerUtil.*
@@ -189,7 +191,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
 
         // Wrap all of the logging in a single session to prevent flushing for each insert
         // FIXME - Temporary workaround for Grails 4.
-        //         This is not correct sematically as we really need to be part of the transaction or at least ensure
+        //         This is not correct semantically as we really need to be part of the transaction or at least ensure
         //         that audit logging is only committed when the transaction is committed.
         getAuditDomainClass().invokeMethod("withNewTransaction") {
             Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
@@ -240,16 +242,16 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             }
         }
     }
-    
+
     /**
      * Create a timestamp of the type of the dateCreated or lastUpdated properties of the audit domain class.
      * @return the timestamp
      */
     private Object createDefaultTimestamp() {
-        MetaClass metaClass = getAuditDomainClass().metaClass
+        PersistentEntity persistentEntity = (PersistentEntity)InvokerHelper.invokeStaticMethod(getAuditDomainClass(), "getGormPersistentEntity", null)
         for (String property : ["dateCreated", "lastUpdated"]) {
-            if (metaClass.hasProperty(property)) {
-                Class<?> timestampClass = metaClass.getMetaProperty(property).getType()
+            Class<?> timestampClass = persistentEntity.getPropertyByName(property)?.getType()
+            if (timestampClass) {
                 return timestampProvider.createTimestamp(timestampClass)
             }
         }
