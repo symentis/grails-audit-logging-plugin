@@ -18,40 +18,38 @@
 */
 package test
 
-import grails.gorm.transactions.Rollback
 import grails.plugins.orm.auditable.AuditLogContext
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 
 @Integration
-@Rollback
 class AuditUpdateCollectionSpec extends Specification {
 
-    void setupData() {
-        AuditLogContext.withoutAuditLog {
-            def author = new Author(name: "Aaron", age: 37, famous: true)
-            author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
-            author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
-            author.addToBooks(new Book(title: 'Mocking Jay', description: 'Blah', pages: 600))
-            author.save(flush: true, failOnError: true)
+    void setup() {
+        Author.withNewTransaction {
+            AuditLogContext.withoutAuditLog {
+                Book.where {}.deleteAll()
+                Author.where {}.deleteAll()
 
-            // Remove all logging of the inserts, we are focused on updates here
-            AuditTrail.withNewTransaction {
-                AuditTrail.where { id != null }.deleteAll()
-                assert AuditTrail.count() == 0
+                def author = new Author(name: "Aaron", age: 37, famous: true)
+                author.addToBooks(new Book(title: 'Hunger Games', description: 'Blah', pages: 400))
+                author.addToBooks(new Book(title: 'Catching Fire', description: 'Blah', pages: 500))
+                author.addToBooks(new Book(title: 'Mocking Jay', description: 'Blah', pages: 600))
+                author.save(flush: true, failOnError: true)
             }
+        }
+        AuditTrail.withNewTransaction {
+            AuditTrail.where {}.deleteAll()
         }
     }
 
     void "Test update property on an instance saved via cascade"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-        def book = author.books.first()
-
         when:
-        book.description = "Woo"
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            def book = author.books.first()
+            book.description = "Woo"
+        }
 
         then: "the author didn't change"
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
@@ -63,16 +61,18 @@ class AuditUpdateCollectionSpec extends Specification {
     }
 
     void "Test remove element from a collection"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        author.removeFromBooks(author.books.find { it.title == 'Mocking Jay' })
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            def book = author.books.find { it.title == 'Mocking Jay' }
+            author.removeFromBooks(book)
+            book.delete()
+        }
 
         then:
-        author.books.size() == 2
+        Author.withNewTransaction {
+            Author.findByName("Aaron").books.size() == 2
+        }
 
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
@@ -89,19 +89,47 @@ class AuditUpdateCollectionSpec extends Specification {
         !e.newValue.contains('[id:Mocking Jay]')
     }
 
-    void "Test add element to a collection"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
+    /*
+    The following test is currently failing.
+    (It never actually passed, we just added it to test the behaviour in this case)
+    -> One AuditTrail for Author.books with 2 books is written while actually the author still has 3 books.
+    -> Does it even make sense to log the collection here? After all it isn't the source of truth.
+       The source of truth is Book#author not Author#books
+    void "Test unsuccessful remove element from collection"() {
         when:
-        author.addToBooks(new Book(title: 'Something', description: 'Blah', pages: 900))
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            def book = author.books.find { it.title == 'Mocking Jay' }
+            // Doesn't succeed as Book#author isn't nullable
+            author.removeFromBooks(book)
+        }
+
+        then:
+        Author.withNewTransaction {
+            Author.findByName("Aaron").books.size() == 3
+        }
+        AuditTrail.withNewTransaction {
+            AuditTrail.count
+        } == 0
+    }
+    */
+
+    void "Test add element to a collection"() {
+        when:
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.addToBooks(title: 'Something', description: 'Blah', pages: 900)
+            author.save()
+        }
 
         then: "another book"
-        author.books.size() == 4
+        Author.withNewTransaction {
+            Author.findByName("Aaron").books.size() == 4
+        }
 
-        def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
+        def events = AuditTrail.withNewTransaction {
+            AuditTrail.withCriteria { eq('className', 'test.Author') }
+        }
         events.size() == 1
 
         and: "the new value lists the values using the entityId override to show title"
@@ -121,17 +149,17 @@ class AuditUpdateCollectionSpec extends Specification {
     }
 
     void "Test remove all elements from a collection"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        // Calling author.books.clear() doesn't seem to flag the Author dirty, seems like could be a bug
-        author.books = []
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.books*.delete()
+            author.books = []
+        }
 
         then:
-        author.books.size() == 0
+        Author.withNewTransaction {
+            Author.findByName("Aaron").books.size() == 0
+        }
 
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }
         events.size() == 1
@@ -141,20 +169,15 @@ class AuditUpdateCollectionSpec extends Specification {
         e.propertyName == 'books'
         e.oldValue == 'N/A'
         e.newValue == null
-
-        and: "no delete orphan so books are NOT changed"
-        def bookEvents = AuditTrail.withCriteria { eq('className', 'test.Book') }
-        bookEvents.size() == 0
     }
 
     void "Test assign collection to null"() {
-        given:
-        setupData()
-        def author = Author.findByName("Aaron")
-
         when:
-        author.books = null
-        author.save(flush: true, failOnError: true)
+        Author.withNewTransaction {
+            def author = Author.findByName("Aaron")
+            author.books*.delete()
+            author.books = null
+        }
 
         then:
         def events = AuditTrail.withCriteria { eq('className', 'test.Author') }

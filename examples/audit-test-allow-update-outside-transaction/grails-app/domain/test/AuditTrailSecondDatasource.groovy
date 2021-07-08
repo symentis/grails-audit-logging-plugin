@@ -25,8 +25,8 @@ import groovy.transform.ToString
  * This requires you to set up a table or allow
  * Grails to create a table for you. (e.g. DDL or db-migration plugin)
  */
-@ToString(includes = 'id,className,actor,eventName,propertyName,oldValue,newValue')
-class AuditTrail implements Serializable {
+@ToString(includes = 'id,className,actor,propertyName,oldValue,newValue')
+class AuditTrailSecondDatasource implements Serializable {
     private static final long serialVersionUID = 1L
 
     String id
@@ -62,17 +62,11 @@ class AuditTrail implements Serializable {
     }
 
     static mapping = {
-
         table 'audit_log'
 
         cache usage: 'read-only', include: 'non-lazy'
 
-        // Set similiar when you used "auditLog.useDatasource" in < 1.1.0 plugin version.
-        // datasource "yourdatasource"
-        //
-        // Allow overriding datasource using environment variable
-        // Used to test different datasources on CI
-        datasource(System.getProperty("audit-test.AuditTrail.datasource", "second"))
+        datasource("second")
 
         // no HQL queries package name import (was default in 1.x version)
         //autoImport false

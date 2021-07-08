@@ -2,5 +2,6 @@ rootProject.name = 'grails-audit-logging'
 
 include 'plugin'
 include 'examples:audit-test'
+include 'examples:audit-test-allow-update-outside-transaction'
 
 findProject(":plugin").name = "audit-logging"

@@ -10,4 +10,4 @@ or start the application:
     
 There you create Authors and list / query the AuditTrails entries.
 
-This sample application is used by Travis to perform the integration tests.
+This sample application is used by CI to perform the integration tests.

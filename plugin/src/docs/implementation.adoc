@@ -1,6 +1,11 @@
 == Implementation
 Most of the plugin code is marked as @CompileStatic.
 
+== Auditing and Transactions
+All audit events for the entire transaction are queued up.
+They are flushed after the transaction has successfully been committed.
+This allows the AuditLogListener to use its own session and transaction.
+
 === AuditLogEventListener
 The Audit Logging plugin registers a PersistenceEventListener (`AuditLogListener`) bean per datasource, which listens to GORM events.
 
@@ -18,5 +23,5 @@ Enabling auditing on a Domain class is done by implementing the `Auditable` trai
 
 === Stampable trait
 Enabling stamping on a Domain class is done by implementing the `Stampable` trait.
-This trait adds the properties dateCreated, lastUpdated, createdBy, lastUpdatedBy
+This trait adds the properties dateCreated, lastUpdated, createdBy and lastUpdatedBy
 to the domain class.
