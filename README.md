@@ -15,7 +15,7 @@ This repositories new artifacts are currently moved to Maven Central, sind Bintr
 ## Documentation
  * For current release documentation, see [User Guide](https://symentis.github.io/grails-audit-logging-plugin/latest/plugin.html)
  * For snapshot documentation, see [Snapshot User Guide](https://symentis.github.io/grails-audit-logging-plugin/snapshot/plugin.html)
- * For 4.x documentation, see [3.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/4.0.x/plugin.html)
+ * For 4.x documentation, see [4.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/4.0.x/plugin.html)
  * For 3.x documentation, see [3.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/3.0.x/plugin.html)
  * For 2.x documentation, see [2.x User Guide](https://symentis.github.io/grails-audit-logging-plugin/2.0.x/plugin.html)
 
