@@ -78,12 +78,12 @@ Special thanks to all the <a href="https://github.com/symentis/grails-audit-logg
 
 
 ## Continuous Integration Server
-[![Build Status](https://travis-ci.org/symentis/grails-audit-logging-plugin.svg?branch=master)](https://travis-ci.org/robertoschwald/grails-audit-logging-plugin)
+[![Build Status](https://travis-ci.org/symentis/grails-audit-logging-plugin.svg?branch=master)](https://travis-ci.org/symentis/grails-audit-logging-plugin)
 
 ## Bintray Repository
 <a href='https://bintray.com/symentis/plugins/audit-logging/view?source=watch' alt='Get automatic notifications about new "audit-logging" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
 
-[ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg) ](https://bintray.com/robertoschwald/plugins/audit-logging/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/symentis/plugins/audit-logging/images/download.svg) ](https://bintray.com/symentis/plugins/audit-logging/_latestVersion)
 
 ***
 

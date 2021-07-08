@@ -74,25 +74,26 @@ class AuditLogListener extends AbstractPersistenceEventListener {
             AuditEventType auditEventType = AuditEventType.forEventType(event.eventType)
             Auditable domain = event.entityObject as Auditable
 
-            if (domain.isAuditable(auditEventType)) {
-                log.trace("Audit logging: Event {} for object {}", auditEventType, event.entityObject.class.name)
+            if (!domain.isAuditable(auditEventType)) {
+                return
+            }
 
-                switch (event.eventType) {
-                    case EventType.PostInsert:
-                    case EventType.PreDelete:
-                        handleInsertAndDelete(domain, auditEventType)
-                        break
-                    case EventType.PreUpdate:
-                        handleUpdate(domain, auditEventType)
-                        break
-                }
+            log.trace("Audit logging: Event {} for object {}", auditEventType, event.entityObject.class.name)
+
+            switch (event.eventType) {
+                case EventType.PostInsert:
+                case EventType.PreDelete:
+                    handleInsertAndDelete(domain, auditEventType, event)
+                    break
+                case EventType.PreUpdate:
+                    handleUpdate(domain, auditEventType, event)
+                    break
             }
         }
         catch (Exception e) {
             if (AuditLogContext.context.failOnError) {
                 throw e
-            }
-            else {
+            } else {
                 log.error("Error creating audit log for event ${event.eventType} and domain ${event.entityObject}", e)
             }
         }
@@ -108,7 +109,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     /**
      * We must use the preDelete event if we want to capture what the old object was like.
      */
-    protected void handleInsertAndDelete(Auditable domain, AuditEventType auditEventType) {
+    protected void handleInsertAndDelete(Auditable domain, AuditEventType auditEventType, AbstractPersistenceEvent event) {
         if (domain.logIgnoreEvents?.contains(auditEventType)) {
             return
         }
@@ -127,7 +128,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         if (map || !verbose) {
             if (auditEventType == AuditEventType.DELETE) {
                 map = map.collectEntries { String property, Object value ->
-                     // Accessing a hibernate PersistentCollection of a deleted entity yields a NPE in Grails 3.3.x.
+                    // Accessing a hibernate PersistentCollection of a deleted entity yields a NPE in Grails 3.3.x.
                     // We can't filter hibernate classes because this plugin is ORM-agnostic and has no dependency to any ORM implementation.
                     // This is a workaround. We might not log some other ORM collection implementation even if it would be possible to log them.
                     // (see #153)
@@ -135,12 +136,11 @@ class AuditLogListener extends AbstractPersistenceEventListener {
                     if (value instanceof Collection) {
                         return [:]
                     }
-                    return [(property):value]
+                    return [(property): value]
                 } as Map<String, Object>
-                logChanges(domain, [:], map, auditEventType)
-            }
-            else {
-                logChanges(domain, map, [:], auditEventType)
+                logChanges(domain, [:], map, auditEventType, event)
+            } else {
+                logChanges(domain, map, [:], auditEventType, event)
             }
         }
     }
@@ -148,7 +148,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
     /**
      * Look at persistent and transient state for the object and log differences
      */
-    protected void handleUpdate(Auditable domain, AuditEventType auditEventType) {
+    protected void handleUpdate(Auditable domain, AuditEventType auditEventType, AbstractPersistenceEvent event) {
         if (domain.logIgnoreEvents?.contains(auditEventType)) {
             return
         }
@@ -174,71 +174,64 @@ class AuditLogListener extends AbstractPersistenceEventListener {
         }
 
         if (newMap || oldMap || !verbose) {
-            logChanges(domain, newMap, oldMap, auditEventType)
+            logChanges(domain, newMap, oldMap, auditEventType, event)
         }
     }
 
     /**
-     * Do the actual logging of changes
+     * Generate log events and add to the queue. The log events should only be written if the transaction successfully completes.
      *
      * @param domain the thing triggering the audit
      * @param newMap for insert and delete, holds the current values filtered to what we care about
      * @param oldMap null for insert and delete, for updates holds the original persisted values filtered to what we care about
      * @param eventType the type of event we are logging
      */
-    protected void logChanges(Auditable domain, Map<String, Object> newMap, Map<String, Object> oldMap, AuditEventType eventType) {
+    protected void logChanges(Auditable domain, Map<String, Object> newMap, Map<String, Object> oldMap, AuditEventType eventType, AbstractPersistenceEvent event) {
         log.debug("Audit logging event {} and domain {}", eventType, domain.getClass().name)
 
-        // Wrap all of the logging in a single session to prevent flushing for each insert
-        // FIXME - Temporary workaround for Grails 4.
-        //         This is not correct semantically as we really need to be part of the transaction or at least ensure
-        //         that audit logging is only committed when the transaction is committed.
-        getAuditDomainClass().invokeMethod("withNewTransaction") {
-            Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
+        Long persistedObjectVersion = getPersistedObjectVersion(domain, newMap, oldMap)
 
-            // Use a single date for all audit_log entries in this transaction
-            // Note, this will be ignored unless the audit_log domin has 'autoTimestamp false'
-            Object timestamp = createDefaultTimestamp()
+        // Use a single date for all audit_log entries in this transaction
+        // Note, this will be ignored unless the audit_log domin has 'autoTimestamp false'
+        Object timestamp = createDefaultTimestamp()
 
-            // This handles insert, delete, and update with any property level logging enabled
-            if (newMap || oldMap) {
-                Set<String> allPropertyNames = (newMap.keySet() + oldMap.keySet())
-                allPropertyNames.each { String propertyName ->
-                    String newValueAsString = null
-                    String oldValueAsString = null
+        // This handles insert, delete, and update with any property level logging enabled
+        if (newMap || oldMap) {
+            Set<String> allPropertyNames = (newMap.keySet() + oldMap.keySet())
+            allPropertyNames.each { String propertyName ->
+                String newValueAsString = null
+                String oldValueAsString = null
 
-                    // This indicates a change
-                    Object newVal = newMap[propertyName]
-                    if (newVal != null) {
-                        newValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, newVal), truncateLength)
-                    }
-                    Object oldVal = oldMap[propertyName]
-                    if (newVal != oldVal) {
-                        oldValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, oldVal), truncateLength)
-                    }
-
-                    // Create a new entity for each property
-                    GormEntity audit = createAuditLogDomainInstance(
-                        actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
-                        persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
-                        propertyName: propertyName, oldValue: oldValueAsString, newValue: newValueAsString,
-                        dateCreated: timestamp, lastUpdated: timestamp
-                    )
-                    if (domain.beforeSaveLog(audit)) {
-                        audit.save(failOnError: true)
-                    }
+                // This indicates a change
+                Object newVal = newMap[propertyName]
+                if (newVal != null) {
+                    newValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, newVal), truncateLength)
                 }
-            }
-            else {
-                // Create a single entity for this event
+                Object oldVal = oldMap[propertyName]
+                if (newVal != oldVal) {
+                    oldValueAsString = conditionallyMaskAndTruncate(domain, propertyName, domain.convertLoggedPropertyToString(propertyName, oldVal), truncateLength)
+                }
+
+                // Create a new entity for each property
                 GormEntity audit = createAuditLogDomainInstance(
                     actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
                     persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
+                    propertyName: propertyName, oldValue: oldValueAsString, newValue: newValueAsString,
                     dateCreated: timestamp, lastUpdated: timestamp
                 )
                 if (domain.beforeSaveLog(audit)) {
-                    audit.save(failOnError: true)
+                    AuditLogQueueManager.addToQueue(audit, event)
                 }
+            }
+        } else {
+            // Create a single entity for this event
+            GormEntity audit = createAuditLogDomainInstance(
+                actor: domain.logCurrentUserName, uri: domain.logURI, className: domain.logClassName, eventName: eventType.name(),
+                persistedObjectId: domain.logEntityId, persistedObjectVersion: persistedObjectVersion,
+                dateCreated: timestamp, lastUpdated: timestamp
+            )
+            if (domain.beforeSaveLog(audit)) {
+                AuditLogQueueManager.addToQueue(audit, event)
             }
         }
     }
@@ -277,7 +270,7 @@ class AuditLogListener extends AbstractPersistenceEventListener {
      * @return configured AuditLogEvent class
      */
     protected Class<GormEntity> getAuditDomainClass() {
-        String auditLogClassName = AuditLoggingConfigUtils.auditConfig.getProperty('auditDomainClassName') as String
+        String auditLogClassName = AuditLogContext.context['auditDomainClassName'] as String
         if (!auditLogClassName) {
             throw new IllegalArgumentException("grails.plugin.auditLog.auditDomainClassName could not be found in application.groovy. Have you performed 'grails audit-quickstart' after installation?")
         }

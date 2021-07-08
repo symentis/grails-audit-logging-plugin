@@ -25,3 +25,5 @@ classes
 /.asscache
 /audit-test/.asscache
 .vscode/settings.json
+/plugin/out
+/examples/audit-test/out
