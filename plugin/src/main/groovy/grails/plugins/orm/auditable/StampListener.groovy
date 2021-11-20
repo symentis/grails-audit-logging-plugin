@@ -23,6 +23,7 @@ import grails.plugins.orm.auditable.resolvers.AuditRequestResolver
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.engine.EntityAccess
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEventListener
 import org.grails.datastore.mapping.engine.event.EventType
@@ -60,7 +61,6 @@ class StampListener extends AbstractPersistenceEventListener {
         }
 
         try {
-            Stampable domain = event.entityObject as Stampable
             log.trace("Stamping object {}", event.entityObject.class.name)
 
             // Lookup the request resolver here to ensure that applications have a chance
@@ -69,10 +69,10 @@ class StampListener extends AbstractPersistenceEventListener {
 
             switch(event.eventType) {
                 case EventType.PreInsert:
-                    handleInsert(domain, requestResolver)
+                    handleInsert(event.entityAccess, requestResolver)
                     break
                 case EventType.PreUpdate:
-                    handleUpdate(domain, requestResolver)
+                    handleUpdate(event.entityAccess, requestResolver)
                     break
             }
         }
@@ -94,17 +94,17 @@ class StampListener extends AbstractPersistenceEventListener {
     /**
      * Stamp inserts
      */
-    protected void handleInsert(Stampable domain, AuditRequestResolver requestResolver) {
+    protected void handleInsert(EntityAccess domain, AuditRequestResolver requestResolver) {
         // Set actors, Grails will take care of setting the dates
         String currentActor = requestResolver.currentActor
-        domain.createdBy = currentActor
-        domain.lastUpdatedBy = currentActor
+        domain.setProperty("createdBy", currentActor)
+        domain.setProperty("lastUpdatedBy", currentActor)
     }
 
     /**
      * Stamp updates
      */
-    protected void handleUpdate(Stampable domain, AuditRequestResolver requestResolver) {
-        domain.lastUpdatedBy = requestResolver.currentActor
+    protected void handleUpdate(EntityAccess domain, AuditRequestResolver requestResolver) {
+        domain.setProperty("lastUpdatedBy", requestResolver.currentActor)
     }
 }
