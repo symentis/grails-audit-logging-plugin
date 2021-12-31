@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 buildscript {
     repositories {
-        mavenLocal()
+        // mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
         mavenCentral()
     }
@@ -19,7 +19,7 @@ plugins {
 }
 
 version project.file("../version.txt").text.trim()
-group "org.grails.plugins"
+group "com.symentis.grails.plugins"
 
 apply plugin: "eclipse"
 apply plugin: "idea"
@@ -78,8 +78,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
 
-apply from: "${rootProject.projectDir}/gradle/grailsPublish.gradle"
-apply from: "${rootProject.projectDir}/gradle/artifactoryPublish.gradle"
 apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 
 
