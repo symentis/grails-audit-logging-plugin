@@ -124,7 +124,7 @@ Audit logging usually requires auditing the user and/or request context for a sp
 
 [WARNING]
 ====
-Spring-Security-Core plugin between version 3.2.1 and 4.0.1 has been set to MODE_INHERITABLETHREADLOCAL. This is highly insecure, as it might keep the security context. This setting was changed back to the secure MODE_THREADLOCAL in Spring-Security-Core 4.0.1. If you use a Spring-Security-Core plugin and see weird actor behavior, either upgrade the Spring-Security-Core plugin, or explicitly set the SecurityContextHolder strategy to MODE_THREADLOCAL.
+Spring-Security-Core plugin between version 3.2.1 and 4.0.1 has been set to MODE_INHERITABLETHREADLOCAL. This can lead to current actor problems, as it might keep the former security context. This setting was changed back to the secure MODE_THREADLOCAL in Spring-Security-Core 4.0.1. If you use a Spring-Security-Core plugin and see weird actor behavior, either upgrade the Spring-Security-Core plugin, or explicitly set the SecurityContextHolder strategy to MODE_THREADLOCAL.
 https://github.com/grails/grails-spring-security-core/issues/587
 ====
 
