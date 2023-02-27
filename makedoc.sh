@@ -30,7 +30,7 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST
   echo " "
   echo "** Updating gh-pages branch **"
   pushd plugin/build
-  git clone https://github.com/robertoschwald/grails-audit-logging-plugin.git -b gh-pages gh-pages --single-branch > /dev/null
+  git clone https://github.com/symentis/grails-audit-logging-plugin.git -b gh-pages gh-pages --single-branch > /dev/null
   cd gh-pages
 
   # prepare index.html
