@@ -57,10 +57,10 @@ class ReflectionUtils {
 
     static ConfigObject getAuditConfig() {
         def grailsConfig = getApplication().config
-        if (grailsConfig.auditLog) {
+        if (grailsConfig.containsProperty('auditLog')) {
             log.error "Your auditLog configuration settings use the old prefix 'auditLog' but must now use 'grails.plugin.auditLog'"
         }
-        grailsConfig.grails.plugin.auditLog
+        grailsConfig.getProperty('grails.plugin.auditLog', ConfigObject.class)
     }
 
     static void setAuditConfig(ConfigObject c) {
