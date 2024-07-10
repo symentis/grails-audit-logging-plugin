@@ -36,7 +36,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException
  * http://www.hibernate.org/318.html
  *
  * See Documentation:
- * https://github.com/robertoschwald/grails-audit-logging-plugin
+ * https://github.com/symentis/grails-audit-logging-plugin
  *
  */
 @Slf4j
@@ -49,7 +49,7 @@ class AuditLoggingGrailsPlugin extends Plugin {
     def description = """ 
         Automatically log change events for domain objects. Optionally supports Stamping. This plugin is ORM agnostic.
     """
-    String documentation = 'https://github.com/robertoschwald/grails-audit-logging-plugin'
+    String documentation = 'https://github.com/symentis/grails-audit-logging-plugin'
     String license = 'APACHE'
 
     def developers = [
@@ -58,8 +58,8 @@ class AuditLoggingGrailsPlugin extends Plugin {
         [name: 'Aaron Long', email: 'longwa@gmail.com']
     ]
 
-    def issueManagement = [system: 'GitHub', url: 'https://github.com/robertoschwald/grails-audit-logging-plugin/issues']
-    def scm = [url: 'https://github.com/robertoschwald/grails-audit-logging-plugin']
+    def issueManagement = [system: 'GitHub', url: 'https://github.com/symentis/grails-audit-logging-plugin/issues']
+    def scm = [url: 'https://github.com/symentis/grails-audit-logging-plugin']
     def loadAfter = ['core', 'dataSource', 'springSecurityCore']
 
     // Register generic GORM listener
