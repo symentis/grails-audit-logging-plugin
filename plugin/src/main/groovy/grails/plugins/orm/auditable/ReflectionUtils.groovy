@@ -14,13 +14,14 @@
  */
 package grails.plugins.orm.auditable
 
+import grails.config.Config
 import grails.core.GrailsApplication
 import grails.util.Holders
 import groovy.util.logging.Slf4j
+import org.grails.config.NavigableMap
 import org.grails.config.PropertySourcesConfig
 import org.springframework.core.env.MapPropertySource
 import org.springframework.core.env.PropertySource
-
 /**
  * Helper methods that use dynamic Groovy
  */
@@ -56,11 +57,11 @@ class ReflectionUtils {
     }
 
     static ConfigObject getAuditConfig() {
-        def grailsConfig = getApplication().config
-        if (grailsConfig.containsProperty('auditLog')) {
+        Config grailsConfig = getApplication().config
+        if (grailsConfig.getProperty('auditLog', NavigableMap)) {
             log.error "Your auditLog configuration settings use the old prefix 'auditLog' but must now use 'grails.plugin.auditLog'"
         }
-        grailsConfig.getProperty('grails.plugin.auditLog', ConfigObject.class)
+        grailsConfig.getProperty("grails.plugin.auditLog", NavigableMap) as ConfigObject
     }
 
     static void setAuditConfig(ConfigObject c) {
