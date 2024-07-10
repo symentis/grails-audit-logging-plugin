@@ -27,3 +27,4 @@ classes
 .vscode/settings.json
 /plugin/out
 /examples/audit-test/out
+/.direnv
