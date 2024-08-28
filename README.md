@@ -1,5 +1,7 @@
 # Grails Audit Logging Plugin
 
+# THIS PLUGIN IS FREE FOR ADOPTION
+
 ## Description
 
 The Audit Logging plugin for Grails adds generic event based Audit Logging to a Grails project.
