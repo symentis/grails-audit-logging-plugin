@@ -1,6 +1,6 @@
 # Grails Audit Logging Plugin
 
-# THIS PLUGIN IS FREE FOR ADOPTION
+This plugin was originally maintained by [symentis](https://github.com/symentis) and was gracefully donated to the GPC
 
 ## Description
 
